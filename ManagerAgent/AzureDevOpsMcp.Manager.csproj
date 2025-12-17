@@ -4,11 +4,6 @@
     <ProjectReference Include="..\Shared\AzureDevOpsMcp.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ModelContextProtocol" Version="0.5.0-preview.1" />
-    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.5.0-preview.1" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="InfraAgent\AzureDevOpsMcp.Infra.csproj" />
+  <Project Path="ManagerAgent\AzureDevOpsMcp.Manager.csproj" />
+  <Project Path="Shared\AzureDevOpsMcp.Shared.csproj" />
+</Solution>
