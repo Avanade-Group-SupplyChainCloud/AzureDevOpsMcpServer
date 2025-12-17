@@ -13,7 +13,7 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - run: dotnet publish AzureDevOpsMcpServer/AzureDevOpsMcpServer.csproj -c Release -o ./published
+      - run: dotnet publish AzureDevOpsMcpServer.csproj -c Release -o ./published
 
       - uses: azure/webapps-deploy@v3
         with:
