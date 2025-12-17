@@ -1,23 +1,27 @@
+using System.Reflection;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModelContextProtocol.Server;
-using System.Reflection;
 
-namespace AzureDevOpsMcp.Shared.Extensions
+namespace AzureDevOpsMcp.Shared.Extensions;
+
+public static class McpServerExtensions
 {
-    public static class McpServerExtensions
-    {
-        public static WebApplicationBuilder AddAzureDevOpsMcp(this WebApplicationBuilder builder, Assembly toolsAssembly)
+        public static WebApplicationBuilder AddAzureDevOpsMcp(
+            this WebApplicationBuilder builder,
+            Assembly toolsAssembly
+        )
         {
             // Configure Azure DevOps settings
-            builder.Services.Configure<AzureDevOpsSettings>(builder.Configuration.GetSection("AzureDevOps"));
+            builder.Services.Configure<AzureDevOpsSettings>(
+                builder.Configuration.GetSection("AzureDevOps")
+            );
             builder.Services.AddSingleton<AzureDevOpsService>();
 
             // Add MCP Server and register tools
-            builder.Services.AddMcpServer()
+            builder
+                .Services.AddMcpServer()
                 .WithHttpTransport()
                 .WithToolsFromAssembly(toolsAssembly);
 
@@ -38,24 +42,30 @@ namespace AzureDevOpsMcp.Shared.Extensions
             app.UseCors();
 
             // API Key Middleware
-            app.Use(async (context, next) =>
-            {
-                var apiKey = app.Configuration["ApiKey"];
-                if (!string.IsNullOrEmpty(apiKey))
+            app.Use(
+                async (context, next) =>
                 {
-                    if (!context.Request.Headers.TryGetValue("x-api-key", out var extractedApiKey) || !string.Equals(extractedApiKey, apiKey))
+                    var apiKey = app.Configuration["ApiKey"];
+                    if (!string.IsNullOrEmpty(apiKey))
                     {
-                        context.Response.StatusCode = 401;
-                        await context.Response.WriteAsync("Unauthorized");
-                        return;
+                        if (
+                            !context.Request.Headers.TryGetValue(
+                                "x-api-key",
+                                out var extractedApiKey
+                            ) || !string.Equals(extractedApiKey, apiKey)
+                        )
+                        {
+                            context.Response.StatusCode = 401;
+                            await context.Response.WriteAsync("Unauthorized");
+                            return;
+                        }
                     }
+                    await next();
                 }
-                await next();
-            });
+            );
 
             app.MapMcp();
 
             return app;
         }
     }
-}

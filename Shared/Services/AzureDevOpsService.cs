@@ -12,28 +12,21 @@ using Microsoft.TeamFoundation.Work.WebApi;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace AzureDevOpsMcp.Shared.Services
+namespace AzureDevOpsMcp.Shared.Services;
+
+public class AzureDevOpsSettings
 {
-    public class AzureDevOpsSettings
-    {
-        public string OrgUrl { get; set; }
-        public string PersonalAccessToken { get; set; }
-    }
+    public string OrgUrl { get; set; }
+    public string PersonalAccessToken { get; set; }
+}
 
-    public class AzureDevOpsService
-    {
-        private readonly VssConnection _connection;
-        private readonly string _personalAccessToken;
+public class AzureDevOpsService(IOptions<AzureDevOpsSettings> settings)
+{
+    private readonly VssConnection _connection = new(new Uri(settings.Value.OrgUrl), new VssBasicCredential(string.Empty, settings.Value.PersonalAccessToken));
+    private readonly string _personalAccessToken = settings.Value.PersonalAccessToken;
 
-        public AzureDevOpsService(IOptions<AzureDevOpsSettings> settings)
-        {
-            _personalAccessToken = settings.Value.PersonalAccessToken;
-            var creds = new VssBasicCredential(string.Empty, _personalAccessToken);
-            _connection = new VssConnection(new Uri(settings.Value.OrgUrl), creds);
-        }
-
-        public VssConnection Connection => _connection;
-        public string PersonalAccessToken => _personalAccessToken;
+    public VssConnection Connection => _connection;
+    public string PersonalAccessToken => _personalAccessToken;
 
         /// <summary>
         /// Creates an HttpClient configured with the PAT for REST API calls.
@@ -60,5 +53,4 @@ namespace AzureDevOpsMcp.Shared.Services
         public async Task<WorkHttpClient> GetWorkApiAsync() => await _connection.GetClientAsync<WorkHttpClient>();
         
         public async Task<TestManagementHttpClient> GetTestManagementApiAsync() => await _connection.GetClientAsync<TestManagementHttpClient>();
-    }
 }
