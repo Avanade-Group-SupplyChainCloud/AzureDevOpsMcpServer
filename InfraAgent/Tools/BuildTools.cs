@@ -93,8 +93,8 @@ public class BuildTools(AzureDevOpsService adoService)
         )
         {
             var client = await _adoService.GetBuildApiAsync();
-            var build = new Build { Status = BuildStatus.Cancelling };
-            return await client.UpdateBuildAsync(build, project, buildId);
+            var build = new Build { Status = BuildStatus.Cancelling, Id = buildId };
+            return await client.UpdateBuildAsync(build);
         }
 
         [McpServerTool(Name = "get_build_artifacts")]
