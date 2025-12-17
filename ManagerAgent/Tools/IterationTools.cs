@@ -1,4 +1,4 @@
-using AzureDevOpsMcpServer.Services;
+using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.Work.WebApi;
 using Microsoft.TeamFoundation.Core.WebApi.Types;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -7,7 +7,7 @@ using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
 
-namespace AzureDevOpsMcpServer.Tools
+namespace AzureDevOpsMcp.Manager.Tools
 {
     [McpServerToolType]
     public class IterationTools

@@ -1,4 +1,4 @@
-namespace AzureDevOpsMcpServer.Models
+namespace AzureDevOpsMcp.Shared.Models
 {
     public class McpToolResult
     {

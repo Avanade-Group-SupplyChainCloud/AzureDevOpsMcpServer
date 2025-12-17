@@ -1,6 +1,0 @@
-@AzureDevOpsMcpServer_HostAddress = http://localhost:5115
-
-GET {{AzureDevOpsMcpServer_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

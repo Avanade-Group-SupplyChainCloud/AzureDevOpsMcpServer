@@ -1,10 +1,10 @@
-using AzureDevOpsMcpServer.Services;
+using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.Build.WebApi;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
 
-namespace AzureDevOpsMcpServer.Tools
+namespace AzureDevOpsMcp.Infra.Tools
 {
     [McpServerToolType]
     public class PipelineTools

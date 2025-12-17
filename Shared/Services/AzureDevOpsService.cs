@@ -12,7 +12,7 @@ using Microsoft.TeamFoundation.Work.WebApi;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace AzureDevOpsMcpServer.Services
+namespace AzureDevOpsMcp.Shared.Services
 {
     public class AzureDevOpsSettings
     {

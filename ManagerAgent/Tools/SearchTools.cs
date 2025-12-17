@@ -1,9 +1,9 @@
-using AzureDevOpsMcpServer.Services;
+using AzureDevOpsMcp.Shared.Services;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
 
-namespace AzureDevOpsMcpServer.Tools;
+namespace AzureDevOpsMcp.Manager.Tools;
 
 public static class SearchTools
 {

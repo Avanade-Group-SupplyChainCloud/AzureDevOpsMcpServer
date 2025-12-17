@@ -1,11 +1,11 @@
-using AzureDevOpsMcpServer.Services;
+using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.VisualStudio.Services.Identity.Client;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
 
-namespace AzureDevOpsMcpServer.Tools
+namespace AzureDevOpsMcp.Manager.Tools
 {
     [McpServerToolType]
     public class CoreTools

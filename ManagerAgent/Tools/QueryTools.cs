@@ -1,11 +1,11 @@
-using AzureDevOpsMcpServer.Services;
+using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 
-namespace AzureDevOpsMcpServer.Tools
+namespace AzureDevOpsMcp.Manager.Tools
 {
     [McpServerToolType]
     public class QueryTools
