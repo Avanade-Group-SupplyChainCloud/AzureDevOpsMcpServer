@@ -108,7 +108,7 @@ public class WorkItemTools(AzureDevOpsService adoService)
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
         var wiql =
-            $"SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo] FROM WorkItems WHERE [System.TeamProject] = '{project}' AND ([System.AssignedTo] = @Me OR [System.CreatedBy] = @Me)";
+            $"SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo], [System.WorkItemType], [Microsoft.VSTS.Scheduling.RemainingWork] FROM WorkItems WHERE [System.TeamProject] = '{project}' AND ([System.AssignedTo] = @Me OR [System.CreatedBy] = @Me)";
 
         if (!includeCompleted)
             wiql +=

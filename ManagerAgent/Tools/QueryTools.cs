@@ -1,382 +1,243 @@
 using System.ComponentModel;
-using System.Text.RegularExpressions;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using ModelContextProtocol.Server;
+using Newtonsoft.Json;
 
 namespace AzureDevOpsMcp.Manager.Tools;
 
-public sealed record WorkItemSummary(
-    int Id,
-    string Url,
-    string WorkItemType,
-    string Title,
-    string State,
-    string AssignedTo,
-    string AreaPath,
-    string IterationPath,
-    string Tags,
-    string Description
-);
-
-public sealed record WorkItemNode(WorkItemSummary Summary, List<WorkItemNode> Children);
-
 [McpServerToolType]
-public partial class QueryTools(AzureDevOpsService adoService)
+public class QueryTools(AzureDevOpsService adoService)
 {
-    private readonly AzureDevOpsService _ado = adoService;
+    private readonly AzureDevOpsService _adoService = adoService;
 
-    private static string Field(WorkItem wi, string name)
-    {
-        if (wi.Fields != null && wi.Fields.TryGetValue(name, out var v) && v is not null)
-        {
-            return v.ToString() ?? string.Empty;
-        }
-
-        return string.Empty;
-    }
-
-    private string WorkItemUrl(int id)
-    {
-        var orgUrl = _ado.Connection.Uri.ToString().TrimEnd('/');
-        return $"{orgUrl}/_workitems/edit/{id}";
-    }
-
-    private WorkItemSummary ToSummary(WorkItem wi)
-    {
-        var id = wi.Id ?? 0;
-
-        return new WorkItemSummary(
-            Id: id,
-            Url: id == 0 ? "" : WorkItemUrl(id),
-            WorkItemType: Field(wi, "System.WorkItemType"),
-            Title: Field(wi, "System.Title"),
-            State: Field(wi, "System.State"),
-            AssignedTo: Field(wi, "System.AssignedTo"),
-            AreaPath: Field(wi, "System.AreaPath"),
-            IterationPath: Field(wi, "System.IterationPath"),
-            Tags: Field(wi, "System.Tags"),
-            Description: Field(wi, "System.Description")
-        );
-    }
-
-    private static int? ExtractFirstInt(string s)
-    {
-        var m = FirstIntRegex().Match(s ?? string.Empty);
-        if (!m.Success)
-        {
-            return null;
-        }
-
-        return int.TryParse(m.Groups["id"].Value, out var id) ? id : null;
-    }
-
-    private static int? TryParseIdFromWorkItemUrl(string? url)
-    {
-        if (string.IsNullOrWhiteSpace(url))
-        {
-            return null;
-        }
-
-        // URLs look like: https://dev.azure.com/org/_apis/wit/workItems/12345
-        var m = WorkItemUrlIdRegex().Match(url);
-        if (!m.Success)
-        {
-            return null;
-        }
-
-        return int.TryParse(m.Groups["id"].Value, out var id) ? id : null;
-    }
-
-    private static IEnumerable<int> GetChildIds(WorkItem wi)
-    {
-        if (wi.Relations == null || wi.Relations.Count == 0)
-        {
-            yield break;
-        }
-
-        foreach (var rel in wi.Relations)
-        {
-            // Parent -> Child link is "Hierarchy-Forward"
-            if (
-                !string.Equals(
-                    rel.Rel,
-                    "System.LinkTypes.Hierarchy-Forward",
-                    StringComparison.OrdinalIgnoreCase
-                )
-            )
-            {
-                continue;
-            }
-
-            var childId = TryParseIdFromWorkItemUrl(rel.Url);
-            if (childId.HasValue)
-            {
-                yield return childId.Value;
-            }
-        }
-    }
-
-    private async Task<IReadOnlyList<WorkItem>> GetWorkItemsAsync(
-        string project,
-        IEnumerable<int> ids,
-        WorkItemExpand expand
+    [McpServerTool(Name = "run_wiql_query")]
+    [Description("Execute a WIQL (Work Item Query Language) query and return matching work items.")]
+    public async Task<IEnumerable<WorkItem>> RunWiqlQuery(
+        [Description(
+            "The WIQL query string. Example: \"SELECT [System.Id], [System.Title] FROM WorkItems WHERE [System.State] = 'Active'\""
+        )]
+            string wiqlQuery,
+        [Description("The project name or ID (required for project-scoped queries).")]
+            string project,
+        [Description("Maximum number of results to return.")] int top = 200
     )
     {
-        var idArray = ids.Distinct().ToArray();
-        if (idArray.Length == 0)
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+
+        var wiql = new Wiql { Query = wiqlQuery };
+        var result = await client.QueryByWiqlAsync(wiql, project, top: top);
+
+        if (result.WorkItems == null || !result.WorkItems.Any())
         {
-            return Array.Empty<WorkItem>();
+            return Enumerable.Empty<WorkItem>();
         }
 
-        var client = await _ado.GetWorkItemTrackingApiAsync();
-        var items = await client.GetWorkItemsAsync(project, idArray, expand: expand);
-        return items;
+        var ids = result.WorkItems.Select(wi => wi.Id).ToArray();
+        var workItems = await client.GetWorkItemsAsync(ids, expand: WorkItemExpand.Fields);
+        return workItems ?? Enumerable.Empty<WorkItem>();
     }
 
-    private async Task<(
-        WorkItemNode Root,
-        List<WorkItemSummary> AllSummaries
-    )> BuildDescendantTreeAsync(string project, int rootId, int maxDepth, int maxItems)
-    {
-        // BFS collecting nodes + adjacency (parent -> children)
-        var visited = new HashSet<int>();
-        var depthById = new Dictionary<int, int>();
-        var childrenByParent = new Dictionary<int, List<int>>();
-        var summaryById = new Dictionary<int, WorkItemSummary>();
-
-        var queue = new Queue<int>();
-        queue.Enqueue(rootId);
-        depthById[rootId] = 0;
-
-        while (queue.Count > 0)
-        {
-            if (visited.Count >= maxItems)
-            {
-                break;
-            }
-
-            // batch pop to reduce API calls
-            var batch = new List<int>(capacity: 200);
-
-            while (queue.Count > 0 && batch.Count < 200)
-            {
-                var id = queue.Dequeue();
-                if (visited.Contains(id))
-                {
-                    continue;
-                }
-
-                var depth = depthById.TryGetValue(id, out var d) ? d : 0;
-                if (depth > maxDepth)
-                {
-                    continue;
-                }
-
-                batch.Add(id);
-                visited.Add(id);
-            }
-
-            if (batch.Count == 0)
-            {
-                continue;
-            }
-
-            // Must include Relations to traverse hierarchy
-            var items = await GetWorkItemsAsync(project, batch, WorkItemExpand.Relations);
-
-            foreach (var wi in items)
-            {
-                if (wi.Id is null || wi.Id.Value == 0)
-                {
-                    continue;
-                }
-
-                var id = wi.Id.Value;
-                summaryById[id] = ToSummary(wi);
-
-                var childIds = GetChildIds(wi).Distinct().ToList();
-                if (!childrenByParent.TryGetValue(id, out var list))
-                {
-                    list = new List<int>();
-                    childrenByParent[id] = list;
-                }
-
-                foreach (var childId in childIds)
-                {
-                    if (!list.Contains(childId))
-                    {
-                        list.Add(childId);
-                    }
-
-                    if (!depthById.ContainsKey(childId))
-                    {
-                        depthById[childId] = (depthById.TryGetValue(id, out var pd) ? pd : 0) + 1;
-                    }
-
-                    if (!visited.Contains(childId))
-                    {
-                        queue.Enqueue(childId);
-                    }
-                }
-            }
-        }
-
-        // Build tree from adjacency + summaries (ensure every referenced id has a summary)
-        // Fetch any missing summaries (e.g., if we hit maxItems mid-level)
-        var missing = visited.Where(id => !summaryById.ContainsKey(id)).ToArray();
-        if (missing.Length > 0)
-        {
-            var extra = await GetWorkItemsAsync(project, missing, WorkItemExpand.Fields);
-            foreach (var wi in extra)
-            {
-                if (wi.Id is null || wi.Id.Value == 0)
-                {
-                    continue;
-                }
-
-                summaryById[wi.Id.Value] = ToSummary(wi);
-            }
-        }
-
-        WorkItemNode Build(int id)
-        {
-            summaryById.TryGetValue(id, out var s);
-            s ??= new WorkItemSummary(id, WorkItemUrl(id), "", "", "", "", "", "", "", "");
-
-            var kids = childrenByParent.TryGetValue(id, out var childList)
-                ? childList
-                : new List<int>();
-            var nodes = new List<WorkItemNode>();
-
-            foreach (var childId in kids)
-            {
-                var childDepth = depthById.TryGetValue(childId, out var d) ? d : 0;
-                if (childDepth > maxDepth)
-                {
-                    continue;
-                }
-
-                nodes.Add(Build(childId));
-            }
-
-            return new WorkItemNode(s, nodes);
-        }
-
-        var root = Build(rootId);
-        var all = visited
-            .Select(id => summaryById.TryGetValue(id, out var s) ? s : null)
-            .Where(s => s is not null)
-            .Select(s => s!)
-            .OrderBy(s => s.Id)
-            .ToList();
-
-        return (root, all);
-    }
-
-    [McpServerTool(Name = "get_work_item_summary")]
-    [Description(
-        "Given a reference like 'feature 43630' or '43630', return work item info. Optionally includes full descendant tree."
-    )]
-    public async Task<object> GetWorkItemSummary(
-        [Description("Reference text like 'feature 43630', 'bug 123', or just '43630'.")]
-            string reference,
+    [McpServerTool(Name = "get_work_items_by_ids")]
+    [Description("Get multiple work items by their IDs in a single request.")]
+    public async Task<IEnumerable<WorkItem>> GetWorkItemsByIds(
+        [Description("Array of work item IDs to retrieve.")] int[] ids,
         [Description("The project name or ID.")] string project,
-        [Description("Include all children / grandchildren / etc via hierarchy links.")]
-            bool includeDescendants = true,
-        [Description("Maximum depth to traverse (0 = just the item).")] int maxDepth = 25,
-        [Description("Safety cap: maximum total items returned (root + descendants).")]
-            int maxItems = 500
+        [Description("Expand level: 'None', 'Relations', 'Fields', 'Links', 'All'.")]
+            string expand = "Fields"
     )
     {
-        var id = ExtractFirstInt(reference);
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
 
-        if (id.HasValue)
+        WorkItemExpand expandEnum = expand.ToLower() switch
         {
-            if (!includeDescendants)
-            {
-                var items = await GetWorkItemsAsync(
-                    project,
-                    new[] { id.Value },
-                    WorkItemExpand.Fields
-                );
-                var wi = items.FirstOrDefault();
-                if (wi is null)
-                {
-                    return new
-                    {
-                        found = false,
-                        reason = "No work item found for parsed ID.",
-                        parsedId = id.Value,
-                    };
-                }
+            "relations" => WorkItemExpand.Relations,
+            "links" => WorkItemExpand.Links,
+            "all" => WorkItemExpand.All,
+            "none" => WorkItemExpand.None,
+            _ => WorkItemExpand.Fields,
+        };
 
-                return new
-                {
-                    found = true,
-                    parsedId = id.Value,
-                    summary = ToSummary(wi),
-                };
-            }
+        var workItems = await client.GetWorkItemsAsync(project, ids, expand: expandEnum);
+        return workItems ?? Enumerable.Empty<WorkItem>();
+    }
 
-            var (root, all) = await BuildDescendantTreeAsync(project, id.Value, maxDepth, maxItems);
+    [McpServerTool(Name = "search_work_items")]
+    [Description("Search for work items by text across title, description, and other fields.")]
+    public async Task<IEnumerable<WorkItem>> SearchWorkItems(
+        [Description("The search text to find in work items.")] string searchText,
+        [Description("The project name or ID.")] string project,
+        [Description("Filter by work item type (e.g., 'Bug', 'Task', 'User Story').")]
+            string workItemType = "",
+        [Description("Filter by state (e.g., 'Active', 'Closed', 'New').")] string state = "",
+        [Description("Filter by assigned to (user display name or email).")] string assignedTo = "",
+        [Description("Maximum number of results to return.")] int top = 50
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
 
-            return new
-            {
-                found = true,
-                parsedId = id.Value,
-                root,
-                allItems = all,
-                limits = new
-                {
-                    maxDepth,
-                    maxItems,
-                    returned = all.Count,
-                },
-            };
+        var conditions = new List<string>();
+        conditions.Add($"[System.TeamProject] = '{project}'");
+
+        if (!string.IsNullOrEmpty(workItemType))
+        {
+            conditions.Add($"[System.WorkItemType] = '{workItemType}'");
         }
 
-        // If no numeric ID detected, return candidates (so the agent can choose)
-        var candidates = (await SearchWorkItems(reference, project, top: 10))
-            .Select(w => new
-            {
-                id = w.Id ?? 0,
-                title = Field(w, "System.Title"),
-                type = Field(w, "System.WorkItemType"),
-                state = Field(w, "System.State"),
-                url = w.Id is int wid ? WorkItemUrl(wid) : "",
-            })
-            .Where(x => x.id != 0)
-            .ToArray();
-
-        return new
+        if (!string.IsNullOrEmpty(state))
         {
-            found = false,
-            reason = "No numeric ID detected in reference; returning candidate matches.",
-            candidates,
-        };
+            conditions.Add($"[System.State] = '{state}'");
+        }
+
+        if (!string.IsNullOrEmpty(assignedTo))
+        {
+            conditions.Add($"[System.AssignedTo] CONTAINS '{assignedTo}'");
+        }
+
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            conditions.Add(
+                $"([System.Title] CONTAINS '{searchText}' OR [System.Description] CONTAINS '{searchText}')"
+            );
+        }
+
+        var wiqlQuery =
+            $"SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo], [System.WorkItemType] FROM WorkItems WHERE {string.Join(" AND ", conditions)} ORDER BY [System.ChangedDate] DESC";
+
+        var wiql = new Wiql { Query = wiqlQuery };
+        var result = await client.QueryByWiqlAsync(wiql, project, top: top);
+
+        if (result.WorkItems == null || !result.WorkItems.Any())
+        {
+            return Enumerable.Empty<WorkItem>();
+        }
+
+        var ids = result.WorkItems.Select(wi => wi.Id).ToArray();
+        var workItems = await client.GetWorkItemsAsync(ids, expand: WorkItemExpand.Fields);
+        return workItems ?? Enumerable.Empty<WorkItem>();
     }
 
-    // You already have this in your class; leaving signature here so the snippet compiles.
-    // Keep your existing implementation.
-    public async Task<IEnumerable<WorkItem>> SearchWorkItems(
-        string searchText,
-        string project,
-        string workItemType = "",
-        string state = "",
-        string assignedTo = "",
-        int top = 50
+    [McpServerTool(Name = "get_work_item_types")]
+    [Description("Get all work item types available in a project.")]
+    public async Task<IEnumerable<WorkItemType>> GetWorkItemTypes(
+        [Description("The project name or ID.")] string project
     )
     {
-        // your existing SearchWorkItems body
-        throw new NotImplementedException();
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var types = await client.GetWorkItemTypesAsync(project);
+        return types ?? Enumerable.Empty<WorkItemType>();
     }
 
-    [GeneratedRegex(@"(?<id>\d{1,10})", RegexOptions.Compiled)]
-    private static partial Regex FirstIntRegex();
+    [McpServerTool(Name = "get_work_item_fields")]
+    [Description("Get all fields available for work items.")]
+    public async Task<IEnumerable<WorkItemField>> GetWorkItemFields()
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var fields = await client.GetFieldsAsync();
+        return fields ?? Enumerable.Empty<WorkItemField>();
+    }
 
-    [GeneratedRegex(@"/workItems/(?<id>\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
-    private static partial Regex WorkItemUrlIdRegex();
+    [McpServerTool(Name = "get_work_item_history")]
+    [Description("Get the revision history of a work item.")]
+    public async Task<IEnumerable<WorkItem>> GetWorkItemHistory(
+        [Description("The ID of the work item.")] int id,
+        [Description("The project name or ID.")] string project,
+        [Description("Maximum number of revisions to return.")] int top = 50
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var revisions = await client.GetRevisionsAsync(project, id, top: top);
+        return revisions ?? Enumerable.Empty<WorkItem>();
+    }
+
+    [McpServerTool(Name = "get_saved_queries")]
+    [Description("Get saved queries (My Queries or Shared Queries) in a project.")]
+    public async Task<IEnumerable<QueryHierarchyItem>> GetSavedQueries(
+        [Description("The project name or ID.")] string project,
+        [Description("Depth of folder expansion (0=no expansion).")] int depth = 1,
+        [Description("Expand level: 'None', 'Wiql', 'Clauses', 'All', 'Minimal'.")]
+            string expand = "None"
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+
+        QueryExpand expandEnum = expand.ToLower() switch
+        {
+            "wiql" => QueryExpand.Wiql,
+            "clauses" => QueryExpand.Clauses,
+            "all" => QueryExpand.All,
+            "minimal" => QueryExpand.Minimal,
+            _ => QueryExpand.None,
+        };
+
+        var queries = await client.GetQueriesAsync(project, expandEnum, depth);
+        return queries ?? Enumerable.Empty<QueryHierarchyItem>();
+    }
+
+    [McpServerTool(Name = "run_saved_query")]
+    [Description("Execute a saved query by its ID and return the results.")]
+    public async Task<IEnumerable<WorkItem>> RunSavedQuery(
+        [Description("The project name or ID.")] string project,
+        [Description("The ID of the saved query.")] Guid queryId,
+        [Description("Maximum number of results to return.")] int top = 200
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+
+        var result = await client.QueryByIdAsync(project, queryId, top: top);
+
+        if (result.WorkItems == null || !result.WorkItems.Any())
+        {
+            return Enumerable.Empty<WorkItem>();
+        }
+
+        var ids = result.WorkItems.Select(wi => wi.Id).ToArray();
+        var workItems = await client.GetWorkItemsAsync(ids, expand: WorkItemExpand.Fields);
+        return workItems ?? Enumerable.Empty<WorkItem>();
+    }
+
+    [McpServerTool(Name = "link_work_items")]
+    [Description("Create a link between two work items.")]
+    public async Task<WorkItem> LinkWorkItems(
+        [Description("The ID of the source work item.")] int sourceId,
+        [Description("The ID of the target work item.")] int targetId,
+        [Description("The link type: 'Parent', 'Child', 'Related', 'Predecessor', 'Successor'.")]
+            string linkType,
+        [Description("Optional comment for the link.")] string comment = ""
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+
+        var linkTypeName = linkType.ToLower() switch
+        {
+            "parent" => "System.LinkTypes.Hierarchy-Reverse",
+            "child" => "System.LinkTypes.Hierarchy-Forward",
+            "predecessor" => "System.LinkTypes.Dependency-Reverse",
+            "successor" => "System.LinkTypes.Dependency-Forward",
+            _ => "System.LinkTypes.Related",
+        };
+
+        // Get the org URL from the connection
+        var orgUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
+        var targetUrl = $"{orgUrl}/_apis/wit/workItems/{targetId}";
+
+        var patchDocument = new JsonPatchDocument
+        {
+            new JsonPatchOperation
+            {
+                Operation = Operation.Add,
+                Path = "/relations/-",
+                Value = new
+                {
+                    rel = linkTypeName,
+                    url = targetUrl,
+                    attributes = new { comment = string.IsNullOrEmpty(comment) ? "" : comment },
+                },
+            },
+        };
+
+        return await client.UpdateWorkItemAsync(patchDocument, sourceId);
+    }
 }
