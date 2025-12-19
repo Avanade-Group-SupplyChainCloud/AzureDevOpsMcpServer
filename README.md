@@ -6,7 +6,7 @@ This is a Model Context Protocol (MCP) server for Azure DevOps, built with .NET 
 
 This server exposes the following tools to MCP clients:
 
-### Core Tools
+### Core Tools (Server)
 - `list_projects`: List all projects in the organization.
 - `get_project`: Get details of a specific project.
 - `list_teams`: List all teams in a project.
@@ -32,6 +32,11 @@ This server exposes the following tools to MCP clients:
 ### Wiki Tools
 - `list_wikis`: List wikis in a project.
 - `get_wiki_page`: Get the content of a wiki page.
+
+### QA Agent Tools (33 total)
+- **Plans/Suites/Points (17):** list/get/create/update/delete plans; list/get/create/update/delete suites; list/update points; add/list/remove test cases in suites.
+- **Runs/Results/Attachments (13):** list/get/create/update/delete runs; list/get/add/update results; run statistics; list run attachments; create run/result attachments.
+- **Test Cases (3):** create/update/get test case work items.
 
 ## Prerequisites
 
