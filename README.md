@@ -34,9 +34,39 @@ This server exposes the following tools to MCP clients:
 - `get_wiki_page`: Get the content of a wiki page.
 
 ### QA Agent Tools (33 total)
-- **Plans/Suites/Points (17):** list/get/create/update/delete plans; list/get/create/update/delete suites; list/update points; add/list/remove test cases in suites.
-- **Runs/Results/Attachments (13):** list/get/create/update/delete runs; list/get/add/update results; run statistics; list run attachments; create run/result attachments.
-- **Test Cases (3):** create/update/get test case work items.
+- `list_test_plans`: List test plans in a project.
+- `get_test_plan`: Get a test plan by ID.
+- `create_test_plan`: Create a new test plan in a project.
+- `update_test_plan`: Update an existing test plan.
+- `delete_test_plan`: Delete a test plan.
+- `list_test_suites`: List test suites under a test plan.
+- `get_test_suite`: Get a test suite by ID.
+- `create_static_test_suite`: Create a static test suite under a plan.
+- `create_requirement_based_suite`: Create a requirement-based suite under a plan for a given work item.
+- `create_query_based_suite`: Create a query-based test suite under a plan.
+- `update_test_suite`: Update an existing test suite.
+- `delete_test_suite`: Delete a test suite from a plan.
+- `list_test_points`: List test points for a plan and suite.
+- `update_test_points`: Update test points (e.g., assign tester, reset outcome).
+- `add_test_cases_to_suite`: Add existing test cases to a test suite.
+- `list_test_cases_in_suite`: List test cases in a suite.
+- `remove_test_cases_from_suite`: Remove test cases from a suite.
+- `list_test_runs`: List test runs in a project.
+- `get_test_run`: Get a test run by ID.
+- `create_test_run`: Create a new test run.
+- `update_test_run`: Update test run properties (state, comment, name, etc.).
+- `delete_test_run`: Delete a test run.
+- `list_test_run_results`: List test results for a run.
+- `get_test_result`: Get a specific test result by ID.
+- `add_test_results`: Add test results to a test run.
+- `update_test_results`: Update existing test results.
+- `get_test_run_statistics`: Get statistics for a test run.
+- `list_test_run_attachments`: List attachments for a test run.
+- `create_test_run_attachment`: Create an attachment for a test run.
+- `create_test_result_attachment`: Create an attachment for a test result.
+- `create_test_case`: Create a new Test Case work item.
+- `update_test_case`: Update fields on a Test Case work item.
+- `get_test_case`: Get a Test Case work item by ID.
 
 ## Prerequisites
 
