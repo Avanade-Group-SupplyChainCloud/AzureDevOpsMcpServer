@@ -1,7 +1,6 @@
 using System.ComponentModel;
-using System.Text.Json;
 using AzureDevOpsMcp.Shared.Services;
-using Microsoft.TeamFoundation.TestManagement.WebApi.Contracts;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.QA.Tools;
@@ -13,208 +12,259 @@ public class TestRunTools(AzureDevOpsService adoService)
 
     [McpServerTool(Name = "list_test_runs")]
     [Description("List test runs in a project.")]
-    public async Task<string> ListTestRuns(
+    public async Task<IEnumerable<TestRun>> ListTestRuns(
         [Description("The project name or ID.")] string project,
         [Description("Maximum number of runs to return.")] int top = 50,
-        [Description("Number of runs to skip.")] int skip = 0,
-        [Description("Optional run state filter: 'InProgress', 'Completed', etc.")]
-            string state = ""
+        [Description("Number of runs to skip.")] int skip = 0
     )
     {
-        var baseUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/test/runs?api-version=7.1&$top={top}&$skip={skip}";
-
-        if (!string.IsNullOrEmpty(state))
-        {
-            url += $"&state={Uri.EscapeDataString(state)}";
-        }
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error listing test runs: {response.StatusCode} - {content}";
-
-        return content;
+        var client = await _adoService.GetTestManagementApiAsync();
+#pragma warning disable CS0612 // Type or member is obsolete
+        var runs = await client.GetTestRunsAsync(project, top: top, skip: skip);
+#pragma warning restore CS0612
+        return runs ?? Enumerable.Empty<TestRun>();
     }
 
     [McpServerTool(Name = "get_test_run")]
     [Description("Get a test run by ID.")]
-    public async Task<string> GetTestRun(
+    public async Task<TestRun> GetTestRun(
         [Description("The project name or ID.")] string project,
         [Description("The test run ID.")] int runId
     )
     {
-        var baseUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/test/runs/{runId}?api-version=7.1";
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error getting test run: {response.StatusCode} - {content}";
-
-        return content;
+        var client = await _adoService.GetTestManagementApiAsync();
+#pragma warning disable CS0612 // Type or member is obsolete
+        return await client.GetTestRunByIdAsync(project, runId);
+#pragma warning restore CS0612
     }
 
     [McpServerTool(Name = "create_test_run")]
     [Description("Create a new test run.")]
-    public async Task<string> CreateTestRun(
+    public async Task<TestRun> CreateTestRun(
         [Description("The project name or ID.")] string project,
         [Description("Test run name.")] string name,
         [Description("Test plan ID.")] int planId,
-        [Description("Test suite ID.")] int suiteId,
-        [Description("Optional build ID associated with run.")] int? buildId = null,
-        [Description("Optional comment.")] string comment = ""
+        [Description("Optional comment.")] string comment = "",
+        [Description("Set to true to create as automated run.")] bool isAutomated = false
     )
     {
-        // REST to keep it flexible
-        var baseUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/test/runs?api-version=7.1";
+        var client = await _adoService.GetTestManagementApiAsync();
 
-        var body = new
-        {
-            name,
-            plan = new { id = planId },
-            pointIds = Array.Empty<int>(),
-            comment = string.IsNullOrEmpty(comment) ? null : comment,
-            build = buildId.HasValue ? new { id = buildId.Value } : null,
-            state = "InProgress",
-            suite = new { id = suiteId },
-        };
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.PostAsync(
-            url,
-            new StringContent(JsonSerializer.Serialize(body), System.Text.Encoding.UTF8, "application/json")
+        var runCreateModel = new RunCreateModel(
+            name: name,
+            plan: new ShallowReference { Id = planId.ToString() },
+            isAutomated: isAutomated,
+            comment: string.IsNullOrEmpty(comment) ? null : comment
         );
 
-        var content = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode)
-            return $"Error creating test run: {response.StatusCode} - {content}";
-
-        return content;
+#pragma warning disable CS0612 // Type or member is obsolete
+        return await client.CreateTestRunAsync(runCreateModel, project);
+#pragma warning restore CS0612
     }
 
-    [McpServerTool(Name = "update_test_run_state")]
-    [Description("Update test run state (e.g., InProgress -> Completed).")]
-    public async Task<string> UpdateTestRunState(
+    [McpServerTool(Name = "update_test_run")]
+    [Description("Update test run properties (state, comment, name, etc.).")]
+    public async Task<TestRun> UpdateTestRun(
         [Description("The project name or ID.")] string project,
         [Description("The test run ID.")] int runId,
-        [Description("New state. Typically 'InProgress' or 'Completed'.")] string state,
+        [Description("Optional new name.")] string name = "",
+        [Description("Optional new state: 'InProgress', 'Completed', 'Aborted', 'Waiting'.")] string state = "",
         [Description("Optional comment.")] string comment = ""
     )
     {
-        var baseUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/test/runs/{runId}?api-version=7.1";
+        var client = await _adoService.GetTestManagementApiAsync();
 
-        var patch = new object[]
-        {
-            new { op = "add", path = "/state", value = state },
-        };
+        var runUpdateModel = new RunUpdateModel(
+            name: string.IsNullOrEmpty(name) ? null : name,
+            state: string.IsNullOrEmpty(state) ? null : state,
+            comment: string.IsNullOrEmpty(comment) ? null : comment
+        );
 
-        if (!string.IsNullOrEmpty(comment))
-        {
-            patch =
-            [
-                new { op = "add", path = "/state", value = state },
-                new { op = "add", path = "/comment", value = comment },
-            ];
-        }
+#pragma warning disable CS0612 // Type or member is obsolete
+        return await client.UpdateTestRunAsync(runUpdateModel, project, runId);
+#pragma warning restore CS0612
+    }
 
-        using var httpClient = _adoService.CreateHttpClient();
-        var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
-        {
-            Content = new StringContent(
-                JsonSerializer.Serialize(patch),
-                System.Text.Encoding.UTF8,
-                "application/json-patch+json"
-            ),
-        };
-
-        var response = await httpClient.SendAsync(request);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error updating test run: {response.StatusCode} - {content}";
-
-        return content;
+    [McpServerTool(Name = "delete_test_run")]
+    [Description("Delete a test run.")]
+    public async Task<string> DeleteTestRun(
+        [Description("The project name or ID.")] string project,
+        [Description("The test run ID.")] int runId
+    )
+    {
+        var client = await _adoService.GetTestManagementApiAsync();
+#pragma warning disable CS0612 // Type or member is obsolete
+        await client.DeleteTestRunAsync(project, runId);
+#pragma warning restore CS0612
+        return $"Deleted test run {runId}.";
     }
 
     [McpServerTool(Name = "list_test_run_results")]
     [Description("List test results for a run.")]
-    public async Task<string> ListTestRunResults(
+    public async Task<IEnumerable<TestCaseResult>> ListTestRunResults(
         [Description("The project name or ID.")] string project,
         [Description("The test run ID.")] int runId,
         [Description("Maximum number of results to return.")] int top = 100,
         [Description("Number of results to skip.")] int skip = 0
     )
     {
-        var baseUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/test/Runs/{runId}/results?api-version=7.1&$top={top}&$skip={skip}";
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error listing run results: {response.StatusCode} - {content}";
-
-        return content;
+        var client = await _adoService.GetTestManagementApiAsync();
+#pragma warning disable CS0612 // Type or member is obsolete
+        var results = await client.GetTestResultsAsync(project, runId, top: top, skip: skip);
+#pragma warning restore CS0612
+        return results ?? Enumerable.Empty<TestCaseResult>();
     }
 
-    [McpServerTool(Name = "list_test_run_attachments")]
-    [Description("List attachments for a test run.")]
-    public async Task<string> ListTestRunAttachments(
+    [McpServerTool(Name = "get_test_result")]
+    [Description("Get a specific test result by ID.")]
+    public async Task<TestCaseResult> GetTestResult(
+        [Description("The project name or ID.")] string project,
+        [Description("The test run ID.")] int runId,
+        [Description("The test result ID.")] int testResultId
+    )
+    {
+        var client = await _adoService.GetTestManagementApiAsync();
+#pragma warning disable CS0612 // Type or member is obsolete
+        var results = await client.GetTestResultByIdAsync(project, runId, testResultId);
+#pragma warning restore CS0612
+        return results;
+    }
+
+    [McpServerTool(Name = "add_test_results")]
+    [Description("Add test results to a test run.")]
+    public async Task<IEnumerable<TestCaseResult>> AddTestResults(
+        [Description("The project name or ID.")] string project,
+        [Description("The test run ID.")] int runId,
+        [Description("Test case ID.")] int testCaseId,
+        [Description("Outcome: 'Passed', 'Failed', 'Blocked', 'NotApplicable', etc.")] string outcome,
+        [Description("Optional comment.")] string comment = "",
+        [Description("Optional error message (for failed tests).")] string errorMessage = "",
+        [Description("Optional duration in milliseconds.")] long? durationInMs = null
+    )
+    {
+        var client = await _adoService.GetTestManagementApiAsync();
+
+        var result = new TestCaseResult
+        {
+            TestCase = new ShallowReference { Id = testCaseId.ToString() },
+            Outcome = outcome,
+            Comment = string.IsNullOrEmpty(comment) ? null : comment,
+            ErrorMessage = string.IsNullOrEmpty(errorMessage) ? null : errorMessage,
+        };
+
+        if (durationInMs.HasValue)
+        {
+            result.DurationInMs = durationInMs.Value;
+        }
+
+#pragma warning disable CS0612 // Type or member is obsolete
+        var results = await client.AddTestResultsToTestRunAsync(new[] { result }, project, runId);
+#pragma warning restore CS0612
+        return results ?? Enumerable.Empty<TestCaseResult>();
+    }
+
+    [McpServerTool(Name = "update_test_results")]
+    [Description("Update existing test results.")]
+    public async Task<IEnumerable<TestCaseResult>> UpdateTestResults(
+        [Description("The project name or ID.")] string project,
+        [Description("The test run ID.")] int runId,
+        [Description("The test result ID to update.")] int testResultId,
+        [Description("Optional new outcome: 'Passed', 'Failed', 'Blocked', 'NotApplicable', etc.")] string outcome = "",
+        [Description("Optional comment.")] string comment = "",
+        [Description("Optional error message.")] string errorMessage = "",
+        [Description("Optional state: 'Pending', 'Completed'.")] string state = ""
+    )
+    {
+        var client = await _adoService.GetTestManagementApiAsync();
+
+        var result = new TestCaseResult { Id = testResultId };
+
+        if (!string.IsNullOrEmpty(outcome))
+            result.Outcome = outcome;
+        if (!string.IsNullOrEmpty(comment))
+            result.Comment = comment;
+        if (!string.IsNullOrEmpty(errorMessage))
+            result.ErrorMessage = errorMessage;
+        if (!string.IsNullOrEmpty(state))
+            result.State = state;
+
+#pragma warning disable CS0612 // Type or member is obsolete
+        var results = await client.UpdateTestResultsAsync(new[] { result }, project, runId);
+#pragma warning restore CS0612
+        return results ?? Enumerable.Empty<TestCaseResult>();
+    }
+
+    [McpServerTool(Name = "get_test_run_statistics")]
+    [Description("Get statistics for a test run.")]
+    public async Task<TestRunStatistic> GetTestRunStatistics(
         [Description("The project name or ID.")] string project,
         [Description("The test run ID.")] int runId
     )
     {
-        var baseUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/test/Runs/{runId}/attachments?api-version=7.1";
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error listing run attachments: {response.StatusCode} - {content}";
-
-        return content;
+        var client = await _adoService.GetTestManagementApiAsync();
+#pragma warning disable CS0612 // Type or member is obsolete
+        return await client.GetTestRunStatisticsAsync(project, runId);
+#pragma warning restore CS0612
     }
 
-    [McpServerTool(Name = "add_test_run_attachment")]
-    [Description("Add an attachment to a test run. Content should be base64 encoded.")]
-    public async Task<string> AddTestRunAttachment(
+    [McpServerTool(Name = "list_test_run_attachments")]
+    [Description("List attachments for a test run.")]
+    public async Task<IEnumerable<TestAttachment>> ListTestRunAttachments(
+        [Description("The project name or ID.")] string project,
+        [Description("The test run ID.")] int runId
+    )
+    {
+        var client = await _adoService.GetTestManagementApiAsync();
+#pragma warning disable CS0612 // Type or member is obsolete
+        var attachments = await client.GetTestRunAttachmentsAsync(project, runId);
+#pragma warning restore CS0612
+        return attachments ?? Enumerable.Empty<TestAttachment>();
+    }
+
+    [McpServerTool(Name = "create_test_run_attachment")]
+    [Description("Create an attachment for a test run.")]
+    public async Task<TestAttachmentReference> CreateTestRunAttachment(
         [Description("The project name or ID.")] string project,
         [Description("The test run ID.")] int runId,
         [Description("Attachment file name.")] string fileName,
-        [Description("Base64 file content.")] string base64Content,
+        [Description("Base64-encoded file content.")] string base64Content,
         [Description("Optional comment.")] string comment = ""
     )
     {
-        var baseUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/test/Runs/{runId}/attachments?api-version=7.1";
+        var client = await _adoService.GetTestManagementApiAsync();
 
-        var body = new
-        {
-            fileName,
-            comment = string.IsNullOrEmpty(comment) ? null : comment,
-            stream = base64Content,
-        };
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.PostAsync(
-            url,
-            new StringContent(JsonSerializer.Serialize(body), System.Text.Encoding.UTF8, "application/json")
+        var attachment = new TestAttachmentRequestModel(
+            stream: base64Content,
+            fileName: fileName,
+            comment: string.IsNullOrEmpty(comment) ? null : comment
         );
 
-        var content = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode)
-            return $"Error adding run attachment: {response.StatusCode} - {content}";
+#pragma warning disable CS0612 // Type or member is obsolete
+        return await client.CreateTestRunAttachmentAsync(attachment, project, runId);
+#pragma warning restore CS0612
+    }
 
-        return content;
+    [McpServerTool(Name = "create_test_result_attachment")]
+    [Description("Create an attachment for a test result.")]
+    public async Task<TestAttachmentReference> CreateTestResultAttachment(
+        [Description("The project name or ID.")] string project,
+        [Description("The test run ID.")] int runId,
+        [Description("The test result ID.")] int testResultId,
+        [Description("Attachment file name.")] string fileName,
+        [Description("Base64-encoded file content.")] string base64Content,
+        [Description("Optional comment.")] string comment = ""
+    )
+    {
+        var client = await _adoService.GetTestManagementApiAsync();
+
+        var attachment = new TestAttachmentRequestModel(
+            stream: base64Content,
+            fileName: fileName,
+            comment: string.IsNullOrEmpty(comment) ? null : comment
+        );
+
+#pragma warning disable CS0612 // Type or member is obsolete
+        return await client.CreateTestResultAttachmentAsync(attachment, project, runId, testResultId);
+#pragma warning restore CS0612
     }
 }
