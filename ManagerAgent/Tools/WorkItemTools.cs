@@ -303,7 +303,8 @@ public class WorkItemTools(AzureDevOpsService adoService)
         [Description("The ID of the target work item.")] int targetId,
         [Description("The project name or ID.")] string project,
         [Description("Link type: 'parent', 'child', 'related', 'predecessor', 'successor'.")]
-            string linkType = "related"
+            string linkType = "related",
+        [Description("Optional comment to include on the link.")] string comment = ""
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
@@ -317,6 +318,13 @@ public class WorkItemTools(AzureDevOpsService adoService)
             _ => "System.LinkTypes.Related",
         };
 
+        var orgUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
+        var targetUrl = $"{orgUrl}/_apis/wit/workItems/{targetId}";
+
+        object attributes = string.IsNullOrWhiteSpace(comment)
+            ? null
+            : new { comment = comment };
+
         var patchDocument = new JsonPatchDocument
         {
             new JsonPatchOperation
@@ -326,7 +334,8 @@ public class WorkItemTools(AzureDevOpsService adoService)
                 Value = new
                 {
                     rel = linkTypeName,
-                    url = $"{_adoService.Connection.Uri}_apis/wit/workItems/{targetId}",
+                    url = targetUrl,
+                    attributes = attributes,
                 },
             },
         };

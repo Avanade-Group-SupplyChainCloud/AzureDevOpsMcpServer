@@ -197,47 +197,4 @@ public class QueryTools(AzureDevOpsService adoService)
         var workItems = await client.GetWorkItemsAsync(ids, expand: WorkItemExpand.Fields);
         return workItems ?? Enumerable.Empty<WorkItem>();
     }
-
-    [McpServerTool(Name = "link_work_items")]
-    [Description("Create a link between two work items.")]
-    public async Task<WorkItem> LinkWorkItems(
-        [Description("The ID of the source work item.")] int sourceId,
-        [Description("The ID of the target work item.")] int targetId,
-        [Description("The link type: 'Parent', 'Child', 'Related', 'Predecessor', 'Successor'.")]
-            string linkType,
-        [Description("Optional comment for the link.")] string comment = ""
-    )
-    {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
-
-        var linkTypeName = linkType.ToLower() switch
-        {
-            "parent" => "System.LinkTypes.Hierarchy-Reverse",
-            "child" => "System.LinkTypes.Hierarchy-Forward",
-            "predecessor" => "System.LinkTypes.Dependency-Reverse",
-            "successor" => "System.LinkTypes.Dependency-Forward",
-            _ => "System.LinkTypes.Related",
-        };
-
-        // Get the org URL from the connection
-        var orgUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
-        var targetUrl = $"{orgUrl}/_apis/wit/workItems/{targetId}";
-
-        var patchDocument = new JsonPatchDocument
-        {
-            new JsonPatchOperation
-            {
-                Operation = Operation.Add,
-                Path = "/relations/-",
-                Value = new
-                {
-                    rel = linkTypeName,
-                    url = targetUrl,
-                    attributes = new { comment = string.IsNullOrEmpty(comment) ? "" : comment },
-                },
-            },
-        };
-
-        return await client.UpdateWorkItemAsync(patchDocument, sourceId);
-    }
 }
