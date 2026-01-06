@@ -35,7 +35,7 @@ public static class McpServerExtensions
 
     public static WebApplication UseAzureDevOpsMcp(this WebApplication app)
     {
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
         app.UseCors();
 
         // API Key Middleware

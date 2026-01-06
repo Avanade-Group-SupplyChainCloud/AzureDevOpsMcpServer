@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json;
+using AzureDevOpsMcp.Shared.Helpers;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
@@ -15,7 +16,9 @@ public class WorkItemTools(AzureDevOpsService adoService)
     private readonly AzureDevOpsService _adoService = adoService;
 
     [McpServerTool(Name = "get_work_item")]
-    [Description("Get a work item by ID with optional field expansion.")]
+    [Description(
+        "Get the raw work item by ID (fields/relations). Use this for data retrieval; if the user asks for a summary/update/status, prefer get_executive_summary instead."
+    )]
     public async Task<WorkItem> GetWorkItem(
         [Description("The ID of the work item.")] int id,
         [Description("The project name or ID.")] string project,
@@ -331,38 +334,41 @@ public class WorkItemTools(AzureDevOpsService adoService)
 
     [McpServerTool(Name = "get_executive_summary")]
     [Description(
-        "Get a detailed update and executive summary of any work item including all children recursively with roadmap, status, and progress information. Use this when asked for updates, details, or status on features, epics, stories, or any work item."
+        "Get an executive summary (summary/update/status) for a work item, including all children recursively (roadmap, status, progress)."
     )]
     public async Task<string> GetExecutiveSummary(
         [Description("The ID of the work item to get updates/details for.")] int workItemId,
         [Description("The project name or ID.")] string project
     )
     {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        return await ErrorHandler.ExecuteWithErrorHandling(async () =>
+        {
+            var client = await _adoService.GetWorkItemTrackingApiAsync();
 
-        // Get the parent work item with relations
-        var parentWorkItem = await client.GetWorkItemAsync(
-            project,
-            workItemId,
-            expand: WorkItemExpand.All
-        );
-
-        if (parentWorkItem == null)
-            return JsonSerializer.Serialize(
-                new { error = $"Work item {workItemId} not found." },
-                new JsonSerializerOptions { WriteIndented = true }
+            // Get the parent work item with relations
+            var parentWorkItem = await client.GetWorkItemAsync(
+                project,
+                workItemId,
+                expand: WorkItemExpand.All
             );
 
-        // Recursively get all children
-        var allChildren = await GetAllChildrenRecursiveAsync(client, project, parentWorkItem);
+            if (parentWorkItem == null)
+                return JsonSerializer.Serialize(
+                    new { error = $"Work item {workItemId} not found." },
+                    new JsonSerializerOptions { WriteIndented = true }
+                );
 
-        // Build executive summary
-        var summary = BuildExecutiveSummary(parentWorkItem, allChildren);
+            // Recursively get all children
+            var allChildren = await GetAllChildrenRecursiveAsync(client, project, parentWorkItem);
 
-        return JsonSerializer.Serialize(
-            summary,
-            new JsonSerializerOptions { WriteIndented = true }
-        );
+            // Build executive summary
+            var summary = BuildExecutiveSummary(parentWorkItem, allChildren);
+
+            return JsonSerializer.Serialize(
+                summary,
+                new JsonSerializerOptions { WriteIndented = true }
+            );
+        });
     }
 
     private async Task<List<WorkItem>> GetAllChildrenRecursiveAsync(
