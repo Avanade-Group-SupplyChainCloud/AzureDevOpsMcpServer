@@ -84,94 +84,6 @@ public class GitTools(AzureDevOpsService adoService)
         return await client.GetBranchAsync(repositoryId, branchName, project);
     }
 
-    [McpServerTool(Name = "list_commits")]
-    [Description("List commits in a repository, optionally filtered by branch.")]
-    public async Task<IEnumerable<GitCommitRef>> ListCommits(
-        [Description("The ID or name of the repository.")] string repositoryId,
-        [Description("The project name or ID.")] string project,
-        [Description("The branch name to filter commits.")] string branch = "main",
-        [Description("Maximum number of commits to return.")] int top = 50,
-        [Description("Number of commits to skip.")] int skip = 0
-    )
-    {
-        var client = await _adoService.GetGitApiAsync();
-        var searchCriteria = new GitQueryCommitsCriteria
-        {
-            Top = top,
-            Skip = skip,
-            ItemVersion = new GitVersionDescriptor
-            {
-                Version = branch,
-                VersionType = GitVersionType.Branch,
-            },
-        };
-
-        var commits = await client.GetCommitsAsync(project, repositoryId, searchCriteria);
-        return commits ?? Enumerable.Empty<GitCommitRef>();
-    }
-
-    [McpServerTool(Name = "search_commits")]
-    [Description("Search for commits with comprehensive filtering capabilities.")]
-    public async Task<IEnumerable<GitCommitRef>> SearchCommits(
-        [Description("The project name or ID.")] string project,
-        [Description("The repository name or ID.")] string repository,
-        [Description("Search text in commit messages.")] string searchText = null,
-        [Description("Filter by author.")] string author = null,
-        [Description("From date (ISO format).")] DateTime? fromDate = null,
-        [Description("To date (ISO format).")] DateTime? toDate = null,
-        [Description("Branch or commit version.")] string version = null,
-        [Description("Version type: 'branch', 'commit', 'tag'.")] string versionType = "branch",
-        [Description("Maximum results.")] int top = 50,
-        [Description("Results to skip.")] int skip = 0
-    )
-    {
-        var client = await _adoService.GetGitApiAsync();
-        var searchCriteria = new GitQueryCommitsCriteria
-        {
-            Top = top,
-            Skip = skip,
-            Author = author,
-            FromDate = fromDate?.ToString("o"),
-            ToDate = toDate?.ToString("o"),
-        };
-
-        if (!string.IsNullOrEmpty(version))
-        {
-            searchCriteria.ItemVersion = new GitVersionDescriptor
-            {
-                Version = version,
-                VersionType = versionType.ToLower() switch
-                {
-                    "commit" => GitVersionType.Commit,
-                    "tag" => GitVersionType.Tag,
-                    _ => GitVersionType.Branch,
-                },
-            };
-        }
-
-        var commits = await client.GetCommitsAsync(project, repository, searchCriteria);
-
-        var result = commits ?? Enumerable.Empty<GitCommitRef>();
-        if (!string.IsNullOrEmpty(searchText))
-            result = result.Where(c =>
-                c.Comment?.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true
-            );
-
-        return result;
-    }
-
-    [McpServerTool(Name = "get_commit")]
-    [Description("Get details of a specific commit by its SHA.")]
-    public async Task<GitCommit> GetCommit(
-        [Description("The ID or name of the repository.")] string repositoryId,
-        [Description("The commit SHA.")] string commitId,
-        [Description("The project name or ID.")] string project
-    )
-    {
-        var client = await _adoService.GetGitApiAsync();
-        return await client.GetCommitAsync(commitId, repositoryId, project);
-    }
-
     [McpServerTool(Name = "get_file_content")]
     [Description("Get the content of a file from a repository at a specific branch or commit.")]
     public async Task<GitItem> GetFileContent(
@@ -250,40 +162,6 @@ public class GitTools(AzureDevOpsService adoService)
             skip: skip
         );
         return prs ?? Enumerable.Empty<GitPullRequest>();
-    }
-
-    [McpServerTool(Name = "list_pull_requests_by_commits")]
-    [Description("Find pull requests containing specific commits.")]
-    public async Task<string> ListPullRequestsByCommits(
-        [Description("The project name or ID.")] string project,
-        [Description("The repository name or ID.")] string repository,
-        [Description("Array of commit IDs to query for.")] IEnumerable<string> commits
-    )
-    {
-        // Using REST API since GitPullRequestQuery properties differ in SDK versions
-        var connection = _adoService.Connection;
-        var baseUrl = connection.Uri.ToString().TrimEnd('/');
-        var url =
-            $"{baseUrl}/{project}/_apis/git/repositories/{repository}/pullrequestquery?api-version=7.1";
-
-        var body = new
-        {
-            queries = new[] { new { type = "lastMergeCommit", items = commits.ToArray() } },
-        };
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var content = new StringContent(
-            JsonSerializer.Serialize(body),
-            System.Text.Encoding.UTF8,
-            "application/json"
-        );
-        var response = await httpClient.PostAsync(url, content);
-        var responseContent = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error querying pull requests by commits: {response.StatusCode} - {responseContent}";
-
-        return responseContent;
     }
 
     [McpServerTool(Name = "get_pull_request_commits")]

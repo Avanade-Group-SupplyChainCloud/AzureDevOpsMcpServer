@@ -67,27 +67,4 @@ public class CoreTools(AzureDevOpsService adoService)
 
         return teams ?? Enumerable.Empty<WebApiTeam>();
     }
-
-    [McpServerTool(Name = "get_identity_ids")]
-    [Description("Retrieve Azure DevOps identity IDs for a provided search filter.")]
-    public async Task<string> GetIdentityIds(
-        [Description("Search filter for identities (e.g., email or display name).")]
-            string searchFilter
-    )
-    {
-        var connection = _adoService.Connection;
-        var baseUrl = connection.Uri.ToString().TrimEnd('/');
-        var url =
-            $"{baseUrl}/_apis/identities?searchFilter=General&filterValue={Uri.EscapeDataString(searchFilter)}&api-version=7.1-preview.1";
-
-        using var httpClient = _adoService.CreateHttpClient();
-
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error retrieving identities: {response.StatusCode} - {content}";
-
-        return content;
-    }
 }

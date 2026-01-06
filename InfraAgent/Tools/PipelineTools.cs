@@ -158,48 +158,5 @@ public class PipelineTools(AzureDevOpsService adoService)
 
         return content;
     }
-
-    [McpServerTool(Name = "create_pipeline")]
-    [Description("Create a new pipeline definition with YAML configuration.")]
-    public async Task<string> CreatePipeline(
-        [Description("The project name or ID.")] string project,
-        [Description("The name of the pipeline.")] string name,
-        [Description("The path to the YAML file in the repository.")] string yamlPath,
-        [Description("The repository type: 'TfsGit' or 'GitHub'.")] string repositoryType,
-        [Description("The repository name.")] string repositoryName,
-        [Description("The folder path for the pipeline definition.")] string folder = null,
-        [Description("The repository ID (required for TfsGit).")] string repositoryId = null
-    )
-    {
-        var connection = _adoService.Connection;
-        var baseUrl = connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/pipelines?api-version=7.1-preview.1";
-
-        var body = new
-        {
-            name = name,
-            folder = folder ?? "\\",
-            configuration = new
-            {
-                type = "yaml",
-                path = yamlPath,
-                repository = new
-                {
-                    id = repositoryId ?? repositoryName,
-                    name = repositoryName,
-                    type = repositoryType,
-                },
-            },
-        };
-
-        using var httpClient = _adoService.CreateHttpClient();
-
-        var response = await httpClient.PostAsJsonAsync(url, body);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error creating pipeline: {response.StatusCode} - {content}";
-
-        return content;
-    }
+}
 }

@@ -43,84 +43,6 @@ public class IterationTools(AzureDevOpsService adoService)
         return iterations?.FirstOrDefault();
     }
 
-    [McpServerTool(Name = "get_iteration_work_items")]
-    [Description("Get all work items assigned to a specific iteration.")]
-    public async Task<IterationWorkItems> GetIterationWorkItems(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
-        [Description("The name or ID of the team.")] string team,
-        [Description("The ID of the iteration.")] Guid iterationId
-    )
-    {
-        var client = await _adoService.GetWorkApiAsync();
-        var teamContext = new TeamContext(project, team);
-        return await client.GetIterationWorkItemsAsync(teamContext, iterationId);
-    }
-
-    [McpServerTool(Name = "create_iteration")]
-    [Description("Create a new iteration (sprint) in the project's classification nodes.")]
-    public async Task<WorkItemClassificationNode> CreateIteration(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
-        [Description("The name of the new iteration.")] string iterationName,
-        [Description("The start date of the iteration (ISO format).")] DateTime? startDate = null,
-        [Description("The finish date of the iteration (ISO format).")] DateTime? finishDate = null,
-        [Description("The path to the parent iteration (optional).")] string parentPath = null
-    )
-    {
-        var witClient = await _adoService.GetWorkItemTrackingApiAsync();
-
-        var newIteration = new WorkItemClassificationNode
-        {
-            Name = iterationName,
-            StructureType = TreeNodeStructureType.Iteration,
-        };
-
-        if (startDate.HasValue || finishDate.HasValue)
-        {
-            newIteration.Attributes = new Dictionary<string, object>();
-            if (startDate.HasValue)
-                newIteration.Attributes["startDate"] = startDate.Value.ToString("o");
-            if (finishDate.HasValue)
-                newIteration.Attributes["finishDate"] = finishDate.Value.ToString("o");
-        }
-
-        return await witClient.CreateOrUpdateClassificationNodeAsync(
-            newIteration,
-            project,
-            TreeStructureGroup.Iterations,
-            parentPath
-        );
-    }
-
-    [McpServerTool(Name = "assign_iteration_to_team")]
-    [Description("Assign an existing iteration to a team.")]
-    public async Task<TeamSettingsIteration> AssignIterationToTeam(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
-        [Description("The name or ID of the team.")] string team,
-        [Description("The ID of the iteration to assign.")] Guid iterationId
-    )
-    {
-        var client = await _adoService.GetWorkApiAsync();
-        var teamContext = new TeamContext(project, team);
-
-        var iterationToAdd = new TeamSettingsIteration { Id = iterationId };
-        return await client.PostTeamIterationAsync(iterationToAdd, teamContext);
-    }
-
-    [McpServerTool(Name = "remove_iteration_from_team")]
-    [Description("Remove an iteration from a team's assigned iterations.")]
-    public async Task<string> RemoveIterationFromTeam(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
-        [Description("The name or ID of the team.")] string team,
-        [Description("The ID of the iteration to remove.")] Guid iterationId
-    )
-    {
-        var client = await _adoService.GetWorkApiAsync();
-        var teamContext = new TeamContext(project, team);
-
-        await client.DeleteTeamIterationAsync(teamContext, iterationId);
-        return $"Iteration {iterationId} removed from team {team}";
-    }
-
     [McpServerTool(Name = "get_iteration_capacities")]
     [Description("Get an iteration's capacity for all teams in iteration and project.")]
     public async Task<string> GetIterationCapacities(
@@ -185,53 +107,6 @@ public class IterationTools(AzureDevOpsService adoService)
             teamContext,
             iterationId,
             teamMemberId
-        );
-    }
-
-    [McpServerTool(Name = "replace_team_capacities")]
-    [Description("Replace all team member capacities for an iteration.")]
-    public async Task<string> ReplaceTeamCapacities(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
-        [Description("The name or ID of the team.")] string team,
-        [Description("The ID of the iteration.")] Guid iterationId,
-        [Description("JSON array of capacity updates [{teamMemberId, capacityPerDay, activity}].")]
-            string capacitiesJson
-    )
-    {
-        var client = await _adoService.GetWorkApiAsync();
-        var teamContext = new TeamContext(project, team);
-
-        var capacityList =
-            JsonSerializer.Deserialize<List<CapacityInput>>(capacitiesJson)
-            ?? new List<CapacityInput>();
-        var results = new List<object>();
-
-        foreach (var input in capacityList)
-        {
-            var capacityPatch = new CapacityPatch
-            {
-                Activities = new List<Activity>
-                {
-                    new Activity
-                    {
-                        Name = input.Activity ?? "Development",
-                        CapacityPerDay = (float)input.CapacityPerDay,
-                    },
-                },
-            };
-
-            var result = await client.UpdateCapacityWithIdentityRefAsync(
-                capacityPatch,
-                teamContext,
-                iterationId,
-                input.TeamMemberId
-            );
-            results.Add(result);
-        }
-
-        return JsonSerializer.Serialize(
-            results,
-            new JsonSerializerOptions { WriteIndented = true }
         );
     }
 
@@ -322,33 +197,6 @@ public class IterationTools(AzureDevOpsService adoService)
         }
 
         return await client.UpdateTeamSettingsAsync(patch, teamContext);
-    }
-
-    [McpServerTool(Name = "get_board_columns")]
-    [Description("Get the columns configured for a team's board.")]
-    public async Task<IEnumerable<BoardColumn>> GetBoardColumns(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
-        [Description("The name or ID of the team.")] string team,
-        [Description("The name of the board (e.g., 'Stories', 'Bugs').")] string board
-    )
-    {
-        var client = await _adoService.GetWorkApiAsync();
-        var teamContext = new TeamContext(project, team);
-        var boardColumns = await client.GetBoardColumnsAsync(teamContext, board);
-        return boardColumns ?? Enumerable.Empty<BoardColumn>();
-    }
-
-    [McpServerTool(Name = "get_boards")]
-    [Description("Get all boards for a team.")]
-    public async Task<IEnumerable<BoardReference>> GetBoards(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
-        [Description("The name or ID of the team.")] string team
-    )
-    {
-        var client = await _adoService.GetWorkApiAsync();
-        var teamContext = new TeamContext(project, team);
-        var boards = await client.GetBoardsAsync(teamContext);
-        return boards ?? Enumerable.Empty<BoardReference>();
     }
 
     // Helper classes for JSON deserialization

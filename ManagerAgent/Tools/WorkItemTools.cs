@@ -97,42 +97,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
         return await client.UpdateWorkItemAsync(patchDocument, id);
     }
 
-    [McpServerTool(Name = "my_work_items")]
-    [Description("Get work items assigned to or created by the current user.")]
-    public async Task<string> MyWorkItems(
-        [Description("The project name or ID.")] string project,
-        [Description("Filter by work item type.")] string type = null,
-        [Description("Include completed work items.")] bool includeCompleted = false,
-        [Description("Maximum number of results.")] int top = 50
-    )
-    {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
-        var wiql =
-            $"SELECT [System.Id], [System.Title], [System.State], [System.AssignedTo], [System.WorkItemType], [Microsoft.VSTS.Scheduling.RemainingWork] FROM WorkItems WHERE [System.TeamProject] = '{project}' AND ([System.AssignedTo] = @Me OR [System.CreatedBy] = @Me)";
-
-        if (!includeCompleted)
-            wiql +=
-                " AND [System.State] <> 'Closed' AND [System.State] <> 'Done' AND [System.State] <> 'Removed'";
-
-        if (!string.IsNullOrEmpty(type))
-            wiql += $" AND [System.WorkItemType] = '{type}'";
-
-        wiql += $" ORDER BY [System.ChangedDate] DESC";
-
-        var query = new Wiql { Query = wiql };
-        var result = await client.QueryByWiqlAsync(query, project, top: top);
-
-        if (result?.WorkItems == null || !result.WorkItems.Any())
-            return "[]";
-
-        var ids = result.WorkItems.Select(w => w.Id).ToList();
-        var workItems = await client.GetWorkItemsAsync(ids, expand: WorkItemExpand.Fields);
-        return JsonSerializer.Serialize(
-            workItems,
-            new JsonSerializerOptions { WriteIndented = true }
-        );
-    }
-
     [McpServerTool(Name = "list_work_item_comments")]
     [Description("Get comments on a work item.")]
     public async Task<string> ListWorkItemComments(
@@ -175,17 +139,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
         var client = await _adoService.GetWorkItemTrackingApiAsync();
         var revisions = await client.GetRevisionsAsync(project, workItemId, top, skip);
         return revisions ?? Enumerable.Empty<WorkItem>();
-    }
-
-    [McpServerTool(Name = "get_work_item_type")]
-    [Description("Get details of a work item type including its fields and rules.")]
-    public async Task<WorkItemType> GetWorkItemType(
-        [Description("The project name or ID.")] string project,
-        [Description("The work item type name.")] string workItemType
-    )
-    {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
-        return await client.GetWorkItemTypeAsync(project, workItemType);
     }
 
     [McpServerTool(Name = "add_child_work_items")]
@@ -343,133 +296,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
         return await client.UpdateWorkItemAsync(patchDocument, sourceId);
     }
 
-    [McpServerTool(Name = "unlink_work_item")]
-    [Description("Remove a link from a work item.")]
-    public async Task<WorkItem> UnlinkWorkItem(
-        [Description("The ID of the work item.")] int id,
-        [Description("The project name or ID.")] string project,
-        [Description("The index of the relation to remove.")] int relationIndex
-    )
-    {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
-
-        var patchDocument = new JsonPatchDocument
-        {
-            new JsonPatchOperation
-            {
-                Operation = Operation.Remove,
-                Path = $"/relations/{relationIndex}",
-            },
-        };
-
-        return await client.UpdateWorkItemAsync(patchDocument, id);
-    }
-
-    [McpServerTool(Name = "link_work_item_to_pull_request")]
-    [Description("Link a work item to a pull request.")]
-    public async Task<WorkItem> LinkWorkItemToPullRequest(
-        [Description("The ID of the work item.")] int workItemId,
-        [Description("The project ID (GUID).")] string projectId,
-        [Description("The repository ID.")] string repositoryId,
-        [Description("The pull request ID.")] int pullRequestId
-    )
-    {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
-
-        var artifactUri =
-            $"vstfs:///Git/PullRequestId/{projectId}%2F{repositoryId}%2F{pullRequestId}";
-
-        var patchDocument = new JsonPatchDocument
-        {
-            new JsonPatchOperation
-            {
-                Operation = Operation.Add,
-                Path = "/relations/-",
-                Value = new
-                {
-                    rel = "ArtifactLink",
-                    url = artifactUri,
-                    attributes = new { name = "Pull Request" },
-                },
-            },
-        };
-
-        return await client.UpdateWorkItemAsync(patchDocument, workItemId);
-    }
-
-    [McpServerTool(Name = "add_artifact_link")]
-    [Description("Add an artifact link (commit, build, branch) to a work item.")]
-    public async Task<WorkItem> AddArtifactLink(
-        [Description("The ID of the work item.")] int workItemId,
-        [Description("The project name or ID.")] string project,
-        [Description("The artifact URI.")] string artifactUri,
-        [Description("The link type name (e.g., 'Build', 'Branch', 'Fixed in Commit').")]
-            string linkType = "ArtifactLink",
-        [Description("A comment for the link.")] string comment = null
-    )
-    {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
-
-        var patchDocument = new JsonPatchDocument
-        {
-            new JsonPatchOperation
-            {
-                Operation = Operation.Add,
-                Path = "/relations/-",
-                Value = new
-                {
-                    rel = "ArtifactLink",
-                    url = artifactUri,
-                    attributes = new { name = linkType, comment = comment ?? "" },
-                },
-            },
-        };
-
-        return await client.UpdateWorkItemAsync(patchDocument, workItemId);
-    }
-
-    [McpServerTool(Name = "list_backlogs")]
-    [Description("List backlogs for a team in a project.")]
-    public async Task<string> ListBacklogs(
-        [Description("The project name or ID.")] string project,
-        [Description("The team name or ID.")] string team
-    )
-    {
-        var client = await _adoService.GetWorkApiAsync();
-        var teamContext = new Microsoft.TeamFoundation.Core.WebApi.Types.TeamContext(project, team);
-        var backlogs = await client.GetBacklogsAsync(teamContext);
-        return JsonSerializer.Serialize(
-            backlogs,
-            new JsonSerializerOptions { WriteIndented = true }
-        );
-    }
-
-    [McpServerTool(Name = "list_backlog_work_items")]
-    [Description("Get work items in a specific backlog.")]
-    public async Task<string> ListBacklogWorkItems(
-        [Description("The project name or ID.")] string project,
-        [Description("The team name or ID.")] string team,
-        [Description("The backlog ID.")] string backlogId
-    )
-    {
-        var client = await _adoService.GetWorkApiAsync();
-        var teamContext = new Microsoft.TeamFoundation.Core.WebApi.Types.TeamContext(project, team);
-        // Using REST API as SDK method signature differs
-        var connection = _adoService.Connection;
-        var baseUrl = connection.Uri.ToString().TrimEnd('/');
-        var url =
-            $"{baseUrl}/{project}/{team}/_apis/work/backlogs/{backlogId}/workItems?api-version=7.1";
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error getting backlog work items: {response.StatusCode} - {content}";
-
-        return content;
-    }
-
     [McpServerTool(Name = "get_query")]
     [Description("Get a saved work item query by ID or path.")]
     public async Task<QueryHierarchyItem> GetQuery(
@@ -502,5 +328,170 @@ public class WorkItemTools(AzureDevOpsService adoService)
             workItems,
             new JsonSerializerOptions { WriteIndented = true }
         );
+    }
+
+    [McpServerTool(Name = "get_executive_summary")]
+    [Description(
+        "Get a detailed update and executive summary of any work item including all children recursively with roadmap, status, and progress information. Use this when asked for updates, details, or status on features, epics, stories, or any work item."
+    )]
+    public async Task<string> GetExecutiveSummary(
+        [Description("The ID of the work item to get updates/details for.")] int workItemId,
+        [Description("The project name or ID.")] string project
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+
+        // Get the parent work item with relations
+        var parentWorkItem = await client.GetWorkItemAsync(
+            project,
+            workItemId,
+            expand: WorkItemExpand.All
+        );
+
+        if (parentWorkItem == null)
+            return JsonSerializer.Serialize(
+                new { error = $"Work item {workItemId} not found." },
+                new JsonSerializerOptions { WriteIndented = true }
+            );
+
+        // Recursively get all children
+        var allChildren = await GetAllChildrenRecursiveAsync(client, project, parentWorkItem);
+
+        // Build executive summary
+        var summary = BuildExecutiveSummary(parentWorkItem, allChildren);
+
+        return JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    private async Task<List<WorkItem>> GetAllChildrenRecursiveAsync(
+        WorkItemTrackingHttpClient client,
+        string project,
+        WorkItem workItem
+    )
+    {
+        var allChildren = new List<WorkItem>();
+
+        if (workItem.Relations == null)
+            return allChildren;
+
+        // Get direct children
+        var childRelations = workItem
+            .Relations.Where(r =>
+                r.Rel == "System.LinkTypes.Hierarchy-Forward" && r.Url.Contains("workItems/")
+            )
+            .ToList();
+
+        if (!childRelations.Any())
+            return allChildren;
+
+        // Extract child IDs
+        var childIds = childRelations
+            .Select(r =>
+            {
+                var url = r.Url;
+                var lastSlash = url.LastIndexOf('/');
+                if (lastSlash >= 0 && int.TryParse(url.Substring(lastSlash + 1), out var id))
+                    return id;
+                return -1;
+            })
+            .Where(id => id > 0)
+            .ToList();
+
+        if (!childIds.Any())
+            return allChildren;
+
+        // Get all child work items
+        var children = await client.GetWorkItemsAsync(
+            project,
+            childIds,
+            expand: WorkItemExpand.Relations
+        );
+
+        foreach (var child in children)
+        {
+            allChildren.Add(child);
+            // Recursively get children of children
+            var grandChildren = await GetAllChildrenRecursiveAsync(client, project, child);
+            allChildren.AddRange(grandChildren);
+        }
+
+        return allChildren;
+    }
+
+    private object BuildExecutiveSummary(WorkItem parent, List<WorkItem> allChildren)
+    {
+        // Helper to safely get field value
+        string GetFieldValue(WorkItem wi, string fieldName) =>
+            wi.Fields != null && wi.Fields.TryGetValue(fieldName, out var value)
+                ? value?.ToString()
+                : "";
+
+        // Parent info
+        var parentInfo = new
+        {
+            Id = parent.Id,
+            Title = GetFieldValue(parent, "System.Title"),
+            Type = GetFieldValue(parent, "System.WorkItemType"),
+            State = GetFieldValue(parent, "System.State"),
+            AssignedTo = GetFieldValue(parent, "System.AssignedTo"),
+            IterationPath = GetFieldValue(parent, "System.IterationPath"),
+            AreaPath = GetFieldValue(parent, "System.AreaPath"),
+            Priority = GetFieldValue(parent, "Microsoft.VSTS.Common.Priority"),
+            Description = GetFieldValue(parent, "System.Description"),
+        };
+
+        // Group children by type
+        var childrenByType = allChildren
+            .GroupBy(c => GetFieldValue(c, "System.WorkItemType"))
+            .Select(g => new { Type = g.Key, Count = g.Count(), Items = g.ToList() })
+            .ToList();
+
+        // Group children by state
+        var childrenByState = allChildren
+            .GroupBy(c => GetFieldValue(c, "System.State"))
+            .Select(g => new
+            {
+                State = g.Key,
+                Count = g.Count(),
+                Percentage = Math.Round((double)g.Count() / allChildren.Count * 100, 1),
+            })
+            .OrderByDescending(g => g.Count)
+            .ToList();
+
+        // Calculate completion metrics
+        var completedStates = new[] { "Done", "Closed", "Completed", "Resolved" };
+        var completedCount = allChildren.Count(c =>
+            completedStates.Contains(GetFieldValue(c, "System.State"))
+        );
+        var totalCount = allChildren.Count;
+        var completionPercentage =
+            totalCount > 0 ? Math.Round((double)completedCount / totalCount * 100, 1) : 0;
+
+        // Group by assigned to
+        var teamWorkload = allChildren
+            .GroupBy(c => GetFieldValue(c, "System.AssignedTo"))
+            .Select(g => new
+            {
+                AssignedTo = string.IsNullOrWhiteSpace(g.Key) ? "Unassigned" : g.Key,
+                Count = g.Count(),
+            })
+            .OrderByDescending(g => g.Count)
+            .ToList();
+
+        return new
+        {
+            Parent = parentInfo,
+            Summary = new
+            {
+                TotalChildren = totalCount,
+                Completed = completedCount,
+                CompletionPercentage = completionPercentage,
+                InProgress = allChildren.Count(c => GetFieldValue(c, "System.State") == "Active"),
+                NotStarted = allChildren.Count(c => GetFieldValue(c, "System.State") == "New"),
+            },
+            ChildrenByType = childrenByType,
+            ChildrenByState = childrenByState,
+            TeamWorkload = teamWorkload,
+        };
     }
 }
