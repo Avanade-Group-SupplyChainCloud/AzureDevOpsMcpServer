@@ -1,10 +1,7 @@
 using System.ComponentModel;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using Microsoft.VisualStudio.Services.WebApi.Patch;
-using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using ModelContextProtocol.Server;
-using Newtonsoft.Json;
 
 namespace AzureDevOpsMcp.Manager.Tools;
 

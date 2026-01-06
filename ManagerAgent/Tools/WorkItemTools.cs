@@ -392,7 +392,7 @@ public class WorkItemTools(AzureDevOpsService adoService)
             {
                 var url = r.Url;
                 var lastSlash = url.LastIndexOf('/');
-                if (lastSlash >= 0 && int.TryParse(url.Substring(lastSlash + 1), out var id))
+                if (lastSlash >= 0 && int.TryParse(url.AsSpan(lastSlash + 1), out var id))
                     return id;
                 return -1;
             })

@@ -136,7 +136,10 @@ public class TestPlanTools(AzureDevOpsService adoService)
         [Description("The project name or ID.")] string project,
         [Description("The test plan ID.")] int planId,
         [Description("The suite name.")] string name,
-        [Description("Parent suite ID. Use the root suite ID from the test plan if creating at root level.")] int parentSuiteId
+        [Description(
+            "Parent suite ID. Use the root suite ID from the test plan if creating at root level."
+        )]
+            int parentSuiteId
     )
     {
         var client = await _adoService.GetTestManagementApiAsync();
@@ -155,13 +158,18 @@ public class TestPlanTools(AzureDevOpsService adoService)
     }
 
     [McpServerTool(Name = "create_requirement_based_suite")]
-    [Description("Create a requirement-based suite under a plan for a given work item (e.g., User Story).")]
+    [Description(
+        "Create a requirement-based suite under a plan for a given work item (e.g., User Story)."
+    )]
     public async Task<IEnumerable<TestSuite>> CreateRequirementBasedSuite(
         [Description("The project name or ID.")] string project,
         [Description("The test plan ID.")] int planId,
         [Description("The suite name.")] string name,
         [Description("The requirement work item ID.")] int requirementId,
-        [Description("Parent suite ID. Use the root suite ID from the test plan if creating at root level.")] int parentSuiteId
+        [Description(
+            "Parent suite ID. Use the root suite ID from the test plan if creating at root level."
+        )]
+            int parentSuiteId
     )
     {
         var client = await _adoService.GetTestManagementApiAsync();
@@ -186,7 +194,10 @@ public class TestPlanTools(AzureDevOpsService adoService)
         [Description("The test plan ID.")] int planId,
         [Description("The suite name.")] string name,
         [Description("The WIQL query string for the suite.")] string queryString,
-        [Description("Parent suite ID. Use the root suite ID from the test plan if creating at root level.")] int parentSuiteId
+        [Description(
+            "Parent suite ID. Use the root suite ID from the test plan if creating at root level."
+        )]
+            int parentSuiteId
     )
     {
         var client = await _adoService.GetTestManagementApiAsync();
@@ -215,9 +226,7 @@ public class TestPlanTools(AzureDevOpsService adoService)
     {
         var client = await _adoService.GetTestManagementApiAsync();
 
-        var suiteParams = new SuiteUpdateModel(
-            name: string.IsNullOrEmpty(name) ? null : name
-        );
+        var suiteParams = new SuiteUpdateModel(name: string.IsNullOrEmpty(name) ? null : name);
 
 #pragma warning disable CS0612 // Type or member is obsolete
         return await client.UpdateTestSuiteAsync(suiteParams, project, planId, suiteId);
@@ -264,7 +273,8 @@ public class TestPlanTools(AzureDevOpsService adoService)
         [Description("The suite ID.")] int suiteId,
         [Description("Comma-separated test point IDs to update.")] string pointIdsCsv,
         [Description("Optional tester ID to assign.")] string testerId = "",
-        [Description("Set to true to reset the test point to active state.")] bool resetToActive = false
+        [Description("Set to true to reset the test point to active state.")]
+            bool resetToActive = false
     )
     {
         var client = await _adoService.GetTestManagementApiAsync();
@@ -275,13 +285,16 @@ public class TestPlanTools(AzureDevOpsService adoService)
             tester = new IdentityRef { Id = testerId };
         }
 
-        var updateModel = new PointUpdateModel(
-            resetToActive: resetToActive,
-            tester: tester
-        );
+        var updateModel = new PointUpdateModel(resetToActive: resetToActive, tester: tester);
 
 #pragma warning disable CS0612 // Type or member is obsolete
-        var result = await client.UpdateTestPointsAsync(updateModel, project, planId, suiteId, pointIdsCsv);
+        var result = await client.UpdateTestPointsAsync(
+            updateModel,
+            project,
+            planId,
+            suiteId,
+            pointIdsCsv
+        );
 #pragma warning restore CS0612
         return result ?? Enumerable.Empty<TestPoint>();
     }
@@ -297,7 +310,12 @@ public class TestPlanTools(AzureDevOpsService adoService)
     {
         var client = await _adoService.GetTestManagementApiAsync();
 #pragma warning disable CS0612 // Type or member is obsolete
-        var result = await client.AddTestCasesToSuiteAsync(project, planId, suiteId, testCaseIdsCsv);
+        var result = await client.AddTestCasesToSuiteAsync(
+            project,
+            planId,
+            suiteId,
+            testCaseIdsCsv
+        );
 #pragma warning restore CS0612
         return result ?? Enumerable.Empty<SuiteTestCase>();
     }

@@ -68,7 +68,8 @@ public class TestRunTools(AzureDevOpsService adoService)
         [Description("The project name or ID.")] string project,
         [Description("The test run ID.")] int runId,
         [Description("Optional new name.")] string name = "",
-        [Description("Optional new state: 'InProgress', 'Completed', 'Aborted', 'Waiting'.")] string state = "",
+        [Description("Optional new state: 'InProgress', 'Completed', 'Aborted', 'Waiting'.")]
+            string state = "",
         [Description("Optional comment.")] string comment = ""
     )
     {
@@ -136,7 +137,8 @@ public class TestRunTools(AzureDevOpsService adoService)
         [Description("The project name or ID.")] string project,
         [Description("The test run ID.")] int runId,
         [Description("Test case ID.")] int testCaseId,
-        [Description("Outcome: 'Passed', 'Failed', 'Blocked', 'NotApplicable', etc.")] string outcome,
+        [Description("Outcome: 'Passed', 'Failed', 'Blocked', 'NotApplicable', etc.")]
+            string outcome,
         [Description("Optional comment.")] string comment = "",
         [Description("Optional error message (for failed tests).")] string errorMessage = "",
         [Description("Optional duration in milliseconds.")] long? durationInMs = null
@@ -169,7 +171,8 @@ public class TestRunTools(AzureDevOpsService adoService)
         [Description("The project name or ID.")] string project,
         [Description("The test run ID.")] int runId,
         [Description("The test result ID to update.")] int testResultId,
-        [Description("Optional new outcome: 'Passed', 'Failed', 'Blocked', 'NotApplicable', etc.")] string outcome = "",
+        [Description("Optional new outcome: 'Passed', 'Failed', 'Blocked', 'NotApplicable', etc.")]
+            string outcome = "",
         [Description("Optional comment.")] string comment = "",
         [Description("Optional error message.")] string errorMessage = "",
         [Description("Optional state: 'Pending', 'Completed'.")] string state = ""
@@ -264,7 +267,12 @@ public class TestRunTools(AzureDevOpsService adoService)
         );
 
 #pragma warning disable CS0612 // Type or member is obsolete
-        return await client.CreateTestResultAttachmentAsync(attachment, project, runId, testResultId);
+        return await client.CreateTestResultAttachmentAsync(
+            attachment,
+            project,
+            runId,
+            testResultId
+        );
 #pragma warning restore CS0612
     }
 }

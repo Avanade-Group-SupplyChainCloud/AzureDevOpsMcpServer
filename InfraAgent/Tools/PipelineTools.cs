@@ -159,4 +159,3 @@ public class PipelineTools(AzureDevOpsService adoService)
         return content;
     }
 }
-}

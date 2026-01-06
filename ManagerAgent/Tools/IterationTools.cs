@@ -3,7 +3,6 @@ using System.Text.Json;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.Core.WebApi.Types;
 using Microsoft.TeamFoundation.Work.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.Manager.Tools;

@@ -61,7 +61,6 @@ public class CoreTools(AzureDevOpsService adoService)
         [Description("The number of teams to skip for pagination. Defaults to 0.")] int skip = 0
     )
     {
-        var client = await _adoService.GetCoreApiAsync();
         var teamClient = await _adoService.GetTeamApiAsync();
         var teams = await teamClient.GetTeamsAsync(project, mine, top, skip);
 
