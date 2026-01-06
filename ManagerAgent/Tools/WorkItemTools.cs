@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Text.Json;
 using AzureDevOpsMcp.Shared.Services;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
@@ -274,9 +275,7 @@ public class WorkItemTools(AzureDevOpsService adoService)
         var orgUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
         var targetUrl = $"{orgUrl}/_apis/wit/workItems/{targetId}";
 
-        object attributes = string.IsNullOrWhiteSpace(comment)
-            ? null
-            : new { comment = comment };
+        object attributes = string.IsNullOrWhiteSpace(comment) ? null : new { comment = comment };
 
         var patchDocument = new JsonPatchDocument
         {
@@ -360,7 +359,10 @@ public class WorkItemTools(AzureDevOpsService adoService)
         // Build executive summary
         var summary = BuildExecutiveSummary(parentWorkItem, allChildren);
 
-        return JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true });
+        return JsonSerializer.Serialize(
+            summary,
+            new JsonSerializerOptions { WriteIndented = true }
+        );
     }
 
     private async Task<List<WorkItem>> GetAllChildrenRecursiveAsync(
@@ -443,7 +445,12 @@ public class WorkItemTools(AzureDevOpsService adoService)
         // Group children by type
         var childrenByType = allChildren
             .GroupBy(c => GetFieldValue(c, "System.WorkItemType"))
-            .Select(g => new { Type = g.Key, Count = g.Count(), Items = g.ToList() })
+            .Select(g => new
+            {
+                Type = g.Key,
+                Count = g.Count(),
+                Items = g.ToList(),
+            })
             .ToList();
 
         // Group children by state
