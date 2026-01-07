@@ -14,22 +14,22 @@ public class BuildTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_build")]
     [Description("Get detailed information about a specific build.")]
     public async Task<Build> GetBuild(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the build.")] int buildId
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
         return await client.GetBuildAsync(project, buildId);
     }
 
     [McpServerTool(Name = "get_build_logs")]
     [Description("Get the log entries for a build.")]
     public async Task<IEnumerable<BuildLog>> GetBuildLogs(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the build.")] int buildId
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
         var logs = await client.GetBuildLogsAsync(project, buildId);
         return logs ?? Enumerable.Empty<BuildLog>();
     }
@@ -37,12 +37,12 @@ public class BuildTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_build_log_content")]
     [Description("Get the content of a specific build log.")]
     public async Task<string> GetBuildLogContent(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the build.")] int buildId,
         [Description("The ID of the log to retrieve.")] int logId
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
         var logStream = await client.GetBuildLogAsync(project, buildId, logId);
         using var reader = new StreamReader(logStream);
         return await reader.ReadToEndAsync();
@@ -51,23 +51,23 @@ public class BuildTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_build_timeline")]
     [Description("Get the timeline (stages, jobs, tasks) of a build.")]
     public async Task<Timeline> GetBuildTimeline(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the build.")] int buildId
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
         return await client.GetBuildTimelineAsync(project, buildId);
     }
 
     [McpServerTool(Name = "get_build_changes")]
     [Description("Get the source changes associated with a build.")]
     public async Task<IEnumerable<Change>> GetBuildChanges(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the build.")] int buildId,
         [Description("Maximum number of changes to return.")] int top = 50
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
         var changes = await client.GetBuildChangesAsync(project, buildId, top: top);
         return changes ?? Enumerable.Empty<Change>();
     }
@@ -75,12 +75,12 @@ public class BuildTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_build_work_items")]
     [Description("Get work items associated with a build.")]
     public async Task<IEnumerable<ResourceRef>> GetBuildWorkItems(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the build.")] int buildId,
         [Description("Maximum number of work items to return.")] int top = 50
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
         var workItems = await client.GetBuildWorkItemsRefsAsync(project, buildId, top: top);
         return workItems ?? Enumerable.Empty<ResourceRef>();
     }
@@ -88,7 +88,6 @@ public class BuildTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "cancel_build")]
     [Description("Cancel a running build.")]
     public async Task<Build> CancelBuild(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the build to cancel.")] int buildId
     )
     {
@@ -100,11 +99,11 @@ public class BuildTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_build_artifacts")]
     [Description("Get the artifacts published by a build.")]
     public async Task<IEnumerable<BuildArtifact>> GetBuildArtifacts(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the build.")] int buildId
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
         var artifacts = await client.GetArtifactsAsync(project, buildId);
         return artifacts ?? Enumerable.Empty<BuildArtifact>();
     }
@@ -112,18 +111,17 @@ public class BuildTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_pipeline_definition")]
     [Description("Get detailed information about a pipeline/build definition.")]
     public async Task<BuildDefinition> GetPipelineDefinition(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the pipeline definition.")] int definitionId
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
         return await client.GetDefinitionAsync(project, definitionId);
     }
 
     [McpServerTool(Name = "get_pipeline_runs")]
     [Description("Get recent runs of a specific pipeline.")]
     public async Task<IEnumerable<Build>> GetPipelineRuns(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the pipeline definition.")] int definitionId,
         [Description("Maximum number of builds to return.")] int top = 20,
         [Description(
@@ -137,6 +135,7 @@ public class BuildTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
 
         BuildStatus? status = string.IsNullOrEmpty(statusFilter)
             ? null
@@ -176,13 +175,13 @@ public class BuildTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "queue_build_with_parameters")]
     [Description("Queue a new build with custom parameters and variables.")]
     public async Task<Build> QueueBuildWithParameters(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the pipeline definition.")] int definitionId,
         [Description("The branch to build (e.g., 'refs/heads/main').")] string sourceBranch = "",
         [Description("Reason for the build: 'manual', 'schedule', etc.")] string reason = "manual"
     )
     {
         var client = await _adoService.GetBuildApiAsync();
+        var project = _adoService.DefaultProject;
 
         var build = new Build
         {

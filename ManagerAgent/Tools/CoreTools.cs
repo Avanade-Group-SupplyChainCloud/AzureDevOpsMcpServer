@@ -52,9 +52,8 @@ public class CoreTools(AzureDevOpsService adoService)
     }
 
     [McpServerTool(Name = "list_teams")]
-    [Description("List all teams in a specific Azure DevOps project.")]
+    [Description("List all teams.")]
     public async Task<IEnumerable<WebApiTeam>> ListProjectTeams(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("If true, only return teams that the authenticated user is a member of.")]
             bool mine = false,
         [Description("The maximum number of teams to return. Defaults to 100.")] int top = 100,
@@ -62,6 +61,7 @@ public class CoreTools(AzureDevOpsService adoService)
     )
     {
         var teamClient = await _adoService.GetTeamApiAsync();
+        var project = _adoService.DefaultProject;
         var teams = await teamClient.GetTeamsAsync(project, mine, top, skip);
 
         return teams ?? Enumerable.Empty<WebApiTeam>();

@@ -17,12 +17,11 @@ public class QueryTools(AzureDevOpsService adoService)
             "The WIQL query string. Example: \"SELECT [System.Id], [System.Title] FROM WorkItems WHERE [System.State] = 'Active'\""
         )]
             string wiqlQuery,
-        [Description("The project name or ID (required for project-scoped queries).")]
-            string project,
         [Description("Maximum number of results to return.")] int top = 200
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
 
         var wiql = new Wiql { Query = wiqlQuery };
         var result = await client.QueryByWiqlAsync(wiql, project, top: top);
@@ -41,12 +40,12 @@ public class QueryTools(AzureDevOpsService adoService)
     [Description("Get multiple work items by their IDs in a single request.")]
     public async Task<IEnumerable<WorkItem>> GetWorkItemsByIds(
         [Description("Array of work item IDs to retrieve.")] int[] ids,
-        [Description("The project name or ID.")] string project,
         [Description("Expand level: 'None', 'Relations', 'Fields', 'Links', 'All'.")]
             string expand = "Fields"
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
 
         WorkItemExpand expandEnum = expand.ToLower() switch
         {
@@ -65,7 +64,6 @@ public class QueryTools(AzureDevOpsService adoService)
     [Description("Search for work items by text across title, description, and other fields.")]
     public async Task<IEnumerable<WorkItem>> SearchWorkItems(
         [Description("The search text to find in work items.")] string searchText,
-        [Description("The project name or ID.")] string project,
         [Description("Filter by work item type (e.g., 'Bug', 'Task', 'User Story').")]
             string workItemType = "",
         [Description("Filter by state (e.g., 'Active', 'Closed', 'New').")] string state = "",
@@ -74,6 +72,7 @@ public class QueryTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
 
         var conditions = new List<string>();
         conditions.Add($"[System.TeamProject] = '{project}'");
@@ -117,12 +116,11 @@ public class QueryTools(AzureDevOpsService adoService)
     }
 
     [McpServerTool(Name = "get_work_item_types")]
-    [Description("Get all work item types available in a project.")]
-    public async Task<IEnumerable<WorkItemType>> GetWorkItemTypes(
-        [Description("The project name or ID.")] string project
-    )
+    [Description("Get all work item types available.")]
+    public async Task<IEnumerable<WorkItemType>> GetWorkItemTypes()
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var types = await client.GetWorkItemTypesAsync(project);
         return types ?? Enumerable.Empty<WorkItemType>();
     }
@@ -140,25 +138,25 @@ public class QueryTools(AzureDevOpsService adoService)
     [Description("Get the revision history of a work item.")]
     public async Task<IEnumerable<WorkItem>> GetWorkItemHistory(
         [Description("The ID of the work item.")] int id,
-        [Description("The project name or ID.")] string project,
         [Description("Maximum number of revisions to return.")] int top = 50
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var revisions = await client.GetRevisionsAsync(project, id, top: top);
         return revisions ?? Enumerable.Empty<WorkItem>();
     }
 
     [McpServerTool(Name = "get_saved_queries")]
-    [Description("Get saved queries (My Queries or Shared Queries) in a project.")]
+    [Description("Get saved queries (My Queries or Shared Queries).")]
     public async Task<IEnumerable<QueryHierarchyItem>> GetSavedQueries(
-        [Description("The project name or ID.")] string project,
         [Description("Depth of folder expansion (0=no expansion).")] int depth = 1,
         [Description("Expand level: 'None', 'Wiql', 'Clauses', 'All', 'Minimal'.")]
             string expand = "None"
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
 
         QueryExpand expandEnum = expand.ToLower() switch
         {
@@ -176,12 +174,12 @@ public class QueryTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "run_saved_query")]
     [Description("Execute a saved query by its ID and return the results.")]
     public async Task<IEnumerable<WorkItem>> RunSavedQuery(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the saved query.")] Guid queryId,
         [Description("Maximum number of results to return.")] int top = 200
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
 
         var result = await client.QueryByIdAsync(project, queryId, top: top);
 

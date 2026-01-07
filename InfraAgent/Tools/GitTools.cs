@@ -14,11 +14,11 @@ public class GitTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_repo_by_name_or_id")]
     [Description("Get repository details by name or ID.")]
     public async Task<GitRepository> GetRepoByNameOrId(
-        [Description("The project name or ID.")] string project,
         [Description("The repository name or ID.")] string repositoryNameOrId
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
         return await client.GetRepositoryAsync(project, repositoryNameOrId);
     }
 
@@ -26,12 +26,12 @@ public class GitTools(AzureDevOpsService adoService)
     [Description("List all branches in a Git repository.")]
     public async Task<IEnumerable<GitBranchStats>> ListBranches(
         [Description("The ID or name of the repository.")] string repositoryId,
-        [Description("The project name or ID.")] string project,
         [Description("Filter branches containing this text.")] string filterContains = null,
         [Description("Maximum number of branches to return.")] int top = 100
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
         var branches = await client.GetBranchesAsync(repositoryId, project);
 
         IEnumerable<GitBranchStats> result = branches ?? Enumerable.Empty<GitBranchStats>();
@@ -48,12 +48,12 @@ public class GitTools(AzureDevOpsService adoService)
     [Description("List branches created by the current user.")]
     public async Task<string> ListMyBranches(
         [Description("The ID or name of the repository.")] string repositoryId,
-        [Description("The project name or ID.")] string project,
         [Description("Filter branches containing this text.")] string filterContains = null,
         [Description("Maximum number of branches to return.")] int top = 100
     )
     {
         var connection = _adoService.Connection;
+        var project = _adoService.DefaultProject;
         var baseUrl = connection.Uri.ToString().TrimEnd('/');
         var url =
             $"{baseUrl}/{project}/_apis/git/repositories/{repositoryId}/refs?filter=heads&peelTags=true&api-version=7.1-preview.1";
@@ -76,11 +76,11 @@ public class GitTools(AzureDevOpsService adoService)
     [Description("Get details of a specific branch including commit info.")]
     public async Task<GitBranchStats> GetBranch(
         [Description("The ID or name of the repository.")] string repositoryId,
-        [Description("The name of the branch.")] string branchName,
-        [Description("The project name or ID.")] string project
+        [Description("The name of the branch.")] string branchName
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
         return await client.GetBranchAsync(repositoryId, branchName, project);
     }
 
@@ -89,7 +89,6 @@ public class GitTools(AzureDevOpsService adoService)
     public async Task<GitItem> GetFileContent(
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The path to the file in the repository.")] string path,
-        [Description("The project name or ID.")] string project,
         [Description("The branch name or commit SHA to get the file from.")]
             string version = "main",
         [Description("The type of version: 'branch', 'commit', or 'tag'.")]
@@ -97,6 +96,7 @@ public class GitTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
 
         var versionDescriptor = new GitVersionDescriptor
         {
@@ -122,7 +122,6 @@ public class GitTools(AzureDevOpsService adoService)
     [Description("List pull requests in a repository with filtering options.")]
     public async Task<IEnumerable<GitPullRequest>> ListPullRequests(
         [Description("The ID or name of the repository.")] string repositoryId,
-        [Description("The project name or ID.")] string project,
         [Description("Filter by status: 'active', 'completed', 'abandoned', or 'all'.")]
             string status = "active",
         [Description("Filter by target branch.")] string targetBranch = "",
@@ -133,6 +132,7 @@ public class GitTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
 
         var searchCriteria = new GitPullRequestSearchCriteria
         {
@@ -168,12 +168,16 @@ public class GitTools(AzureDevOpsService adoService)
     [Description("Get the commits associated with a pull request.")]
     public async Task<IEnumerable<GitCommitRef>> GetPullRequestCommits(
         [Description("The ID or name of the repository.")] string repositoryId,
-        [Description("The ID of the pull request.")] int pullRequestId,
-        [Description("The project name or ID.")] string project
+        [Description("The ID of the pull request.")] int pullRequestId
     )
     {
         var client = await _adoService.GetGitApiAsync();
-        var commits = await client.GetPullRequestCommitsAsync(repositoryId, pullRequestId, project);
+        var project = _adoService.DefaultProject;
+        var commits = await client.GetPullRequestCommitsAsync(
+            repositoryId,
+            pullRequestId,
+            project
+        );
         return commits ?? Enumerable.Empty<GitCommitRef>();
     }
 
@@ -181,11 +185,11 @@ public class GitTools(AzureDevOpsService adoService)
     [Description("Get the reviewers of a pull request.")]
     public async Task<IEnumerable<IdentityRefWithVote>> GetPullRequestReviewers(
         [Description("The ID or name of the repository.")] string repositoryId,
-        [Description("The ID of the pull request.")] int pullRequestId,
-        [Description("The project name or ID.")] string project
+        [Description("The ID of the pull request.")] int pullRequestId
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
         var reviewers = await client.GetPullRequestReviewersAsync(
             repositoryId,
             pullRequestId,
@@ -199,7 +203,6 @@ public class GitTools(AzureDevOpsService adoService)
     public async Task<GitPullRequest> UpdatePullRequest(
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The ID of the pull request.")] int pullRequestId,
-        [Description("The project name or ID.")] string project,
         [Description("New title for the PR.")] string title = "",
         [Description("New description for the PR.")] string description = "",
         [Description("New status: 'active', 'completed', 'abandoned'.")] string status = "",
@@ -208,6 +211,7 @@ public class GitTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
 
         var update = new GitPullRequest();
         if (!string.IsNullOrEmpty(title))
@@ -228,7 +232,12 @@ public class GitTools(AzureDevOpsService adoService)
             };
         }
 
-        return await client.UpdatePullRequestAsync(update, repositoryId, pullRequestId, project);
+        return await client.UpdatePullRequestAsync(
+            update,
+            repositoryId,
+            pullRequestId,
+            project
+        );
     }
 
     [McpServerTool(Name = "update_pull_request_reviewers")]
@@ -236,12 +245,12 @@ public class GitTools(AzureDevOpsService adoService)
     public async Task<string> UpdatePullRequestReviewers(
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The ID of the pull request.")] int pullRequestId,
-        [Description("The project name or ID.")] string project,
         [Description("List of reviewer IDs.")] IEnumerable<string> reviewerIds,
         [Description("Action: 'add' or 'remove'.")] string action = "add"
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
         var results = new List<object>();
 
         foreach (var reviewerId in reviewerIds)
@@ -282,11 +291,11 @@ public class GitTools(AzureDevOpsService adoService)
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The ID of the pull request.")] int pullRequestId,
         [Description("The ID of the reviewer to add.")] string reviewerId,
-        [Description("The project name or ID.")] string project,
         [Description("Whether the reviewer is required.")] bool isRequired = false
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
 
         var reviewer = new IdentityRefWithVote { Id = reviewerId, IsRequired = isRequired };
 
@@ -304,12 +313,12 @@ public class GitTools(AzureDevOpsService adoService)
     public async Task<IEnumerable<GitPullRequestCommentThread>> GetPullRequestThreads(
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The ID of the pull request.")] int pullRequestId,
-        [Description("The project name or ID.")] string project,
         [Description("Filter by status: 'active', 'fixed', 'wontFix', 'closed', 'pending'.")]
             string status = null
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
         var threads = await client.GetThreadsAsync(project, repositoryId, pullRequestId);
 
         var result = threads ?? Enumerable.Empty<GitPullRequestCommentThread>();
@@ -335,11 +344,11 @@ public class GitTools(AzureDevOpsService adoService)
     public async Task<IEnumerable<Comment>> ListPullRequestThreadComments(
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The ID of the pull request.")] int pullRequestId,
-        [Description("The ID of the thread.")] int threadId,
-        [Description("The project name or ID.")] string project
+        [Description("The ID of the thread.")] int threadId
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
         var comments = await client.GetCommentsAsync(
             repositoryId,
             pullRequestId,
@@ -355,7 +364,6 @@ public class GitTools(AzureDevOpsService adoService)
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The ID of the pull request.")] int pullRequestId,
         [Description("The content of the comment.")] string content,
-        [Description("The project name or ID.")] string project,
         [Description("The file path for file-level comments.")] string filePath = null,
         [Description(
             "The status of the thread: 'active', 'fixed', 'wontFix', 'closed', 'pending'."
@@ -364,6 +372,7 @@ public class GitTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
 
         var thread = new GitPullRequestCommentThread
         {
@@ -383,7 +392,12 @@ public class GitTools(AzureDevOpsService adoService)
             thread.ThreadContext = new CommentThreadContext { FilePath = filePath };
         }
 
-        return await client.CreateThreadAsync(thread, repositoryId, pullRequestId, project);
+        return await client.CreateThreadAsync(
+            thread,
+            repositoryId,
+            pullRequestId,
+            project
+        );
     }
 
     [McpServerTool(Name = "update_pull_request_thread")]
@@ -392,12 +406,12 @@ public class GitTools(AzureDevOpsService adoService)
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The ID of the pull request.")] int pullRequestId,
         [Description("The ID of the thread.")] int threadId,
-        [Description("The project name or ID.")] string project,
         [Description("New status: 'active', 'fixed', 'wontFix', 'closed', 'pending'.")]
             string status
     )
     {
         var client = await _adoService.GetGitApiAsync();
+        var project = _adoService.DefaultProject;
 
         var threadUpdate = new GitPullRequestCommentThread
         {
@@ -426,12 +440,12 @@ public class GitTools(AzureDevOpsService adoService)
         [Description("The ID or name of the repository.")] string repositoryId,
         [Description("The ID of the pull request.")] int pullRequestId,
         [Description("The ID of the thread.")] int threadId,
-        [Description("The content of the reply.")] string content,
-        [Description("The project name or ID.")] string project
+        [Description("The content of the reply.")] string content
     )
     {
         var client = await _adoService.GetGitApiAsync();
         var comment = new Comment { Content = content };
+        var project = _adoService.DefaultProject;
         return await client.CreateCommentAsync(
             comment,
             repositoryId,

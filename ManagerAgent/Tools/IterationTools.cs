@@ -13,14 +13,14 @@ public class IterationTools(AzureDevOpsService adoService)
     private readonly AzureDevOpsService _adoService = adoService;
 
     [McpServerTool(Name = "list_iterations")]
-    [Description("List all iterations (sprints) for a team in a project.")]
+    [Description("List all iterations (sprints) for a team.")]
     public async Task<IEnumerable<TeamSettingsIteration>> ListIterations(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The name or ID of the team.")] string team,
         [Description("Filter by timeframe: 'current', 'past', or 'future'.")] string timeframe = ""
     )
     {
         var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
         var teamContext = new TeamContext(project, team);
         var iterations = await client.GetTeamIterationsAsync(
             teamContext,
@@ -32,24 +32,24 @@ public class IterationTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_current_iteration")]
     [Description("Get the current iteration (sprint) for a team.")]
     public async Task<TeamSettingsIteration> GetCurrentIteration(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The name or ID of the team.")] string team
     )
     {
         var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
         var teamContext = new TeamContext(project, team);
         var iterations = await client.GetTeamIterationsAsync(teamContext, "current");
         return iterations?.FirstOrDefault();
     }
 
     [McpServerTool(Name = "get_iteration_capacities")]
-    [Description("Get an iteration's capacity for all teams in iteration and project.")]
+    [Description("Get an iteration's capacity for all teams.")]
     public async Task<string> GetIterationCapacities(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The ID of the iteration.")] string iterationId
     )
     {
         var connection = _adoService.Connection;
+        var project = _adoService.DefaultProject;
         var baseUrl = connection.Uri.ToString().TrimEnd('/');
         var url =
             $"{baseUrl}/{project}/_apis/work/iterations/{iterationId}/iterationcapacities?api-version=7.1";
@@ -67,12 +67,12 @@ public class IterationTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_team_capacity")]
     [Description("Get the capacity settings for a team in a specific iteration.")]
     public async Task<IEnumerable<TeamMemberCapacityIdentityRef>> GetTeamCapacity(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The name or ID of the team.")] string team,
         [Description("The ID of the iteration.")] Guid iterationId
     )
     {
         var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
         var teamContext = new TeamContext(project, team);
         var capacities = await client.GetCapacitiesWithIdentityRefAsync(teamContext, iterationId);
         return capacities ?? Enumerable.Empty<TeamMemberCapacityIdentityRef>();
@@ -81,7 +81,6 @@ public class IterationTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "update_team_member_capacity")]
     [Description("Update capacity for a team member in an iteration.")]
     public async Task<TeamMemberCapacityIdentityRef> UpdateTeamMemberCapacity(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The name or ID of the team.")] string team,
         [Description("The ID of the iteration.")] Guid iterationId,
         [Description("The ID of the team member.")] Guid teamMemberId,
@@ -91,6 +90,7 @@ public class IterationTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
         var teamContext = new TeamContext(project, team);
 
         var capacityPatch = new CapacityPatch
@@ -112,12 +112,12 @@ public class IterationTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_team_days_off")]
     [Description("Get the team days off for a specific iteration.")]
     public async Task<TeamSettingsDaysOff> GetTeamDaysOff(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The name or ID of the team.")] string team,
         [Description("The ID of the iteration.")] Guid iterationId
     )
     {
         var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
         var teamContext = new TeamContext(project, team);
         return await client.GetTeamDaysOffAsync(teamContext, iterationId);
     }
@@ -125,13 +125,13 @@ public class IterationTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "set_team_days_off")]
     [Description("Set days off for the team in a specific iteration.")]
     public async Task<TeamSettingsDaysOff> SetTeamDaysOff(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The name or ID of the team.")] string team,
         [Description("The ID of the iteration.")] Guid iterationId,
         [Description("JSON array of date ranges [{start, end}] for days off.")] string daysOffJson
     )
     {
         var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
         var teamContext = new TeamContext(project, team);
 
         var dateRanges =
@@ -153,11 +153,11 @@ public class IterationTools(AzureDevOpsService adoService)
         "Get the team settings including backlog iteration, default iteration, and working days."
     )]
     public async Task<TeamSetting> GetTeamSettings(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The name or ID of the team.")] string team
     )
     {
         var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
         var teamContext = new TeamContext(project, team);
         return await client.GetTeamSettingsAsync(teamContext);
     }
@@ -167,7 +167,6 @@ public class IterationTools(AzureDevOpsService adoService)
         "Update team settings like default iteration, backlog iteration, and working days."
     )]
     public async Task<TeamSetting> UpdateTeamSettings(
-        [Description("The name or ID of the Azure DevOps project.")] string project,
         [Description("The name or ID of the team.")] string team,
         [Description("The default iteration ID (GUID).")] Guid? defaultIterationId = null,
         [Description("The backlog iteration ID (GUID).")] Guid? backlogIterationId = null,
@@ -178,6 +177,7 @@ public class IterationTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
         var teamContext = new TeamContext(project, team);
 
         var patch = new TeamSettingsPatch();

@@ -17,6 +17,7 @@ public class AzureDevOpsSettings
 {
     public string OrgUrl { get; set; }
     public string PersonalAccessToken { get; set; }
+    public string DefaultProject { get; set; }
 }
 
 public class AzureDevOpsService(IOptions<AzureDevOpsSettings> settings)
@@ -27,9 +28,17 @@ public class AzureDevOpsService(IOptions<AzureDevOpsSettings> settings)
     );
 
     private readonly string _personalAccessToken = settings.Value.PersonalAccessToken;
+    private readonly string _defaultProject = settings.Value.DefaultProject;
 
     public VssConnection Connection => _connection;
     public string PersonalAccessToken => _personalAccessToken;
+    public string DefaultProject => _defaultProject;
+
+    /// <summary>
+    /// Returns the provided project if not null/empty, otherwise returns the default project from settings.
+    /// </summary>
+    public string GetProjectOrDefault(string project) =>
+        string.IsNullOrWhiteSpace(project) ? _defaultProject : project;
 
     /// <summary>
     /// Creates an HttpClient configured with the PAT for REST API calls.

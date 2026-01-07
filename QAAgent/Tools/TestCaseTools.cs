@@ -15,7 +15,6 @@ public class TestCaseTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "create_test_case")]
     [Description("Create a new Test Case work item.")]
     public async Task<WorkItem> CreateTestCase(
-        [Description("The project name or ID.")] string project,
         [Description("Test case title.")] string title,
         [Description("Optional area path.")] string areaPath = "",
         [Description("Optional iteration path.")] string iterationPath = "",
@@ -27,6 +26,7 @@ public class TestCaseTools(AzureDevOpsService adoService)
     )
     {
         var wit = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
 
         var patch = new JsonPatchDocument
         {
@@ -122,7 +122,6 @@ public class TestCaseTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "update_test_case")]
     [Description("Update fields on a Test Case work item.")]
     public async Task<WorkItem> UpdateTestCase(
-        [Description("The project name or ID.")] string project,
         [Description("Test case work item ID.")] int id,
         [Description("Field updates as dictionary of field reference name -> value.")]
             Dictionary<string, object> updates
@@ -149,11 +148,11 @@ public class TestCaseTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_test_case")]
     [Description("Get a Test Case work item by ID.")]
     public async Task<WorkItem> GetTestCase(
-        [Description("The project name or ID.")] string project,
         [Description("Test case work item ID.")] int id
     )
     {
         var wit = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         return await wit.GetWorkItemAsync(project, id, expand: WorkItemExpand.Fields);
     }
 }

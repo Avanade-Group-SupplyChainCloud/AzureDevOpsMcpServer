@@ -21,7 +21,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
     )]
     public async Task<WorkItem> GetWorkItem(
         [Description("The ID of the work item.")] int id,
-        [Description("The project name or ID.")] string project,
         [Description("A list of fields to include in the response.")]
             IEnumerable<string> fields = null,
         [Description("The date and time to retrieve the work item as of.")] DateTime? asOf = null,
@@ -30,33 +29,34 @@ public class WorkItemTools(AzureDevOpsService adoService)
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         return await client.GetWorkItemAsync(project, id, fields, asOf, expand);
     }
 
     [McpServerTool(Name = "get_work_items_batch")]
     [Description("Get multiple work items by IDs in a single batch request.")]
     public async Task<IEnumerable<WorkItem>> GetWorkItemsBatch(
-        [Description("The project name or ID.")] string project,
         [Description("List of work item IDs to retrieve.")] IEnumerable<int> ids,
         [Description("A list of fields to include in the response.")]
             IEnumerable<string> fields = null
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var workItems = await client.GetWorkItemsAsync(project, ids, fields);
         return workItems ?? Enumerable.Empty<WorkItem>();
     }
 
     [McpServerTool(Name = "create_work_item")]
-    [Description("Create a new work item (Bug, Task, User Story, etc.) in a project.")]
+    [Description("Create a new work item (Bug, Task, User Story, etc.).")]
     public async Task<WorkItem> CreateWorkItem(
-        [Description("The project name or ID.")] string project,
         [Description("The type of work item to create (e.g., 'Bug', 'Task').")] string workItemType,
         [Description("A dictionary of fields and their values for the new work item.")]
             Dictionary<string, object> fields
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var patchDocument = new JsonPatchDocument();
 
         foreach (var field in fields)
@@ -78,7 +78,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [Description("Update fields on an existing work item.")]
     public async Task<WorkItem> UpdateWorkItem(
         [Description("The ID of the work item to update.")] int id,
-        [Description("The project name or ID.")] string project,
         [Description("A dictionary of fields and their values to update.")]
             Dictionary<string, object> updates
     )
@@ -104,12 +103,12 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "list_work_item_comments")]
     [Description("Get comments on a work item.")]
     public async Task<string> ListWorkItemComments(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the work item.")] int workItemId,
         [Description("Maximum number of comments to return.")] int top = 100
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var comments = await client.GetCommentsAsync(project, workItemId, top);
         return JsonSerializer.Serialize(
             comments,
@@ -120,12 +119,12 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "add_work_item_comment")]
     [Description("Add a comment to a work item.")]
     public async Task<string> AddWorkItemComment(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the work item.")] int workItemId,
         [Description("The comment text.")] string comment
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var request = new CommentCreate { Text = comment };
         var result = await client.AddCommentAsync(request, project, workItemId);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
@@ -134,13 +133,13 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "list_work_item_revisions")]
     [Description("Get revision history of a work item.")]
     public async Task<IEnumerable<WorkItem>> ListWorkItemRevisions(
-        [Description("The project name or ID.")] string project,
         [Description("The ID of the work item.")] int workItemId,
         [Description("Maximum number of revisions.")] int top = 100,
         [Description("Number of revisions to skip.")] int skip = 0
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var revisions = await client.GetRevisionsAsync(project, workItemId, top, skip);
         return revisions ?? Enumerable.Empty<WorkItem>();
     }
@@ -149,12 +148,12 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [Description("Create child work items under a parent work item.")]
     public async Task<IEnumerable<WorkItem>> AddChildWorkItems(
         [Description("The ID of the parent work item.")] int parentId,
-        [Description("The project name or ID.")] string project,
         [Description("The type of child work items to create.")] string workItemType,
         [Description("List of child work item titles.")] IEnumerable<string> titles
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var results = new List<WorkItem>();
 
         foreach (var title in titles)
@@ -179,7 +178,11 @@ public class WorkItemTools(AzureDevOpsService adoService)
                 },
             };
 
-            var workItem = await client.CreateWorkItemAsync(patchDocument, project, workItemType);
+            var workItem = await client.CreateWorkItemAsync(
+                patchDocument,
+                project,
+                workItemType
+            );
             results.Add(workItem);
         }
 
@@ -258,7 +261,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
     public async Task<WorkItem> LinkWorkItems(
         [Description("The ID of the source work item.")] int sourceId,
         [Description("The ID of the target work item.")] int targetId,
-        [Description("The project name or ID.")] string project,
         [Description("Link type: 'parent', 'child', 'related', 'predecessor', 'successor'.")]
             string linkType = "related",
         [Description("Optional comment to include on the link.")] string comment = ""
@@ -301,12 +303,12 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [McpServerTool(Name = "get_query")]
     [Description("Get a saved work item query by ID or path.")]
     public async Task<QueryHierarchyItem> GetQuery(
-        [Description("The project name or ID.")] string project,
         [Description("The query ID or path.")] string query,
         [Description("Expand level for children.")] int depth = 0
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         return await client.GetQueryAsync(project, query, depth: depth);
     }
 
@@ -314,11 +316,11 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [Description("Execute a saved query and get results.")]
     public async Task<string> GetQueryResults(
         [Description("The query ID.")] string queryId,
-        [Description("The project name or ID.")] string project = null,
         [Description("Maximum number of results.")] int top = 100
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
         var result = await client.QueryByIdAsync(project, Guid.Parse(queryId));
 
         if (result?.WorkItems == null || !result.WorkItems.Any())
@@ -337,13 +339,13 @@ public class WorkItemTools(AzureDevOpsService adoService)
         "Get an executive summary (summary/update/status) for a work item, including all children recursively (roadmap, status, progress)."
     )]
     public async Task<string> GetExecutiveSummary(
-        [Description("The ID of the work item to get updates/details for.")] int workItemId,
-        [Description("The project name or ID.")] string project
+        [Description("The ID of the work item to get updates/details for.")] int workItemId
     )
     {
         return await ErrorHandler.ExecuteWithErrorHandling(async () =>
         {
             var client = await _adoService.GetWorkItemTrackingApiAsync();
+            var project = _adoService.DefaultProject;
 
             // Get the parent work item with relations
             var parentWorkItem = await client.GetWorkItemAsync(
@@ -437,7 +439,7 @@ public class WorkItemTools(AzureDevOpsService adoService)
         // Parent info
         var parentInfo = new
         {
-            Id = parent.Id,
+            parent.Id,
             Title = GetFieldValue(parent, "System.Title"),
             Type = GetFieldValue(parent, "System.WorkItemType"),
             State = GetFieldValue(parent, "System.State"),
