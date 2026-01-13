@@ -197,6 +197,34 @@ Run whichever agent you want to expose:
 
 Each agent listens on the port configured in its `Properties/launchSettings.json`.
 
+### Usage Examples
+
+- update_work_item
+  - Purpose: Update one or more fields on a work item by ID.
+  - Signature: `update_work_item(id, updates: Dictionary<string, object>)`
+  - Example:
+
+    ```json
+    {
+      "tool": "update_work_item",
+      "args": {
+        "id": 12345,
+        "updates": {
+          "System.Title": "Update API contract",
+          "System.AreaPath": "MyProject\\MyArea",
+          "System.IterationPath": "MyProject\\Sprint 1",
+          "Microsoft.VSTS.Scheduling.OriginalEstimate": 8,
+          "Microsoft.VSTS.Scheduling.RemainingWork": 8
+        }
+      }
+    }
+    ```
+
+  - Notes:
+    - `updates` is required and must contain at least one field.
+    - Field names are Azure DevOps reference names (e.g., `System.AreaPath`).
+    - For string values containing backslashes, escape as needed in JSON.
+
 ## MCP Configuration
 
 To use one of these servers with an MCP client (like Claude Desktop or VS Code), configure the client to start the desired agent.

@@ -78,43 +78,64 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [Description("Update fields on an existing work item.")]
     public async Task<string> UpdateWorkItem(
         [Description("The ID of the work item to update.")] int id,
-        [Description("A dictionary of fields and their values to update.")]
+        [Description(
+            "Field ref name -> value. Example: { \"System.Title\": \"Fix login bug\", \"System.State\": \"Active\" }."
+        )]
             Dictionary<string, object> updates
     )
     {
         return await ErrorHandler.ExecuteWithErrorHandling(async () =>
         {
+            if (updates == null || updates.Count == 0)
+            {
+                throw new ArgumentException(
+                    "Parameter 'updates' is required and must contain at least one field mapping."
+                );
+            }
+
             var client = await _adoService.GetWorkItemTrackingApiAsync();
             var patchDocument = new JsonPatchDocument();
 
             foreach (var (field, rawValue) in updates)
             {
-                var value = ExtractValue(rawValue);
-                patchDocument.Add(new JsonPatchOperation
+                object value = rawValue;
+
+                // Tool calls often deserialize Dictionary<string, object> values as JsonElement.
+                if (rawValue is JsonElement e)
                 {
-                    Operation = Operation.Replace,
-                    Path = $"/fields/{field}",
-                    Value = value,
-                });
+                    value = e.ValueKind switch
+                    {
+                        JsonValueKind.String => e.GetString(),
+                        JsonValueKind.Number => e.TryGetInt64(out var l) ? l : e.GetDouble(),
+                        JsonValueKind.True => true,
+                        JsonValueKind.False => false,
+                        JsonValueKind.Null => null,
+                        _ => e.GetRawText(), // for arrays/objects, pass raw JSON text
+                    };
+                }
+
+                patchDocument.Add(
+                    new JsonPatchOperation
+                    {
+                        Operation = Operation.Replace,
+                        Path = $"/fields/{field}",
+                        Value = value,
+                    }
+                );
             }
 
             var result = await client.UpdateWorkItemAsync(patchDocument, id);
-            return JsonSerializer.Serialize(new { success = true, id = result.Id, rev = result.Rev });
+
+            return JsonSerializer.Serialize(
+                new
+                {
+                    success = true,
+                    id = result.Id,
+                    rev = result.Rev,
+                }
+            );
         });
     }
-
-    private static object ExtractValue(object value) => value switch
-    {
-        JsonElement e => e.ValueKind switch
-        {
-            JsonValueKind.String => e.GetString(),
-            JsonValueKind.Number => e.GetDouble(),
-            JsonValueKind.True => true,
-            JsonValueKind.False => false,
-            _ => null
-        },
-        _ => value
-    };
 
     [McpServerTool(Name = "list_work_item_comments")]
     [Description("Get comments on a work item.")]
