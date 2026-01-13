@@ -201,7 +201,7 @@ Each agent listens on the port configured in its `Properties/launchSettings.json
 
 - update_work_item
   - Purpose: Update one or more fields on a work item by ID.
-  - Signature: `update_work_item(id, updates: Dictionary<string, object>)`
+  - Signature: `update_work_item(id, updates: List<{ Field: string, Value: any }>)`
   - Example:
 
     ```json
@@ -209,19 +209,19 @@ Each agent listens on the port configured in its `Properties/launchSettings.json
       "tool": "update_work_item",
       "args": {
         "id": 12345,
-        "updates": {
-          "System.Title": "Update API contract",
-          "System.AreaPath": "MyProject\\MyArea",
-          "System.IterationPath": "MyProject\\Sprint 1",
-          "Microsoft.VSTS.Scheduling.OriginalEstimate": 8,
-          "Microsoft.VSTS.Scheduling.RemainingWork": 8
-        }
+        "updates": [
+          { "field": "System.Title", "value": "Update API contract" },
+          { "field": "System.AreaPath", "value": "MyProject\\MyArea" },
+          { "field": "System.IterationPath", "value": "MyProject\\Sprint 1" },
+          { "field": "Microsoft.VSTS.Scheduling.OriginalEstimate", "value": 8 },
+          { "field": "Microsoft.VSTS.Scheduling.RemainingWork", "value": 8 }
+        ]
       }
     }
     ```
 
   - Notes:
-    - `updates` is required and must contain at least one field.
+    - `updates` is required and must contain at least one item.
     - Field names are Azure DevOps reference names (e.g., `System.AreaPath`).
     - For string values containing backslashes, escape as needed in JSON.
 

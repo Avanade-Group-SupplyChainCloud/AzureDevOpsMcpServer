@@ -10,6 +10,8 @@ using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.Manager.Tools;
 
+public record FieldUpdate(string Field, JsonElement Value);
+
 [McpServerToolType]
 public class WorkItemTools(AzureDevOpsService adoService)
 {
@@ -33,19 +35,19 @@ public class WorkItemTools(AzureDevOpsService adoService)
         return await client.GetWorkItemAsync(project, id, fields, asOf, expand);
     }
 
-    [McpServerTool(Name = "get_work_items_batch")]
-    [Description("Get multiple work items by IDs in a single batch request.")]
-    public async Task<IEnumerable<WorkItem>> GetWorkItemsBatch(
-        [Description("List of work item IDs to retrieve.")] IEnumerable<int> ids,
-        [Description("A list of fields to include in the response.")]
-            IEnumerable<string> fields = null
-    )
-    {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
-        var project = _adoService.DefaultProject;
-        var workItems = await client.GetWorkItemsAsync(project, ids, fields);
-        return workItems ?? Enumerable.Empty<WorkItem>();
-    }
+    //[McpServerTool(Name = "get_work_items_batch")]
+    //[Description("Get multiple work items by IDs in a single batch request.")]
+    //public async Task<IEnumerable<WorkItem>> GetWorkItemsBatch(
+    //    [Description("List of work item IDs to retrieve.")] IEnumerable<int> ids,
+    //    [Description("A list of fields to include in the response.")]
+    //        IEnumerable<string> fields = null
+    //)
+    //{
+    //    var client = await _adoService.GetWorkItemTrackingApiAsync();
+    //    var project = _adoService.DefaultProject;
+    //    var workItems = await client.GetWorkItemsAsync(project, ids, fields);
+    //    return workItems ?? Enumerable.Empty<WorkItem>();
+    //}
 
     [McpServerTool(Name = "create_work_item")]
     [Description("Create a new work item (Bug, Task, User Story, etc.).")]
@@ -79,46 +81,39 @@ public class WorkItemTools(AzureDevOpsService adoService)
     public async Task<string> UpdateWorkItem(
         [Description("The ID of the work item to update.")] int id,
         [Description(
-            "Field ref name -> value. Example: { \"System.Title\": \"Fix login bug\", \"System.State\": \"Active\" }."
+            "List of field updates. Each item is { field: <reference name>, value: <json value> }."
         )]
-            Dictionary<string, object> updates
+            List<FieldUpdate> updates
     )
     {
         return await ErrorHandler.ExecuteWithErrorHandling(async () =>
         {
             if (updates == null || updates.Count == 0)
-            {
                 throw new ArgumentException(
-                    "Parameter 'updates' is required and must contain at least one field mapping."
+                    "Parameter 'updates' is required and must contain at least one field update."
                 );
-            }
 
             var client = await _adoService.GetWorkItemTrackingApiAsync();
             var patchDocument = new JsonPatchDocument();
 
-            foreach (var (field, rawValue) in updates)
+            foreach (var update in updates)
             {
-                object value = rawValue;
-
-                // Tool calls often deserialize Dictionary<string, object> values as JsonElement.
-                if (rawValue is JsonElement e)
+                var e = update.Value;
+                object value = e.ValueKind switch
                 {
-                    value = e.ValueKind switch
-                    {
-                        JsonValueKind.String => e.GetString(),
-                        JsonValueKind.Number => e.TryGetInt64(out var l) ? l : e.GetDouble(),
-                        JsonValueKind.True => true,
-                        JsonValueKind.False => false,
-                        JsonValueKind.Null => null,
-                        _ => e.GetRawText(), // for arrays/objects, pass raw JSON text
-                    };
-                }
+                    JsonValueKind.String => e.GetString(),
+                    JsonValueKind.Number => e.TryGetInt64(out var l) ? (object)l : e.GetDouble(),
+                    JsonValueKind.True => true,
+                    JsonValueKind.False => false,
+                    JsonValueKind.Null => null,
+                    _ => e.GetRawText(), // for arrays/objects, pass raw JSON text
+                };
 
                 patchDocument.Add(
                     new JsonPatchOperation
                     {
                         Operation = Operation.Replace,
-                        Path = $"/fields/{field}",
+                        Path = $"/fields/{update.Field}",
                         Value = value,
                     }
                 );
