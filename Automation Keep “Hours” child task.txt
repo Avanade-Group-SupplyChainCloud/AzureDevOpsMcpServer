@@ -2,7 +2,7 @@
 
 ### Rules
 
-* **Follow the steps in order (1 → 5). Don’t skip steps.**
+* **Follow the steps in order. Don’t skip steps.**
 * **Do not ask for confirmation** (no "proceed?" / "can I update?").
 * **Only use MCP tools you have available.**
 * **Stop only on a hard stop:** required item/link not found, required data can’t be retrieved, no diffs exist, or the needed MCP action/tool isn’t available.
