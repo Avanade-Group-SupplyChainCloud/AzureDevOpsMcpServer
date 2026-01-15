@@ -37,7 +37,7 @@ public class WikiTools(AzureDevOpsService adoService)
     public async Task<string> ListWikiPages(
         [Description("The wiki identifier or name.")] string wikiIdentifier,
         [Description("Maximum number of pages to return.")] int top = 100,
-        [Description("Number of days to include page views for. Use 0 to skip.")] int pageViewsForDays = 0
+        [Description("Number of days to include page views for.")] int? pageViewsForDays = null
     )
     {
         // Using REST API since WikiPagesBatchRequest type is not available in all SDK versions
@@ -47,9 +47,7 @@ public class WikiTools(AzureDevOpsService adoService)
         var url =
             $"{baseUrl}/{project}/_apis/wiki/wikis/{Uri.EscapeDataString(wikiIdentifier)}/pagesbatch?api-version=7.1";
 
-        object body = pageViewsForDays > 0 
-            ? new { top, pageViewsForDays = (int?)pageViewsForDays } 
-            : new { top, pageViewsForDays = (int?)null };
+        var body = new { top, pageViewsForDays };
 
         using var httpClient = _adoService.CreateHttpClient();
         var content = new StringContent(
@@ -100,7 +98,7 @@ public class WikiTools(AzureDevOpsService adoService)
         [Description("The wiki identifier or name.")] string wikiIdentifier,
         [Description("The path of the wiki page.")] string path,
         [Description("The content of the wiki page.")] string content,
-        [Description("A comment for the update.")] string comment = ""
+        [Description("A comment for the update.")] string comment = null
     )
     {
         var client = await _adoService.GetWikiApiAsync();
@@ -112,7 +110,7 @@ public class WikiTools(AzureDevOpsService adoService)
             project,
             wikiIdentifier,
             path,
-            string.IsNullOrEmpty(comment) ? null : comment
+            comment
         );
     }
 }

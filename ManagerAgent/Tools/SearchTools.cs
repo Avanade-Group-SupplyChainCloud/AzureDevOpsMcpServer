@@ -11,9 +11,9 @@ public static class SearchTools
     public static async Task<string> SearchCode(
         AzureDevOpsService adoService,
         [Description("Text to search for in code")] string searchText,
-        [Description("Repository name to scope the search (optional)")] string repository = "",
-        [Description("Branch name to scope the search (optional)")] string branch = "",
-        [Description("Path to scope the search (optional)")] string path = "",
+        [Description("Repository name to scope the search (optional)")] string repository = null,
+        [Description("Branch name to scope the search (optional)")] string branch = null,
+        [Description("Path to scope the search (optional)")] string path = null,
         [Description("Number of results to skip")] int skip = 0,
         [Description("Maximum number of results to return")] int top = 100
     )
@@ -57,7 +57,7 @@ public static class SearchTools
     public static async Task<string> SearchWiki(
         AzureDevOpsService adoService,
         [Description("Text to search for in wiki")] string searchText,
-        [Description("Wiki name to scope the search (optional)")] string wiki = "",
+        [Description("Wiki name to scope the search (optional)")] string wiki = null,
         [Description("Number of results to skip")] int skip = 0,
         [Description("Maximum number of results to return")] int top = 100
     )
@@ -97,10 +97,10 @@ public static class SearchTools
     public static async Task<string> SearchWorkItem(
         AzureDevOpsService adoService,
         [Description("Text to search for in work items")] string searchText,
-        [Description("Work item type filter (optional)")] string workItemType = "",
-        [Description("State filter (optional)")] string state = "",
-        [Description("Assigned to filter (optional)")] string assignedTo = "",
-        [Description("Area path filter (optional)")] string areaPath = "",
+        [Description("Work item type filter (optional)")] string workItemType = null,
+        [Description("State filter (optional)")] string state = null,
+        [Description("Assigned to filter (optional)")] string assignedTo = null,
+        [Description("Area path filter (optional)")] string areaPath = null,
         [Description("Number of results to skip")] int skip = 0,
         [Description("Maximum number of results to return")] int top = 100
     )

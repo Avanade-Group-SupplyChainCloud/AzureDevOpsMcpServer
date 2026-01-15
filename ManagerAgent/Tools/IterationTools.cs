@@ -168,12 +168,12 @@ public class IterationTools(AzureDevOpsService adoService)
     )]
     public async Task<TeamSetting> UpdateTeamSettings(
         [Description("The name or ID of the team.")] string team,
-        [Description("The default iteration ID (GUID). Use empty string to skip.")] string defaultIterationId = "",
-        [Description("The backlog iteration ID (GUID). Use empty string to skip.")] string backlogIterationId = "",
+        [Description("The default iteration ID (GUID).")] Guid? defaultIterationId = null,
+        [Description("The backlog iteration ID (GUID).")] Guid? backlogIterationId = null,
         [Description(
-            "Working days as JSON array (e.g., ['monday','tuesday','wednesday','thursday','friday']). Use empty string to skip."
+            "Working days as JSON array (e.g., ['monday','tuesday','wednesday','thursday','friday'])."
         )]
-            string workingDaysJson = ""
+            string workingDaysJson = null
     )
     {
         var client = await _adoService.GetWorkApiAsync();
@@ -182,11 +182,11 @@ public class IterationTools(AzureDevOpsService adoService)
 
         var patch = new TeamSettingsPatch();
 
-        if (!string.IsNullOrEmpty(defaultIterationId) && Guid.TryParse(defaultIterationId, out var defIterId))
-            patch.DefaultIteration = defIterId;
+        if (defaultIterationId.HasValue)
+            patch.DefaultIteration = defaultIterationId.Value;
 
-        if (!string.IsNullOrEmpty(backlogIterationId) && Guid.TryParse(backlogIterationId, out var backIterId))
-            patch.BacklogIteration = backIterId;
+        if (backlogIterationId.HasValue)
+            patch.BacklogIteration = backlogIterationId.Value;
 
         if (!string.IsNullOrEmpty(workingDaysJson))
         {
