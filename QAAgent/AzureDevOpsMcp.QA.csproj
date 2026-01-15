@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.5.0-preview.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Shared\AzureDevOpsMcp.Shared.csproj" />
   </ItemGroup>
 
