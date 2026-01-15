@@ -37,3 +37,50 @@ Copilot Studio (Power Platform) is fragile with nested object schemas and will o
 - Keep changes minimal and aligned with existing patterns.
 - Prefer `System.Text.Json` for JSON parsing/serialization.
 - When changing tool contracts, update `README.md` examples accordingly.
+
+## MCP tool classes must use dependency injection
+
+**Rule:** MCP tool classes must be **instance classes** with dependency injection, not static classes.
+
+### Do
+
+- Mark tool classes with `[McpServerToolType]` attribute.
+- Use constructor injection for dependencies like `AzureDevOpsService`.
+- Store injected dependencies as private readonly fields.
+- Make tool methods instance methods (not static).
+
+Example:
+```csharp
+[McpServerToolType]
+public class MyTools(AzureDevOpsService adoService)
+{
+    private readonly AzureDevOpsService _adoService = adoService;
+
+    [McpServerTool(Name = "my_tool")]
+    public async Task<string> MyTool(string param) 
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        // ...
+    }
+}
+```
+
+### Don't
+
+- Don't use `static` classes for MCP tools - they won't be discovered/registered.
+- Don't use `static` methods for MCP tools.
+- Don't pass dependencies as method parameters (use constructor injection instead).
+
+Example of what NOT to do:
+```csharp
+public static class MyTools  // ❌ static class won't work
+{
+    [McpServerTool(Name = "my_tool")]
+    public static async Task<string> MyTool(
+        AzureDevOpsService adoService,  // ❌ don't pass as parameter
+        string param) 
+    {
+        // ...
+    }
+}
+```
