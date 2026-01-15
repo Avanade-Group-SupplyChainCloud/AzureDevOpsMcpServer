@@ -79,24 +79,34 @@ public class WorkItemTools(AzureDevOpsService adoService)
     public async Task<string> UpdateWorkItem(
         [Description("The ID of the work item to update.")] int id,
         [Description(
-            "List of field updates. Each item is { field: <reference name>, value: <json value> }."
+            "JSON array of field updates. Example: [{\"field\":\"System.Title\",\"value\":\"New Title\"},{\"field\":\"Microsoft.VSTS.Scheduling.OriginalEstimate\",\"value\":8}]"
         )]
-            List<FieldUpdateDto> updates
+            string updatesJson
     )
     {
         return await ErrorHandler.ExecuteWithErrorHandling(async () =>
         {
-            if (updates == null || updates.Count == 0)
+            if (string.IsNullOrWhiteSpace(updatesJson))
                 throw new ArgumentException(
                     "Parameter 'updates' is required and must contain at least one field update."
                 );
 
+            // Parse the JSON string into a list of updates
+            var parsedUpdates =
+                JsonSerializer.Deserialize<List<FieldUpdateDto>>(
+                    updatesJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                ) ?? throw new ArgumentException("Could not parse 'updates' as a JSON array.");
+
+            if (parsedUpdates.Count == 0)
+                throw new ArgumentException("'updates' must contain at least one field update.");
+
             var client = await _adoService.GetWorkItemTrackingApiAsync();
             var patchDocument = new JsonPatchDocument();
 
-            foreach (var update in updates)
+            foreach (var update in parsedUpdates)
             {
-                // Handle different value types - could be JsonElement from MCP or raw object
+                // Handle different value types - could be JsonElement from deserialization
                 object value = update.Value switch
                 {
                     JsonElement je => je.ValueKind switch
@@ -136,12 +146,9 @@ public class WorkItemTools(AzureDevOpsService adoService)
         });
     }
 
-    public class FieldUpdateDto
+    private class FieldUpdateDto
     {
-        // [System.Text.Json.Serialization.JsonPropertyName("field")]
         public string Field { get; set; } = "";
-
-        //[System.Text.Json.Serialization.JsonPropertyName("value")]
         public object Value { get; set; }
     }
 
@@ -229,73 +236,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
 
         return results;
     }
-
-    //[McpServerTool(Name = "update_work_items_batch")]
-    //[Description("Update multiple work items in batch.")]
-    //public async Task<string> UpdateWorkItemsBatch(
-    //    [Description(
-    //        "JSON array of updates: [{id, op, path, value, format}]. op can be 'Add', 'Replace', or 'Remove'. format is optional ('Html' or 'Markdown')."
-    //    )]
-    //        string updatesJson
-    //)
-    //{
-    //    var connection = _adoService.Connection;
-    //    var baseUrl = connection.Uri.ToString().TrimEnd('/');
-    //    var url = $"{baseUrl}/_apis/wit/$batch?api-version=7.1";
-
-    //    // Parse the updates JSON and group by work item ID
-    //    var updates =
-    //        JsonSerializer.Deserialize<List<BatchUpdateInput>>(updatesJson)
-    //        ?? new List<BatchUpdateInput>();
-    //    var uniqueIds = updates.Select(u => u.Id).Distinct().ToList();
-
-    //    var body = uniqueIds
-    //        .Select(id => new
-    //        {
-    //            method = "PATCH",
-    //            uri = $"/_apis/wit/workitems/{id}?api-version=7.1",
-    //            headers = new Dictionary<string, string>
-    //            {
-    //                { "Content-Type", "application/json-patch+json" },
-    //            },
-    //            body = updates
-    //                .Where(u => u.Id == id)
-    //                .Select(u => new
-    //                {
-    //                    op = u.Op?.ToLower() ?? "add",
-    //                    path = u.Path,
-    //                    value = u.Value,
-    //                })
-    //                .ToArray(),
-    //        })
-    //        .ToArray();
-
-    //    using var httpClient = _adoService.CreateHttpClient();
-    //    var request = new HttpRequestMessage(new HttpMethod("PATCH"), url)
-    //    {
-    //        Content = new StringContent(
-    //            JsonSerializer.Serialize(body),
-    //            System.Text.Encoding.UTF8,
-    //            "application/json"
-    //        ),
-    //    };
-    //    var response = await httpClient.SendAsync(request);
-    //    var content = await response.Content.ReadAsStringAsync();
-
-    //    if (!response.IsSuccessStatusCode)
-    //        return $"Error updating work items in batch: {response.StatusCode} - {content}";
-
-    //    return content;
-    //}
-
-    //private class BatchUpdateInput
-    //{
-    //    public int Id { get; set; }
-    //    public string Op { get; set; }
-    //    public string Path { get; set; } = "";
-    //    public string Value { get; set; } = "";
-    //    public string Format { get; set; }
-    //}
 
     [McpServerTool(Name = "link_work_items")]
     [Description("Link two work items together with a specified link type.")]

@@ -1,14 +1,34 @@
-// {
-//   "servers": {
-//     "my-mcp": {
-//       "type": "http",
-//       "url": "http://localhost:5155",
-//       "headers": {
-//         "x-api-key": "1"
-//       }
-//     }
-//   }
-// }
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "scc-api-key",
+      "description": "SCC MCP API Key",
+      "password": true
+    }
+  ],
+  "servers": {
+    "my-mcp": {
+      "type": "http",
+      "url": "https://sccadomcp-manager.azurewebsites.net/",
+      "headers": {
+        "x-api-key": "${input:scc-api-key}"
+      }
+    }
+  }
+}
+
+{
+  "servers": {
+    "my-mcp": {
+      "type": "http",
+      "url": "http://localhost:5155",
+      "headers": {
+        "x-api-key": "1"
+      }
+    }
+  }
+}
 
 6d48b6e2-721a-4d06-80fb-4537e3c42314
 
