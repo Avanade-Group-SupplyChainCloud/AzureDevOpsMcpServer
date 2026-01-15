@@ -96,15 +96,19 @@ public class WorkItemTools(AzureDevOpsService adoService)
 
             foreach (var update in updates)
             {
-                var e = update.Value;
-                object value = e.ValueKind switch
+                // Handle different value types - could be JsonElement from MCP or raw object
+                object value = update.Value switch
                 {
-                    JsonValueKind.String => e.GetString(),
-                    JsonValueKind.Number => e.TryGetInt64(out var l) ? (object)l : e.GetDouble(),
-                    JsonValueKind.True => true,
-                    JsonValueKind.False => false,
-                    JsonValueKind.Null => null,
-                    _ => e.GetRawText(),
+                    JsonElement je => je.ValueKind switch
+                    {
+                        JsonValueKind.String => je.GetString(),
+                        JsonValueKind.Number => je.TryGetInt64(out var l) ? (object)l : je.GetDouble(),
+                        JsonValueKind.True => true,
+                        JsonValueKind.False => false,
+                        JsonValueKind.Null => null,
+                        _ => je.GetRawText(),
+                    },
+                    _ => update.Value // Already a primitive (string, int, bool, etc.)
                 };
 
                 patchDocument.Add(
@@ -136,7 +140,7 @@ public class WorkItemTools(AzureDevOpsService adoService)
         public string Field { get; set; } = "";
 
         [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public JsonElement Value { get; set; }
+        public object Value { get; set; }
     }
 
     [McpServerTool(Name = "list_work_item_comments")]
