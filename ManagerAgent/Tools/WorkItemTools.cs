@@ -79,24 +79,17 @@ public class WorkItemTools(AzureDevOpsService adoService)
     public async Task<string> UpdateWorkItem(
         [Description("The ID of the work item to update.")] int id,
         [Description(
-            "JSON array of field updates. Example: [{\"field\":\"System.Title\",\"value\":\"New Title\"},{\"field\":\"System.State\",\"value\":\"Active\"}]"
+            "List of field updates. Each item is { field: <reference name>, value: <json value> }."
         )]
-            string updatesJson
+            List<FieldUpdateDto> updates
     )
     {
         return await ErrorHandler.ExecuteWithErrorHandling(async () =>
         {
-            if (string.IsNullOrWhiteSpace(updatesJson))
+            if (updates == null || updates.Count == 0)
                 throw new ArgumentException(
-                    "Parameter 'updatesJson' is required and must contain at least one field update."
+                    "Parameter 'updates' is required and must contain at least one field update."
                 );
-
-            var updates =
-                JsonSerializer.Deserialize<List<FieldUpdateDto>>(updatesJson)
-                ?? throw new ArgumentException("Could not parse updatesJson as a JSON array.");
-
-            if (updates.Count == 0)
-                throw new ArgumentException("updatesJson must contain at least one field update.");
 
             var client = await _adoService.GetWorkItemTrackingApiAsync();
             var patchDocument = new JsonPatchDocument();
@@ -137,9 +130,12 @@ public class WorkItemTools(AzureDevOpsService adoService)
         });
     }
 
-    private class FieldUpdateDto
+    public class FieldUpdateDto
     {
+        [System.Text.Json.Serialization.JsonPropertyName("field")]
         public string Field { get; set; } = "";
+
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
         public JsonElement Value { get; set; }
     }
 

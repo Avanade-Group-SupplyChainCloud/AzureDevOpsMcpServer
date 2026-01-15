@@ -1,0 +1,15 @@
+// {
+//   "servers": {
+//     "my-mcp": {
+//       "type": "http",
+//       "url": "http://localhost:5155",
+//       "headers": {
+//         "x-api-key": "1"
+//       }
+//     }
+//   }
+// }
+
+6d48b6e2-721a-4d06-80fb-4537e3c42314
+
+for /f "tokens=2 delims=: " %S in ('curl -s -D - -o NUL -X POST "https://sccadomcp-manager.azurewebsites.net/mcp" -H "Content-Type: application/json" -H "x-api-key: 6d48b6e2-721a-4d06-80fb-4537e3c42314" --data "{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-03-26\",\"capabilities\":{},\"clientInfo\":{\"name\":\"cmd\",\"version\":\"0.1\"}}}" ^| findstr /i "Mcp-Session-Id"') do @curl -i -X POST "https://sccadomcp-manager.azurewebsites.net/mcp" -H "Content-Type: application/json" -H "x-api-key: 6d48b6e2-721a-4d06-80fb-4537e3c42314" -H "Mcp-Session-Id: %S" --data "{\"jsonrpc\":\"2.0\",\"id\":\"2\",\"method\":\"tools/list\",\"params\":{}}"
