@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Text.Json;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.Core.WebApi.Types;
 using Microsoft.TeamFoundation.Work.WebApi;
@@ -108,5 +109,115 @@ public class IterationToolsLite(AzureDevOpsService adoService)
             return $"Error getting iteration capacities: {response.StatusCode} - {content}";
 
         return content;
+    }
+
+    [McpServerTool(Name = "set_team_days_off")]
+    [Description("Set days off for the team in a specific iteration.")]
+    public async Task<TeamSettingsDaysOff> SetTeamDaysOff(
+        [Description("The name or ID of the team.")] string team,
+        [Description("The ID of the iteration (GUID).")]
+            string iterationId,
+        [Description("JSON array of date ranges [{start, end}] for days off.")]
+            string daysOffJson
+    )
+    {
+        if (!Guid.TryParse(iterationId, out var iterationGuid))
+            throw new ArgumentException("iterationId must be a GUID.");
+
+        var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
+        var teamContext = new TeamContext(project, team);
+
+        var dateRanges =
+            JsonSerializer.Deserialize<List<DateRangeInput>>(daysOffJson)
+            ?? new List<DateRangeInput>();
+
+        var daysOffPatch = new TeamSettingsDaysOffPatch
+        {
+            DaysOff = dateRanges
+                .Select(d => new DateRange { Start = d.Start, End = d.End })
+                .ToList(),
+        };
+
+        return await client.UpdateTeamDaysOffAsync(daysOffPatch, teamContext, iterationGuid);
+    }
+
+    [McpServerTool(Name = "update_team_member_capacity")]
+    [Description("Update capacity for a team member in an iteration.")]
+    public async Task<TeamMemberCapacityIdentityRef> UpdateTeamMemberCapacity(
+        [Description("The name or ID of the team.")] string team,
+        [Description("The ID of the iteration (GUID).")]
+            string iterationId,
+        [Description("The ID of the team member (GUID).")]
+            string teamMemberId,
+        [Description("Daily capacity in hours.")]
+            double capacityPerDay,
+        [Description("Activity name (e.g., 'Development', 'Testing').")]
+            string activity = "Development"
+    )
+    {
+        if (!Guid.TryParse(iterationId, out var iterationGuid))
+            throw new ArgumentException("iterationId must be a GUID.");
+
+        if (!Guid.TryParse(teamMemberId, out var teamMemberGuid))
+            throw new ArgumentException("teamMemberId must be a GUID.");
+
+        var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
+        var teamContext = new TeamContext(project, team);
+
+        var capacityPatch = new CapacityPatch
+        {
+            Activities = new List<Activity>
+            {
+                new Activity { Name = activity, CapacityPerDay = (float)capacityPerDay },
+            },
+        };
+
+        return await client.UpdateCapacityWithIdentityRefAsync(
+            capacityPatch,
+            teamContext,
+            iterationGuid,
+            teamMemberGuid
+        );
+    }
+
+    [McpServerTool(Name = "update_team_settings")]
+    [Description("Update team settings like default iteration, backlog iteration, and working days.")]
+    public async Task<TeamSetting> UpdateTeamSettings(
+        [Description("The name or ID of the team.")] string team,
+        [Description("The default iteration ID (GUID). Use empty string to skip.")]
+            string defaultIterationId = "",
+        [Description("The backlog iteration ID (GUID). Use empty string to skip.")]
+            string backlogIterationId = "",
+        [Description("Working days as JSON array (e.g., ['monday','tuesday','wednesday','thursday','friday']). Use empty string to skip.")]
+            string workingDaysJson = ""
+    )
+    {
+        var client = await _adoService.GetWorkApiAsync();
+        var project = _adoService.DefaultProject;
+        var teamContext = new TeamContext(project, team);
+
+        var patch = new TeamSettingsPatch();
+
+        if (!string.IsNullOrEmpty(defaultIterationId) && Guid.TryParse(defaultIterationId, out var defIterId))
+            patch.DefaultIteration = defIterId;
+
+        if (!string.IsNullOrEmpty(backlogIterationId) && Guid.TryParse(backlogIterationId, out var backIterId))
+            patch.BacklogIteration = backIterId;
+
+        if (!string.IsNullOrEmpty(workingDaysJson))
+        {
+            var days = JsonSerializer.Deserialize<List<string>>(workingDaysJson) ?? new List<string>();
+            patch.WorkingDays = days.Select(d => Enum.Parse<DayOfWeek>(d, true)).ToArray();
+        }
+
+        return await client.UpdateTeamSettingsAsync(patch, teamContext);
+    }
+
+    private class DateRangeInput
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
     }
 }

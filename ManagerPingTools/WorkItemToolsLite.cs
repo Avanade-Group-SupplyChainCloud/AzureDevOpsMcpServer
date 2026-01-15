@@ -3,6 +3,8 @@ using System.Text.Json;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.WebApi.Patch;
+using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.ManagerPingTools;
@@ -49,5 +51,63 @@ public class WorkItemToolsLite(AzureDevOpsService adoService)
         var project = _adoService.DefaultProject;
         var revisions = await client.GetRevisionsAsync(project, workItemId, top, skip);
         return revisions ?? Enumerable.Empty<WorkItem>();
+    }
+
+    [McpServerTool(Name = "add_work_item_comment")]
+    [Description("Add a comment to a work item.")]
+    public async Task<string> AddWorkItemComment(
+        [Description("The ID of the work item.")] int workItemId,
+        [Description("The comment text.")] string comment
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
+        var request = new CommentCreate { Text = comment };
+        var result = await client.AddCommentAsync(request, project, workItemId);
+        return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    [McpServerTool(Name = "link_work_items")]
+    [Description("Link two work items together with a specified link type.")]
+    public async Task<WorkItem> LinkWorkItems(
+        [Description("The ID of the source work item.")] int sourceId,
+        [Description("The ID of the target work item.")] int targetId,
+        [Description("Link type: 'parent', 'child', 'related', 'predecessor', 'successor'.")]
+            string linkType = "related",
+        [Description("Optional comment to include on the link.")] string comment = ""
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+
+        var linkTypeName = linkType.ToLower() switch
+        {
+            "parent" => "System.LinkTypes.Hierarchy-Reverse",
+            "child" => "System.LinkTypes.Hierarchy-Forward",
+            "predecessor" => "System.LinkTypes.Dependency-Reverse",
+            "successor" => "System.LinkTypes.Dependency-Forward",
+            _ => "System.LinkTypes.Related",
+        };
+
+        var orgUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
+        var targetUrl = $"{orgUrl}/_apis/wit/workItems/{targetId}";
+
+        object attributes = string.IsNullOrWhiteSpace(comment) ? null : new { comment = comment };
+
+        var patchDocument = new JsonPatchDocument
+        {
+            new JsonPatchOperation
+            {
+                Operation = Operation.Add,
+                Path = "/relations/-",
+                Value = new
+                {
+                    rel = linkTypeName,
+                    url = targetUrl,
+                    attributes = attributes,
+                },
+            },
+        };
+
+        return await client.UpdateWorkItemAsync(patchDocument, sourceId);
     }
 }
