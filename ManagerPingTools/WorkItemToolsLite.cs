@@ -10,6 +10,8 @@ using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.ManagerPingTools;
 
+public record FieldUpdate(string Field, JsonElement Value);
+
 [McpServerToolType]
 public class WorkItemToolsLite(AzureDevOpsService adoService)
 {
@@ -138,6 +140,62 @@ public class WorkItemToolsLite(AzureDevOpsService adoService)
         }
 
         return await client.CreateWorkItemAsync(patchDocument, project, workItemType);
+    }
+
+    [McpServerTool(Name = "update_work_item")]
+    [Description("Update fields on an existing work item.")]
+    public async Task<string> UpdateWorkItem(
+        [Description("The ID of the work item to update.")] int id,
+        [Description(
+            "List of field updates. Each item is { field: <reference name>, value: <json value> }."
+        )]
+            List<FieldUpdate> updates
+    )
+    {
+        return await ErrorHandler.ExecuteWithErrorHandling(async () =>
+        {
+            if (updates == null || updates.Count == 0)
+                throw new ArgumentException(
+                    "Parameter 'updates' is required and must contain at least one field update."
+                );
+
+            var client = await _adoService.GetWorkItemTrackingApiAsync();
+            var patchDocument = new JsonPatchDocument();
+
+            foreach (var update in updates)
+            {
+                var e = update.Value;
+                object value = e.ValueKind switch
+                {
+                    JsonValueKind.String => e.GetString(),
+                    JsonValueKind.Number => e.TryGetInt64(out var l) ? (object)l : e.GetDouble(),
+                    JsonValueKind.True => true,
+                    JsonValueKind.False => false,
+                    JsonValueKind.Null => null,
+                    _ => e.GetRawText(), // for arrays/objects, pass raw JSON text
+                };
+
+                patchDocument.Add(
+                    new JsonPatchOperation
+                    {
+                        Operation = Operation.Replace,
+                        Path = $"/fields/{update.Field}",
+                        Value = value,
+                    }
+                );
+            }
+
+            var result = await client.UpdateWorkItemAsync(patchDocument, id);
+
+            return JsonSerializer.Serialize(
+                new
+                {
+                    success = true,
+                    id = result.Id,
+                    rev = result.Rev,
+                }
+            );
+        });
     }
 
     [McpServerTool(Name = "add_child_work_items")]
