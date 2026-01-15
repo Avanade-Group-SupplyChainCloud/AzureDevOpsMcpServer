@@ -10,8 +10,6 @@ using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.ManagerPingTools;
 
-public record FieldUpdate(string Field, JsonElement Value);
-
 [McpServerToolType]
 public class WorkItemToolsLite(AzureDevOpsService adoService)
 {
@@ -147,17 +145,23 @@ public class WorkItemToolsLite(AzureDevOpsService adoService)
     public async Task<string> UpdateWorkItem(
         [Description("The ID of the work item to update.")] int id,
         [Description(
-            "List of field updates. Each item is { field: <reference name>, value: <json value> }."
+            "JSON array of field updates. Example: [{\"field\":\"System.Title\",\"value\":\"New Title\"},{\"field\":\"System.State\",\"value\":\"Active\"}]"
         )]
-            List<FieldUpdate> updates
+            string updatesJson
     )
     {
         return await ErrorHandler.ExecuteWithErrorHandling(async () =>
         {
-            if (updates == null || updates.Count == 0)
+            if (string.IsNullOrWhiteSpace(updatesJson))
                 throw new ArgumentException(
-                    "Parameter 'updates' is required and must contain at least one field update."
+                    "Parameter 'updatesJson' is required and must contain at least one field update."
                 );
+
+            var updates = JsonSerializer.Deserialize<List<FieldUpdateDto>>(updatesJson)
+                ?? throw new ArgumentException("Could not parse updatesJson as a JSON array.");
+
+            if (updates.Count == 0)
+                throw new ArgumentException("updatesJson must contain at least one field update.");
 
             var client = await _adoService.GetWorkItemTrackingApiAsync();
             var patchDocument = new JsonPatchDocument();
@@ -172,7 +176,7 @@ public class WorkItemToolsLite(AzureDevOpsService adoService)
                     JsonValueKind.True => true,
                     JsonValueKind.False => false,
                     JsonValueKind.Null => null,
-                    _ => e.GetRawText(), // for arrays/objects, pass raw JSON text
+                    _ => e.GetRawText(),
                 };
 
                 patchDocument.Add(
@@ -196,6 +200,12 @@ public class WorkItemToolsLite(AzureDevOpsService adoService)
                 }
             );
         });
+    }
+
+    private class FieldUpdateDto
+    {
+        public string Field { get; set; } = "";
+        public JsonElement Value { get; set; }
     }
 
     [McpServerTool(Name = "add_child_work_items")]
