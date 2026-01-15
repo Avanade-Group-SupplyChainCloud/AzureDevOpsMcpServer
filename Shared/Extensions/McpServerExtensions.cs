@@ -59,7 +59,7 @@ public static class McpServerExtensions
             }
         );
 
-        app.MapMcp();
+        app.MapMcp("/mcp");
 
         return app;
     }
