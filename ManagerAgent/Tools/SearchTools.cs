@@ -4,12 +4,14 @@ using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.Manager.Tools;
 
-public static class SearchTools
+[McpServerToolType]
+public class SearchTools(AzureDevOpsService adoService)
 {
+    private readonly AzureDevOpsService _adoService = adoService;
+
     [McpServerTool(Name = "search_code")]
     [Description("Search Azure DevOps Repositories for code matching the search text.")]
-    public static async Task<string> SearchCode(
-        AzureDevOpsService adoService,
+    public async Task<string> SearchCode(
         [Description("Text to search for in code")] string searchText,
         [Description("Repository name to scope the search (optional)")] string repository = null,
         [Description("Branch name to scope the search (optional)")] string branch = null,
@@ -18,12 +20,12 @@ public static class SearchTools
         [Description("Maximum number of results to return")] int top = 100
     )
     {
-        var connection = adoService.Connection;
+        var connection = _adoService.Connection;
         var baseUrl = connection.Uri.ToString().TrimEnd('/');
         var url = $"{baseUrl}/_apis/search/codesearchresults?api-version=7.1-preview.1";
 
         var filters = new Dictionary<string, List<string>>();
-        var project = adoService.DefaultProject;
+        var project = _adoService.DefaultProject;
         if (!string.IsNullOrWhiteSpace(project))
             filters["Project"] = new List<string> { project };
         if (!string.IsNullOrEmpty(repository))
@@ -41,7 +43,7 @@ public static class SearchTools
             takeResults = top,
         };
 
-        using var httpClient = adoService.CreateHttpClient();
+        using var httpClient = _adoService.CreateHttpClient();
 
         var response = await httpClient.PostAsJsonAsync(url, requestBody);
         var content = await response.Content.ReadAsStringAsync();
@@ -54,20 +56,19 @@ public static class SearchTools
 
     [McpServerTool(Name = "search_wiki")]
     [Description("Search Azure DevOps Wiki for pages matching the search text.")]
-    public static async Task<string> SearchWiki(
-        AzureDevOpsService adoService,
+    public async Task<string> SearchWiki(
         [Description("Text to search for in wiki")] string searchText,
         [Description("Wiki name to scope the search (optional)")] string wiki,
         [Description("Number of results to skip")] int skip = 0,
         [Description("Maximum number of results to return")] int top = 100
     )
     {
-        var connection = adoService.Connection;
+        var connection = _adoService.Connection;
         var baseUrl = connection.Uri.ToString().TrimEnd('/');
         var url = $"{baseUrl}/_apis/search/wikisearchresults?api-version=7.1-preview.1";
 
         var filters = new Dictionary<string, List<string>>();
-        var project = adoService.DefaultProject;
+        var project = _adoService.DefaultProject;
         if (!string.IsNullOrWhiteSpace(project))
             filters["Project"] = new List<string> { project };
         if (!string.IsNullOrEmpty(wiki))
@@ -81,7 +82,7 @@ public static class SearchTools
             takeResults = top,
         };
 
-        using var httpClient = adoService.CreateHttpClient();
+        using var httpClient = _adoService.CreateHttpClient();
 
         var response = await httpClient.PostAsJsonAsync(url, requestBody);
         var content = await response.Content.ReadAsStringAsync();
@@ -94,8 +95,7 @@ public static class SearchTools
 
     [McpServerTool(Name = "search_workitem")]
     [Description("Search Azure DevOps Work Items matching the search text.")]
-    public static async Task<string> SearchWorkItem(
-        AzureDevOpsService adoService,
+    public async Task<string> SearchWorkItem(
         [Description("Text to search for in work items")] string searchText,
         [Description("Work item type filter (optional)")] string workItemType = null,
         [Description("State filter (optional)")] string state = null,
@@ -105,12 +105,12 @@ public static class SearchTools
         [Description("Maximum number of results to return")] int top = 100
     )
     {
-        var connection = adoService.Connection;
+        var connection = _adoService.Connection;
         var baseUrl = connection.Uri.ToString().TrimEnd('/');
         var url = $"{baseUrl}/_apis/search/workitemsearchresults?api-version=7.1-preview.1";
 
         var filters = new Dictionary<string, List<string>>();
-        var project = adoService.DefaultProject;
+        var project = _adoService.DefaultProject;
         if (!string.IsNullOrWhiteSpace(project))
             filters["System.TeamProject"] = new List<string> { project };
         if (!string.IsNullOrEmpty(workItemType))
@@ -130,7 +130,7 @@ public static class SearchTools
             takeResults = top,
         };
 
-        using var httpClient = adoService.CreateHttpClient();
+        using var httpClient = _adoService.CreateHttpClient();
 
         var response = await httpClient.PostAsJsonAsync(url, requestBody);
         var content = await response.Content.ReadAsStringAsync();
