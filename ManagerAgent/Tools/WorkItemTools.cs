@@ -102,13 +102,15 @@ public class WorkItemTools(AzureDevOpsService adoService)
                     JsonElement je => je.ValueKind switch
                     {
                         JsonValueKind.String => je.GetString(),
-                        JsonValueKind.Number => je.TryGetInt64(out var l) ? (object)l : je.GetDouble(),
+                        JsonValueKind.Number => je.TryGetInt64(out var l)
+                            ? (object)l
+                            : je.GetDouble(),
                         JsonValueKind.True => true,
                         JsonValueKind.False => false,
                         JsonValueKind.Null => null,
                         _ => je.GetRawText(),
                     },
-                    _ => update.Value // Already a primitive (string, int, bool, etc.)
+                    _ => update.Value, // Already a primitive (string, int, bool, etc.)
                 };
 
                 patchDocument.Add(
@@ -136,10 +138,10 @@ public class WorkItemTools(AzureDevOpsService adoService)
 
     public class FieldUpdateDto
     {
-        [System.Text.Json.Serialization.JsonPropertyName("field")]
+        // [System.Text.Json.Serialization.JsonPropertyName("field")]
         public string Field { get; set; } = "";
 
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        //[System.Text.Json.Serialization.JsonPropertyName("value")]
         public object Value { get; set; }
     }
 
