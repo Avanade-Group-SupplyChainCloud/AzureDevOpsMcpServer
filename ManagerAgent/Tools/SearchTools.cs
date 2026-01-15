@@ -57,7 +57,7 @@ public static class SearchTools
     public static async Task<string> SearchWiki(
         AzureDevOpsService adoService,
         [Description("Text to search for in wiki")] string searchText,
-        [Description("Wiki name to scope the search (optional)")] string wiki = null,
+        [Description("Wiki name to scope the search (optional)")] string wiki,
         [Description("Number of results to skip")] int skip = 0,
         [Description("Maximum number of results to return")] int top = 100
     )

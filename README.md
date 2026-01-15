@@ -2,67 +2,62 @@
 
 This is a Model Context Protocol (MCP) server for Azure DevOps, built with .NET 10 and ASP.NET Core.
 
+## Copilot Studio compatibility (important)
+
+Copilot Studio (Power Platform) is fragile with nested object schemas and can reshape/drop nested objects (often surfacing as “ADTL” / schema issues).
+
+In this repo, MCP tools are intentionally designed to avoid nested object parameters:
+
+- Prefer flat parameters (`string`, `int`, `bool`, `double`).
+- If a complex structure is needed, accept it as a single JSON string parameter named `...Json` (for example: `updatesJson`, `daysOffJson`, `workingDaysJson`) and parse server-side.
+- Prefer flat outputs; if an API returns a deep graph, return a minimal flattened object or a serialized JSON string.
+
 ## Features
 
 This repo contains three MCP server “agents”, each exposing its own set of tools:
 
-### Manager Agent Tools (55 total)
+### Manager Agent Tools (39 total)
 
 #### Core
 - `list_projects`: List all projects in the Azure DevOps organization. Supports filtering by state and name.
-- `list_teams`: List all teams in a specific Azure DevOps project.
-- `get_identity_ids`: Retrieve Azure DevOps identity IDs for a provided search filter.
+- `list_teams`: List all teams in the Azure DevOps organization.
 
 #### Work Items & Queries
 - `get_work_item`: Get a work item by ID with optional field expansion.
 - `get_work_items_batch`: Get multiple work items by IDs in a single batch request.
+- `get_work_items_by_ids`: Get multiple work items by their IDs in a single request.
 - `create_work_item`: Create a new work item (Bug, Task, User Story, etc.) in a project.
 - `update_work_item`: Update fields on an existing work item.
-- `my_work_items`: Get work items assigned to or created by the current user.
 - `list_work_item_comments`: Get comments on a work item.
 - `add_work_item_comment`: Add a comment to a work item.
 - `list_work_item_revisions`: Get revision history of a work item.
-- `get_work_item_type`: Get details of a work item type including its fields and rules.
 - `add_child_work_items`: Create child work items under a parent work item.
-- `update_work_items_batch`: Update multiple work items in batch.
 - `link_work_items`: Link two work items together with a specified link type.
-- `unlink_work_item`: Remove a link from a work item.
-- `link_work_item_to_pull_request`: Link a work item to a pull request.
-- `add_artifact_link`: Add an artifact link (commit, build, branch) to a work item.
-- `list_backlogs`: List backlogs for a team in a project.
-- `list_backlog_work_items`: Get work items in a specific backlog.
 - `run_wiql_query`: Execute a WIQL (Work Item Query Language) query and return matching work items.
-- `get_work_items_by_ids`: Get multiple work items by their IDs in a single request.
-- `search_work_items`: Search for work items by text across title, description, and other fields.
 - `get_work_item_types`: Get all work item types available in a project.
 - `get_work_item_fields`: Get all fields available for work items.
 - `get_work_item_history`: Get the revision history of a work item.
+- `get_executive_summary`: Get an executive summary for a work item, including children recursively.
 - `get_saved_queries`: Get saved queries (My Queries or Shared Queries) in a project.
 - `run_saved_query`: Execute a saved query by its ID and return the results.
 - `get_query`: Get a saved work item query by ID or path.
 - `get_query_results`: Execute a saved query and get results.
 
-#### Iterations, Capacity & Boards
-- `list_iterations`: List all iterations (sprints) for a team in a project.
+#### Iterations & Capacity
+- `list_iterations`: List all iterations (sprints) for a team.
 - `get_current_iteration`: Get the current iteration (sprint) for a team.
-- `get_iteration_work_items`: Get all work items assigned to a specific iteration.
-- `create_iteration`: Create a new iteration (sprint) in the project's classification nodes.
-- `assign_iteration_to_team`: Assign an existing iteration to a team.
-- `remove_iteration_from_team`: Remove an iteration from a team's assigned iterations.
-- `get_iteration_capacities`: Get an iteration's capacity for all teams in iteration and project.
+- `get_iteration_capacities`: Get an iteration's capacity for all teams.
 - `get_team_capacity`: Get the capacity settings for a team in a specific iteration.
 - `update_team_member_capacity`: Update capacity for a team member in an iteration.
-- `replace_team_capacities`: Replace all team member capacities for an iteration.
 - `get_team_days_off`: Get the team days off for a specific iteration.
 - `set_team_days_off`: Set days off for the team in a specific iteration.
 - `get_team_settings`: Get the team settings including backlog iteration, default iteration, and working days.
 - `update_team_settings`: Update team settings like default iteration, backlog iteration, and working days.
-- `get_board_columns`: Get the columns configured for a team's board.
-- `get_boards`: Get all boards for a team.
 
 #### Search
 - `search_code`: Search Azure DevOps Repositories for code matching the search text.
 - `search_wiki`: Search Azure DevOps Wiki for pages matching the search text.
+- `search_work_items`: Search for work items by text across title, description, and other fields.
 - `search_workitem`: Search Azure DevOps Work Items matching the search text.
 
 #### Wiki
@@ -73,7 +68,7 @@ This repo contains three MCP server “agents”, each exposing its own set of t
 - `get_wiki_page_content`: Get wiki page content as markdown.
 - `create_or_update_wiki_page`: Create a new wiki page or update an existing one.
 
-### Infra Agent Tools (40 total)
+### Infra Agent Tools (35 total)
 
 #### Builds
 - `get_build`: Get detailed information about a specific build.
@@ -97,19 +92,14 @@ This repo contains three MCP server “agents”, each exposing its own set of t
 - `get_build_status`: Get the status of a specific build.
 - `get_build_definition_revisions`: Get revision history of a build definition.
 - `update_build_stage`: Update a build stage (cancel, retry, or run). Useful for stage-level control in YAML pipelines.
-- `create_pipeline`: Create a new pipeline definition with YAML configuration.
 
 #### Git & Pull Requests
 - `get_repo_by_name_or_id`: Get repository details by name or ID.
 - `list_branches`: List all branches in a Git repository.
 - `list_my_branches`: List branches created by the current user.
 - `get_branch`: Get details of a specific branch including commit info.
-- `list_commits`: List commits in a repository, optionally filtered by branch.
-- `search_commits`: Search for commits with comprehensive filtering capabilities.
-- `get_commit`: Get details of a specific commit by its SHA.
 - `get_file_content`: Get the content of a file from a repository at a specific branch or commit.
 - `list_pull_requests`: List pull requests in a repository with filtering options.
-- `list_pull_requests_by_commits`: Find pull requests containing specific commits.
 - `get_pull_request_commits`: Get the commits associated with a pull request.
 - `get_pull_request_reviewers`: Get the reviewers of a pull request.
 - `update_pull_request`: Update a pull request (title, description, status, etc.).
@@ -187,6 +177,10 @@ Each agent has its own `appsettings.json`.
 }
 ```
 
+### API key (optional but recommended)
+
+If you set `ApiKey` in an agent's `appsettings.json`, the server requires an `x-api-key` header on all requests.
+
 ## Running the Server
 
 Run whichever agent you want to expose:
@@ -195,13 +189,17 @@ Run whichever agent you want to expose:
 - Infra agent: `dotnet run --project InfraAgent/AzureDevOpsMcp.Infra.csproj`
 - QA agent: `dotnet run --project QAAgent/AzureDevOpsMcp.QA.csproj`
 
-Each agent listens on the port configured in its `Properties/launchSettings.json`.
+Each agent listens on the port configured in its `Properties/launchSettings.json` (current defaults):
+
+- Manager agent: `http://localhost:5155`
+- Infra agent: `http://localhost:5122`
+- QA agent: `http://localhost:5180`
 
 ### Usage Examples
 
 - update_work_item
   - Purpose: Update one or more fields on a work item by ID.
-  - Signature: `update_work_item(id, updates: List<{ Field: string, Value: any }>)`
+  - Signature: `update_work_item(id, updatesJson)`
   - Example:
 
     ```json
@@ -209,25 +207,37 @@ Each agent listens on the port configured in its `Properties/launchSettings.json
       "tool": "update_work_item",
       "args": {
         "id": 12345,
-        "updates": [
-          { "field": "System.Title", "value": "Update API contract" },
-          { "field": "System.AreaPath", "value": "MyProject\\MyArea" },
-          { "field": "System.IterationPath", "value": "MyProject\\Sprint 1" },
-          { "field": "Microsoft.VSTS.Scheduling.OriginalEstimate", "value": 8 },
-          { "field": "Microsoft.VSTS.Scheduling.RemainingWork", "value": 8 }
-        ]
+        "updatesJson": "[{\"field\":\"System.Title\",\"value\":\"Update API contract\"},{\"field\":\"Microsoft.VSTS.Scheduling.OriginalEstimate\",\"value\":8}]"
       }
     }
     ```
 
   - Notes:
-    - `updates` is required and must contain at least one item.
+    - `updatesJson` is required and must be a JSON array string.
     - Field names are Azure DevOps reference names (e.g., `System.AreaPath`).
-    - For string values containing backslashes, escape as needed in JSON.
+    - This `...Json` pattern is used to keep tool schemas flat and Copilot Studio-friendly.
 
 ## MCP Configuration
 
 To use one of these servers with an MCP client (like Claude Desktop or VS Code), configure the client to start the desired agent.
+
+### VS Code (MCP over HTTP)
+
+This repo includes a working example at `.vscode/mcp.json` (Manager agent defaults to `http://localhost:5155`).
+
+```jsonc
+{
+  "servers": {
+    "my-mcp": {
+      "type": "http",
+      "url": "http://localhost:5155",
+      "headers": {
+        "x-api-key": "<your ApiKey>"
+      }
+    }
+  }
+}
+```
 
 Example configuration for Claude Desktop (`claude_desktop_config.json`) to run the Manager agent:
 
