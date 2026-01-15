@@ -23,16 +23,13 @@ public class WorkItemTools(AzureDevOpsService adoService)
     )]
     public async Task<WorkItem> GetWorkItem(
         [Description("The ID of the work item.")] int id,
-        [Description("A list of fields to include in the response.")]
-            IEnumerable<string> fields = null,
-        [Description("The date and time to retrieve the work item as of.")] DateTime? asOf = null,
         [Description("The expand level for the work item.")]
             WorkItemExpand expand = WorkItemExpand.None
     )
     {
         var client = await _adoService.GetWorkItemTrackingApiAsync();
         var project = _adoService.DefaultProject;
-        return await client.GetWorkItemAsync(project, id, fields, asOf, expand);
+        return await client.GetWorkItemAsync(project, id, null, null, expand);
     }
 
     //[McpServerTool(Name = "get_work_items_batch")]

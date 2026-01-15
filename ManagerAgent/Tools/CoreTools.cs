@@ -20,7 +20,7 @@ public class CoreTools(AzureDevOpsService adoService)
         [Description("The maximum number of projects to return. Defaults to 100.")] int top = 100,
         [Description("The number of projects to skip for pagination. Defaults to 0.")] int skip = 0,
         [Description("Filter projects by name. Supports partial matches.")]
-            string projectNameFilter = null
+            string projectNameFilter = ""
     )
     {
         var client = await _adoService.GetCoreApiAsync();
