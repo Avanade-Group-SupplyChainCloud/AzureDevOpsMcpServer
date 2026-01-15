@@ -96,4 +96,26 @@ public class WikiToolsLite(AzureDevOpsService adoService)
         var page = await client.GetPageAsync(project, wikiIdentifier, path, includeContent: true);
         return page?.Page?.Content ?? string.Empty;
     }
+
+    [McpServerTool(Name = "create_or_update_wiki_page")]
+    [Description("Create a new wiki page or update an existing one.")]
+    public async Task<WikiPageResponse> CreateOrUpdatePage(
+        [Description("The wiki identifier or name.")] string wikiIdentifier,
+        [Description("The path of the wiki page.")] string path,
+        [Description("The content of the wiki page.")] string content,
+        [Description("A comment for the update.")] string comment = ""
+    )
+    {
+        var client = await _adoService.GetWikiApiAsync();
+        var project = _adoService.DefaultProject;
+        var pageUpdate = new WikiPageCreateOrUpdateParameters { Content = content };
+
+        return await client.CreateOrUpdatePageAsync(
+            pageUpdate,
+            project,
+            wikiIdentifier,
+            path,
+            string.IsNullOrEmpty(comment) ? null : comment
+        );
+    }
 }

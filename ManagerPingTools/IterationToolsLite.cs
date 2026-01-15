@@ -87,4 +87,26 @@ public class IterationToolsLite(AzureDevOpsService adoService)
         var teamContext = new TeamContext(project, team);
         return await client.GetTeamSettingsAsync(teamContext);
     }
+
+    [McpServerTool(Name = "get_iteration_capacities")]
+    [Description("Get an iteration's capacity for all teams.")]
+    public async Task<string> GetIterationCapacities(
+        [Description("The ID of the iteration.")] string iterationId
+    )
+    {
+        var connection = _adoService.Connection;
+        var project = _adoService.DefaultProject;
+        var baseUrl = connection.Uri.ToString().TrimEnd('/');
+        var url =
+            $"{baseUrl}/{project}/_apis/work/iterations/{Uri.EscapeDataString(iterationId)}/iterationcapacities?api-version=7.1";
+
+        using var httpClient = _adoService.CreateHttpClient();
+        var response = await httpClient.GetAsync(url);
+        var content = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+            return $"Error getting iteration capacities: {response.StatusCode} - {content}";
+
+        return content;
+    }
 }
