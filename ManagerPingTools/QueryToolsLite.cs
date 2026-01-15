@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Text.Json;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using ModelContextProtocol.Server;
@@ -88,5 +89,41 @@ public class QueryToolsLite(AzureDevOpsService adoService)
         var project = _adoService.DefaultProject;
         var revisions = await client.GetRevisionsAsync(project, id, top: top);
         return revisions ?? Enumerable.Empty<WorkItem>();
+    }
+
+    [McpServerTool(Name = "get_query")]
+    [Description("Get a saved work item query by ID or path.")]
+    public async Task<QueryHierarchyItem> GetQuery(
+        [Description("The query ID or path.")] string query,
+        [Description("Expand level for children.")] int depth = 0
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
+        return await client.GetQueryAsync(project, query, depth: depth);
+    }
+
+    [McpServerTool(Name = "get_query_results")]
+    [Description("Execute a saved query and get results.")]
+    public async Task<string> GetQueryResults(
+        [Description("The query ID (GUID).")]
+            string queryId,
+        [Description("Maximum number of results.")]
+            int top = 100
+    )
+    {
+        if (!Guid.TryParse(queryId, out var queryGuid))
+            throw new ArgumentException("queryId must be a GUID.");
+
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
+        var result = await client.QueryByIdAsync(project, queryGuid);
+
+        if (result?.WorkItems == null || !result.WorkItems.Any())
+            return "[]";
+
+        var ids = result.WorkItems.Take(top).Select(w => w.Id).ToList();
+        var workItems = await client.GetWorkItemsAsync(ids, expand: WorkItemExpand.Fields);
+        return JsonSerializer.Serialize(workItems, new JsonSerializerOptions { WriteIndented = true });
     }
 }
