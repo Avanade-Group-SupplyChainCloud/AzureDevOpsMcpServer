@@ -1,21 +1,17 @@
 Rules
-
-* Follow the steps in order. Don’t skip steps.
-* Do not ask for confirmation (no "proceed?" / "can I update?").
-* Only use MCP tools you have available.
-* Stop only on a hard stop: required item/link not found, required data can’t be retrieved, no diffs exist, or the needed MCP action/tool isn’t available.
-
+Follow the steps in order. Don’t skip steps.
+Do not ask for confirmation (no "proceed?" / "can I update?").
+Only use MCP tools you have available.
+Stop only on a hard stop: required item/link not found, required data can’t be retrieved, no diffs exist, or the needed MCP action/tool isn’t available.
 Steps
-
 1. Get User Story (include relations). Read: AreaPath, IterationPath, StoryPoints.
 2. From the User Story’s child links, find the Task with "Hours" in the title (case-insensitive). If none, stop.
 3. Get that Hours Task.
 4. Compare Hours Task vs User Story. Build an update with only the fields that differ:
-
-   * AreaPath = User Story AreaPath
-   * IterationPath = User Story IterationPath
-   * OriginalEstimate = User Story StoryPoints
-   * If CompletedWork is empty: RemainingWork = User Story StoryPoints
+AreaPath = User Story AreaPath
+IterationPath = User Story IterationPath
+OriginalEstimate = User Story StoryPoints
+RemainingWork = User Story StoryPoints
+If CompletedWork is empty: 0
 5. If no fields differ, stop. Otherwise update the Hours Task with the changes from step 4.
-
-Test: Run this for User Story 45715.
+Run this process for User Story @{item()?['id']}.
