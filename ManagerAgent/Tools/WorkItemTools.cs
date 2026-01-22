@@ -52,20 +52,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
         return await client.GetWorkItemAsync(project, id, fields, asOf, expand);
     }
 
-    //[McpServerTool(Name = "get_work_items_batch")]
-    //[Description("Get multiple work items by IDs in a single batch request.")]
-    //public async Task<IEnumerable<WorkItem>> GetWorkItemsBatch(
-    //    [Description("List of work item IDs to retrieve.")] IEnumerable<int> ids,
-    //    [Description("A list of fields to include in the response.")]
-    //        IEnumerable<string> fields = null
-    //)
-    //{
-    //    var client = await _adoService.GetWorkItemTrackingApiAsync();
-    //    var project = _adoService.DefaultProject;
-    //    var workItems = await client.GetWorkItemsAsync(project, ids, fields);
-    //    return workItems ?? Enumerable.Empty<WorkItem>();
-    //}
-
     [McpServerTool(Name = "create_work_item")]
     [Description("Create a new work item (Bug, Task, User Story, etc.).")]
     public async Task<WorkItem> CreateWorkItem(
@@ -73,23 +59,22 @@ public class WorkItemTools(AzureDevOpsService adoService)
         [Description(
             "JSON object of fields and their values for the new work item. Example: {\"System.Title\":\"My task\",\"Microsoft.VSTS.Scheduling.OriginalEstimate\":8}"
         )]
-            string fieldsJson
+            string fields
     )
     {
-        if (string.IsNullOrWhiteSpace(fieldsJson))
+        if (string.IsNullOrWhiteSpace(fields))
             throw new ArgumentException(
-                "Parameter 'fieldsJson' is required and must contain at least one field."
+                "Parameter 'fields' is required and must contain at least one field."
             );
 
         var parsedFields =
             JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
-                fieldsJson,
+                fields,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            )
-            ?? throw new ArgumentException("Could not parse 'fieldsJson' as a JSON object.");
+            ) ?? throw new ArgumentException("Could not parse 'fields' as a JSON object.");
 
         if (parsedFields.Count == 0)
-            throw new ArgumentException("'fieldsJson' must contain at least one field.");
+            throw new ArgumentException("'fields' must contain at least one field.");
 
         var client = await _adoService.GetWorkItemTrackingApiAsync();
         var project = _adoService.DefaultProject;
@@ -212,47 +197,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
         var project = _adoService.DefaultProject;
         var revisions = await client.GetRevisionsAsync(project, workItemId, top, skip);
         return revisions ?? Enumerable.Empty<WorkItem>();
-    }
-
-    [McpServerTool(Name = "add_child_work_items")]
-    [Description("Create child work items under a parent work item.")]
-    public async Task<IEnumerable<WorkItem>> AddChildWorkItems(
-        [Description("The ID of the parent work item.")] int parentId,
-        [Description("The type of child work items to create.")] string workItemType,
-        [Description("List of child work item titles.")] IEnumerable<string> titles
-    )
-    {
-        var client = await _adoService.GetWorkItemTrackingApiAsync();
-        var project = _adoService.DefaultProject;
-        var results = new List<WorkItem>();
-
-        foreach (var title in titles)
-        {
-            var patchDocument = new JsonPatchDocument
-            {
-                new JsonPatchOperation
-                {
-                    Operation = Operation.Add,
-                    Path = "/fields/System.Title",
-                    Value = title,
-                },
-                new JsonPatchOperation
-                {
-                    Operation = Operation.Add,
-                    Path = "/relations/-",
-                    Value = new
-                    {
-                        rel = "System.LinkTypes.Hierarchy-Reverse",
-                        url = $"{_adoService.Connection.Uri}_apis/wit/workItems/{parentId}",
-                    },
-                },
-            };
-
-            var workItem = await client.CreateWorkItemAsync(patchDocument, project, workItemType);
-            results.Add(workItem);
-        }
-
-        return results;
     }
 
     [McpServerTool(Name = "link_work_items")]
