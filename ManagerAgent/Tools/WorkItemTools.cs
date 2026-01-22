@@ -34,6 +34,46 @@ public class WorkItemTools(AzureDevOpsService adoService)
         };
     }
 
+    private static JsonPatchDocument ParseFieldsAndCreatePatchDocument(
+        string fieldsJson,
+        string parameterName,
+        Operation operation
+    )
+    {
+        if (string.IsNullOrWhiteSpace(fieldsJson))
+            throw new ArgumentException(
+                $"Parameter '{parameterName}' is required and must contain at least one field."
+            );
+
+        var parsedFields =
+            JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
+                fieldsJson,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            )
+            ?? throw new ArgumentException(
+                $"Could not parse '{parameterName}' as a JSON object."
+            );
+
+        if (parsedFields.Count == 0)
+            throw new ArgumentException($"'{parameterName}' must contain at least one field.");
+
+        var patchDocument = new JsonPatchDocument();
+
+        foreach (var field in parsedFields)
+        {
+            patchDocument.Add(
+                new JsonPatchOperation
+                {
+                    Operation = operation,
+                    Path = $"/fields/{field.Key}",
+                    Value = NormalizeJsonValue(field.Value),
+                }
+            );
+        }
+
+        return patchDocument;
+    }
+
     [McpServerTool(Name = "get_work_item")]
     [Description(
         "Get the raw work item by ID (fields/relations). Use this for data retrieval; if the user asks for a summary/update/status, prefer get_executive_summary instead."
@@ -62,35 +102,14 @@ public class WorkItemTools(AzureDevOpsService adoService)
             string fieldsJson
     )
     {
-        if (string.IsNullOrWhiteSpace(fieldsJson))
-            throw new ArgumentException(
-                "Parameter 'fieldsJson' is required and must contain at least one field."
-            );
-
-        var parsedFields =
-            JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
-                fieldsJson,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? throw new ArgumentException("Could not parse 'fieldsJson' as a JSON object.");
-
-        if (parsedFields.Count == 0)
-            throw new ArgumentException("'fieldsJson' must contain at least one field.");
+        var patchDocument = ParseFieldsAndCreatePatchDocument(
+            fieldsJson,
+            nameof(fieldsJson),
+            Operation.Add
+        );
 
         var client = await _adoService.GetWorkItemTrackingApiAsync();
         var project = _adoService.DefaultProject;
-        var patchDocument = new JsonPatchDocument();
-
-        foreach (var field in parsedFields)
-        {
-            patchDocument.Add(
-                new JsonPatchOperation
-                {
-                    Operation = Operation.Add,
-                    Path = $"/fields/{field.Key}",
-                    Value = NormalizeJsonValue(field.Value),
-                }
-            );
-        }
 
         return await client.CreateWorkItemAsync(patchDocument, project, workItemType);
     }
@@ -100,43 +119,18 @@ public class WorkItemTools(AzureDevOpsService adoService)
     public async Task<string> UpdateWorkItem(
         [Description("The ID of the work item to update.")] int id,
         [Description(
-            "JSON array of field updates. Example: [{\"field\":\"System.Title\",\"value\":\"New Title\"},{\"field\":\"Microsoft.VSTS.Scheduling.OriginalEstimate\",\"value\":8}]"
+            "JSON object of field updates. Example: {\"System.Title\":\"New Title\",\"Microsoft.VSTS.Scheduling.OriginalEstimate\":8}"
         )]
             string updatesJson
     )
     {
-        if (string.IsNullOrWhiteSpace(updatesJson))
-            throw new ArgumentException(
-                "Parameter 'updates' is required and must contain at least one field update."
-            );
-
-        // Parse the JSON string into a list of updates
-        var parsedUpdates =
-            JsonSerializer.Deserialize<List<FieldUpdateDto>>(
-                updatesJson,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? throw new ArgumentException("Could not parse 'updates' as a JSON array.");
-
-        if (parsedUpdates.Count == 0)
-            throw new ArgumentException("'updates' must contain at least one field update.");
+        var patchDocument = ParseFieldsAndCreatePatchDocument(
+            updatesJson,
+            nameof(updatesJson),
+            Operation.Replace
+        );
 
         var client = await _adoService.GetWorkItemTrackingApiAsync();
-        var patchDocument = new JsonPatchDocument();
-
-        foreach (var update in parsedUpdates)
-        {
-            var value = NormalizeJsonValue(update.Value);
-
-            patchDocument.Add(
-                new JsonPatchOperation
-                {
-                    Operation = Operation.Replace,
-                    Path = $"/fields/{update.Field}",
-                    Value = value,
-                }
-            );
-        }
-
         var result = await client.UpdateWorkItemAsync(patchDocument, id);
 
         return JsonSerializer.Serialize(
@@ -147,12 +141,6 @@ public class WorkItemTools(AzureDevOpsService adoService)
                 rev = result.Rev,
             }
         );
-    }
-
-    private class FieldUpdateDto
-    {
-        public string Field { get; set; } = "";
-        public object Value { get; set; }
     }
 
     [McpServerTool(Name = "list_work_item_comments")]
