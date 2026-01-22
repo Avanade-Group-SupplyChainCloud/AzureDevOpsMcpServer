@@ -35,6 +35,22 @@ public static class McpServerExtensions
 
     public static WebApplication UseAzureDevOpsMcp(this WebApplication app)
     {
+        // Global exception handler - catches all exceptions in the request pipeline
+        app.Use(
+            async (context, next) =>
+            {
+                try
+                {
+                    await next();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{ex.GetType().Name}: {ex.Message}");
+                    throw;
+                }
+            }
+        );
+
         // app.UseHttpsRedirection();
         app.UseCors();
 

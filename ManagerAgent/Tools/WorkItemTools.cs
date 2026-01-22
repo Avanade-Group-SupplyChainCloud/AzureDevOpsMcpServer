@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Text.Json;
-using AzureDevOpsMcp.Shared.Helpers;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
