@@ -78,6 +78,7 @@ public static class McpServerExtensions
         );
 
         app.MapMcp();
+        app.MapGet("/health", () => Results.Ok("ok"));
 
         return app;
     }

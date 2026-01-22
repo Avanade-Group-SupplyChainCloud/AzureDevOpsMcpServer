@@ -187,6 +187,18 @@ public class WorkItemTools(AzureDevOpsService adoService)
         return revisions ?? Enumerable.Empty<WorkItem>();
     }
 
+    [McpServerTool(Name = "get_work_item_latest_revision")]
+    [Description("Get the most recent revision of a work item.")]
+    public async Task<WorkItem> GetWorkItemLatestRevision(
+        [Description("The ID of the work item.")] int workItemId
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
+        var revisions = await client.GetRevisionsAsync(project, workItemId, top: 1, skip: 0);
+        return revisions?.LastOrDefault();
+    }
+
     [McpServerTool(Name = "link_work_items")]
     [Description("Link two work items together with a specified link type.")]
     public async Task<WorkItem> LinkWorkItems(
