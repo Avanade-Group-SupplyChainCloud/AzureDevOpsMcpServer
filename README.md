@@ -197,6 +197,26 @@ Each agent listens on the port configured in its `Properties/launchSettings.json
 
 ### Usage Examples
 
+- create_work_item
+  - Purpose: Create a new work item with one or more fields.
+  - Signature: `create_work_item(workItemType, fieldsJson)`
+  - Example:
+
+    ```json
+    {
+      "tool": "create_work_item",
+      "args": {
+        "workItemType": "Task",
+        "fieldsJson": "{\"System.Title\":\"(Hours) Example\",\"System.AreaPath\":\"Supply Chain Cloud\",\"System.IterationPath\":\"Supply Chain Cloud\\\\Sprint 82\",\"Microsoft.VSTS.Common.Activity\":\"Development\",\"Microsoft.VSTS.Scheduling.OriginalEstimate\":8,\"Microsoft.VSTS.Scheduling.RemainingWork\":8}"
+      }
+    }
+    ```
+
+  - Notes:
+    - `fieldsJson` is required and must be a JSON object string.
+    - Field names are Azure DevOps reference names (e.g., `System.AreaPath`).
+    - Nested JSON objects are preserved as raw JSON strings to keep schemas Copilot Studio-friendly.
+
 - update_work_item
   - Purpose: Update one or more fields on a work item by ID.
   - Signature: `update_work_item(id, updatesJson)`

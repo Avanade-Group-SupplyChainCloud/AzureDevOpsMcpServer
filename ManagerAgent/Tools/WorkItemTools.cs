@@ -14,6 +14,26 @@ public class WorkItemTools(AzureDevOpsService adoService)
 {
     private readonly AzureDevOpsService _adoService = adoService;
 
+    private static object NormalizeJsonValue(object value)
+    {
+        if (value is not JsonElement je)
+            return value;
+
+        return je.ValueKind switch
+        {
+            JsonValueKind.String => je.GetString(),
+            JsonValueKind.Number => je.TryGetInt64(out var l) ? (object)l : je.GetDouble(),
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            JsonValueKind.Null => null,
+            JsonValueKind.Array => je.EnumerateArray().Select(e => NormalizeJsonValue(e)).ToArray(),
+            // Copilot Studio is fragile with nested object schemas; if callers send nested objects,
+            // preserve as raw JSON rather than trying to model nested DTOs.
+            JsonValueKind.Object => je.GetRawText(),
+            _ => je.GetRawText(),
+        };
+    }
+
     [McpServerTool(Name = "get_work_item")]
     [Description(
         "Get the raw work item by ID (fields/relations). Use this for data retrieval; if the user asks for a summary/update/status, prefer get_executive_summary instead."
@@ -50,22 +70,39 @@ public class WorkItemTools(AzureDevOpsService adoService)
     [Description("Create a new work item (Bug, Task, User Story, etc.).")]
     public async Task<WorkItem> CreateWorkItem(
         [Description("The type of work item to create (e.g., 'Bug', 'Task').")] string workItemType,
-        [Description("A dictionary of fields and their values for the new work item.")]
-            Dictionary<string, object> fields
+        [Description(
+            "JSON object of fields and their values for the new work item. Example: {\"System.Title\":\"My task\",\"Microsoft.VSTS.Scheduling.OriginalEstimate\":8}"
+        )]
+            string fieldsJson
     )
     {
+        if (string.IsNullOrWhiteSpace(fieldsJson))
+            throw new ArgumentException(
+                "Parameter 'fieldsJson' is required and must contain at least one field."
+            );
+
+        var parsedFields =
+            JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
+                fieldsJson,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            )
+            ?? throw new ArgumentException("Could not parse 'fieldsJson' as a JSON object.");
+
+        if (parsedFields.Count == 0)
+            throw new ArgumentException("'fieldsJson' must contain at least one field.");
+
         var client = await _adoService.GetWorkItemTrackingApiAsync();
         var project = _adoService.DefaultProject;
         var patchDocument = new JsonPatchDocument();
 
-        foreach (var field in fields)
+        foreach (var field in parsedFields)
         {
             patchDocument.Add(
                 new JsonPatchOperation
                 {
                     Operation = Operation.Add,
                     Path = $"/fields/{field.Key}",
-                    Value = field.Value,
+                    Value = NormalizeJsonValue(field.Value),
                 }
             );
         }
@@ -83,66 +120,48 @@ public class WorkItemTools(AzureDevOpsService adoService)
             string updatesJson
     )
     {
-        return await ErrorHandler.ExecuteWithErrorHandling(async () =>
+        if (string.IsNullOrWhiteSpace(updatesJson))
+            throw new ArgumentException(
+                "Parameter 'updates' is required and must contain at least one field update."
+            );
+
+        // Parse the JSON string into a list of updates
+        var parsedUpdates =
+            JsonSerializer.Deserialize<List<FieldUpdateDto>>(
+                updatesJson,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            ) ?? throw new ArgumentException("Could not parse 'updates' as a JSON array.");
+
+        if (parsedUpdates.Count == 0)
+            throw new ArgumentException("'updates' must contain at least one field update.");
+
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var patchDocument = new JsonPatchDocument();
+
+        foreach (var update in parsedUpdates)
         {
-            if (string.IsNullOrWhiteSpace(updatesJson))
-                throw new ArgumentException(
-                    "Parameter 'updates' is required and must contain at least one field update."
-                );
+            var value = NormalizeJsonValue(update.Value);
 
-            // Parse the JSON string into a list of updates
-            var parsedUpdates =
-                JsonSerializer.Deserialize<List<FieldUpdateDto>>(
-                    updatesJson,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                ) ?? throw new ArgumentException("Could not parse 'updates' as a JSON array.");
-
-            if (parsedUpdates.Count == 0)
-                throw new ArgumentException("'updates' must contain at least one field update.");
-
-            var client = await _adoService.GetWorkItemTrackingApiAsync();
-            var patchDocument = new JsonPatchDocument();
-
-            foreach (var update in parsedUpdates)
-            {
-                // Handle different value types - could be JsonElement from deserialization
-                object value = update.Value switch
+            patchDocument.Add(
+                new JsonPatchOperation
                 {
-                    JsonElement je => je.ValueKind switch
-                    {
-                        JsonValueKind.String => je.GetString(),
-                        JsonValueKind.Number => je.TryGetInt64(out var l)
-                            ? (object)l
-                            : je.GetDouble(),
-                        JsonValueKind.True => true,
-                        JsonValueKind.False => false,
-                        JsonValueKind.Null => null,
-                        _ => je.GetRawText(),
-                    },
-                    _ => update.Value, // Already a primitive (string, int, bool, etc.)
-                };
-
-                patchDocument.Add(
-                    new JsonPatchOperation
-                    {
-                        Operation = Operation.Replace,
-                        Path = $"/fields/{update.Field}",
-                        Value = value,
-                    }
-                );
-            }
-
-            var result = await client.UpdateWorkItemAsync(patchDocument, id);
-
-            return JsonSerializer.Serialize(
-                new
-                {
-                    success = true,
-                    id = result.Id,
-                    rev = result.Rev,
+                    Operation = Operation.Replace,
+                    Path = $"/fields/{update.Field}",
+                    Value = value,
                 }
             );
-        });
+        }
+
+        var result = await client.UpdateWorkItemAsync(patchDocument, id);
+
+        return JsonSerializer.Serialize(
+            new
+            {
+                success = true,
+                id = result.Id,
+                rev = result.Rev,
+            }
+        );
     }
 
     private class FieldUpdateDto
@@ -322,35 +341,32 @@ public class WorkItemTools(AzureDevOpsService adoService)
         [Description("The ID of the work item to get updates/details for.")] int workItemId
     )
     {
-        return await ErrorHandler.ExecuteWithErrorHandling(async () =>
-        {
-            var client = await _adoService.GetWorkItemTrackingApiAsync();
-            var project = _adoService.DefaultProject;
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
 
-            // Get the parent work item with relations
-            var parentWorkItem = await client.GetWorkItemAsync(
-                project,
-                workItemId,
-                expand: WorkItemExpand.All
-            );
+        // Get the parent work item with relations
+        var parentWorkItem = await client.GetWorkItemAsync(
+            project,
+            workItemId,
+            expand: WorkItemExpand.All
+        );
 
-            if (parentWorkItem == null)
-                return JsonSerializer.Serialize(
-                    new { error = $"Work item {workItemId} not found." },
-                    new JsonSerializerOptions { WriteIndented = true }
-                );
-
-            // Recursively get all children
-            var allChildren = await GetAllChildrenRecursiveAsync(client, project, parentWorkItem);
-
-            // Build executive summary
-            var summary = BuildExecutiveSummary(parentWorkItem, allChildren);
-
+        if (parentWorkItem == null)
             return JsonSerializer.Serialize(
-                summary,
+                new { error = $"Work item {workItemId} not found." },
                 new JsonSerializerOptions { WriteIndented = true }
             );
-        });
+
+        // Recursively get all children
+        var allChildren = await GetAllChildrenRecursiveAsync(client, project, parentWorkItem);
+
+        // Build executive summary
+        var summary = BuildExecutiveSummary(parentWorkItem, allChildren);
+
+        return JsonSerializer.Serialize(
+            summary,
+            new JsonSerializerOptions { WriteIndented = true }
+        );
     }
 
     private async Task<List<WorkItem>> GetAllChildrenRecursiveAsync(
