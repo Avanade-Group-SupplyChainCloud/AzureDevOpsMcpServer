@@ -13,6 +13,8 @@ public static class McpServerExtensions
         Assembly toolsAssembly
     )
     {
+        builder.Services.AddApplicationInsightsTelemetry();
+
         // Configure Azure DevOps settings
         builder.Services.Configure<AzureDevOpsSettings>(
             builder.Configuration.GetSection("AzureDevOps")
