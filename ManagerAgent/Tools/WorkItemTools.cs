@@ -59,22 +59,22 @@ public class WorkItemTools(AzureDevOpsService adoService)
         [Description(
             "JSON object of fields and their values for the new work item. Example: {\"System.Title\":\"My task\",\"Microsoft.VSTS.Scheduling.OriginalEstimate\":8}"
         )]
-            string fields
+            string fieldsJson
     )
     {
-        if (string.IsNullOrWhiteSpace(fields))
+        if (string.IsNullOrWhiteSpace(fieldsJson))
             throw new ArgumentException(
-                "Parameter 'fields' is required and must contain at least one field."
+                "Parameter 'fieldsJson' is required and must contain at least one field."
             );
 
         var parsedFields =
             JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
-                fields,
+                fieldsJson,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? throw new ArgumentException("Could not parse 'fields' as a JSON object.");
+            ) ?? throw new ArgumentException("Could not parse 'fieldsJson' as a JSON object.");
 
         if (parsedFields.Count == 0)
-            throw new ArgumentException("'fields' must contain at least one field.");
+            throw new ArgumentException("'fieldsJson' must contain at least one field.");
 
         var client = await _adoService.GetWorkItemTrackingApiAsync();
         var project = _adoService.DefaultProject;
