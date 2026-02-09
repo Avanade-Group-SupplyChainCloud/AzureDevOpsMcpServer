@@ -16,7 +16,7 @@ In this repo, MCP tools are intentionally designed to avoid nested object parame
 
 This repo contains three MCP server “agents”, each exposing its own set of tools:
 
-### Manager Agent Tools (39 total)
+### Manager Agent Tools (37 total)
 
 #### Core
 - `list_projects`: List all projects in the Azure DevOps organization. Supports filtering by state and name.
@@ -24,18 +24,16 @@ This repo contains three MCP server “agents”, each exposing its own set of t
 
 #### Work Items & Queries
 - `get_work_item`: Get a work item by ID with optional field expansion.
-- `get_work_items_batch`: Get multiple work items by IDs in a single batch request.
 - `get_work_items_by_ids`: Get multiple work items by their IDs in a single request.
 - `create_work_item`: Create a new work item (Bug, Task, User Story, etc.) in a project.
 - `update_work_item`: Update fields on an existing work item.
 - `list_work_item_comments`: Get comments on a work item.
 - `add_work_item_comment`: Add a comment to a work item.
 - `list_work_item_revisions`: Get revision history of a work item.
-- `add_child_work_items`: Create child work items under a parent work item.
+- `get_work_item_latest_revision`: Get the most recent revision of a work item.
+- `get_work_item_previous_revision`: Get the previous revision of a work item (current - 1).
 - `link_work_items`: Link two work items together with a specified link type.
 - `run_wiql_query`: Execute a WIQL (Work Item Query Language) query and return matching work items.
-- `get_work_item_types`: Get all work item types available in a project.
-- `get_work_item_fields`: Get all fields available for work items.
 - `get_work_item_history`: Get the revision history of a work item.
 - `get_executive_summary`: Get an executive summary for a work item, including children recursively.
 - `get_saved_queries`: Get saved queries (My Queries or Shared Queries) in a project.
@@ -57,7 +55,6 @@ This repo contains three MCP server “agents”, each exposing its own set of t
 #### Search
 - `search_code`: Search Azure DevOps Repositories for code matching the search text.
 - `search_wiki`: Search Azure DevOps Wiki for pages matching the search text.
-- `search_work_items`: Search for work items by text across title, description, and other fields.
 - `search_workitem`: Search Azure DevOps Work Items matching the search text.
 
 #### Wiki
