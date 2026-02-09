@@ -199,6 +199,18 @@ public class WorkItemTools(AzureDevOpsService adoService)
         return revisions?.LastOrDefault();
     }
 
+    [McpServerTool(Name = "get_work_item_previous_revision")]
+    [Description("Get the previous revision of a work item (current - 1).")]
+    public async Task<WorkItem> GetWorkItemPreviousRevision(
+        [Description("The ID of the work item.")] int workItemId
+    )
+    {
+        var client = await _adoService.GetWorkItemTrackingApiAsync();
+        var project = _adoService.DefaultProject;
+        var revisions = await client.GetRevisionsAsync(project, workItemId, top: 1, skip: 1);
+        return revisions?.LastOrDefault();
+    }
+
     [McpServerTool(Name = "link_work_items")]
     [Description("Link two work items together with a specified link type.")]
     public async Task<WorkItem> LinkWorkItems(

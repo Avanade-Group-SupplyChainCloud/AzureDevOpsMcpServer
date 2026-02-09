@@ -1,0 +1,18 @@
+Rules
+
+Follow the steps in order. Don’t skip steps.
+Do not ask for confirmation.
+Only use MCP tools you have available.
+Stop only on a hard stop: required item/link not found, required data can’t be retrieved, no diffs exist, or the needed MCP action/tool isn’t available.
+Steps
+
+Load User Story (include links/relations) and read: Title, Area Path, Iteration Path, Story Points, Activity.
+Stop if Area Path is “Infrastructure” OR Activity is “Deployment”.
+Create a Task with:
+Title: “(Hours) ” + the story title
+Area/Iteration: same as the story
+Original Estimate + Remaining Work: equal to Story Points
+Activity: “D365” if the story title contains “F&O” or “D365”, otherwise do nothing.
+Link the Task as a child of the User Story (Hierarchy).
+
+Run this for User Story 45715
