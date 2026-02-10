@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.Shared.Extensions;
@@ -29,8 +30,8 @@ public static class McpServerExtensions
             .AddMcpServer()
             .WithHttpTransport()
             .WithToolsFromAssembly(toolsAssembly)
-            .WithPrompts(Array.Empty<McpServerPrompt>())
-            .WithResources(Array.Empty<McpServerResource>());
+            .WithListPromptsHandler((_, _) => ValueTask.FromResult(new ListPromptsResult()))
+            .WithListResourcesHandler((_, _) => ValueTask.FromResult(new ListResourcesResult()));
 
         builder.Services.AddCors(options =>
         {
