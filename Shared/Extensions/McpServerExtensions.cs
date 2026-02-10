@@ -50,7 +50,14 @@ public static class McpServerExtensions
         app.UseCors();
 
         // Health endpoint – outside MCP pipeline and auth
-        app.MapGet("/health", () => Results.Ok("ok"));
+        app.Map("/health", healthApp =>
+        {
+            healthApp.Run(context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status200OK;
+                return Task.CompletedTask;
+            });
+        });
 
         // MCP Streamable HTTP returns text/event-stream responses. Some clients send
         // Accept: application/json which triggers 406. Normalize it to avoid the issue.
@@ -108,13 +115,6 @@ public static class McpServerExtensions
 
         app.Use(async (context, next) =>
         {
-            // Let the health endpoint bypass MCP middleware and auth
-            if (context.Request.Path.StartsWithSegments("/health"))
-            {
-                await next();
-                return;
-            }
-
             if (HttpMethods.IsPost(context.Request.Method) && context.Request.Path == "/")
             {
                 var accept = context.Request.Headers.Accept.ToString();
