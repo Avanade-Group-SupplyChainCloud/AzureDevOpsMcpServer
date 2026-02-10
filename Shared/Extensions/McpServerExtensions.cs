@@ -56,23 +56,62 @@ public static class McpServerExtensions
         // app.UseHttpsRedirection();
         app.UseCors();
 
-        // API Key Middleware
+        // Auth Middleware (optional): ApiKey can be supplied via x-api-key or Authorization (Bearer or raw)
         app.Use(
             async (context, next) =>
             {
                 var apiKey = app.Configuration["ApiKey"];
-                if (!string.IsNullOrEmpty(apiKey))
+                if (string.IsNullOrWhiteSpace(apiKey))
                 {
-                    if (
-                        !context.Request.Headers.TryGetValue("x-api-key", out var extractedApiKey)
-                        || !string.Equals(extractedApiKey, apiKey)
-                    )
-                    {
-                        context.Response.StatusCode = 401;
-                        await context.Response.WriteAsync("Unauthorized");
-                        return;
-                    }
+                    await next();
+                    return;
                 }
+
+                static string ExtractAuthorizationToken(string authHeader)
+                {
+                    if (string.IsNullOrWhiteSpace(authHeader))
+                    {
+                        return string.Empty;
+                    }
+
+                    const string bearerPrefix = "Bearer ";
+                    return authHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase)
+                        ? authHeader[bearerPrefix.Length..].Trim()
+                        : authHeader.Trim();
+                }
+
+                static bool TokenMatchesApiKey(string token, string configuredApiKey)
+                {
+                    if (Guid.TryParse(configuredApiKey, out var expectedGuid))
+                    {
+                        return Guid.TryParse(token, out var providedGuid) && providedGuid == expectedGuid;
+                    }
+
+                    return string.Equals(token, configuredApiKey, StringComparison.Ordinal);
+                }
+
+                var tokenFromApiKeyHeader = context.Request.Headers.TryGetValue(
+                    "x-api-key",
+                    out var extractedApiKey
+                )
+                    ? extractedApiKey.ToString().Trim()
+                    : string.Empty;
+
+                var tokenFromAuthorizationHeader = ExtractAuthorizationToken(
+                    context.Request.Headers.Authorization.ToString()
+                );
+
+                var authorized =
+                    TokenMatchesApiKey(tokenFromApiKeyHeader, apiKey)
+                    || TokenMatchesApiKey(tokenFromAuthorizationHeader, apiKey);
+
+                if (!authorized)
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync("Unauthorized");
+                    return;
+                }
+
                 await next();
             }
         );
