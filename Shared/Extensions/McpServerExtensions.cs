@@ -26,8 +26,8 @@ public static class McpServerExtensions
         builder.Services.AddSingleton<AzureDevOpsService>();
 
         // Add MCP Server and register tools
-        builder.Services
-            .AddMcpServer()
+        builder
+            .Services.AddMcpServer()
             .WithHttpTransport()
             .WithToolsFromAssembly(toolsAssembly)
             .WithListPromptsHandler((_, _) => ValueTask.FromResult(new ListPromptsResult()))
@@ -46,138 +46,102 @@ public static class McpServerExtensions
 
     public static WebApplication UseAzureDevOpsMcp(this WebApplication app)
     {
-        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger(
-            "AzureDevOpsMcp.RequestHeaders"
-        );
-
-        // Global exception handler - catches all exceptions in the request pipeline
-        app.Use(
-            async (context, next) =>
-            {
-                try
-                {
-                    await next();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(
-                        ex,
-                        "Unhandled exception in {Method} {Path}: {Message}",
-                        context.Request.Method,
-                        context.Request.Path,
-                        ex.Message
-                    );
-                    throw;
-                }
-            }
-        );
-
         // app.UseHttpsRedirection();
         app.UseCors();
 
-        // Simple header logging for diagnostics
-        app.Use(
-            async (context, next) =>
-            {
-                if (app.Configuration.GetValue("AppInsights:LogRequestHeaders", false))
-                {
-                    var headers = string.Join(
-                        ";",
-                        context.Request.Headers.Select(h => $"{h.Key}={h.Value}")
-                    );
-                    logger.LogInformation(
-                        "{Method} {Path} Headers: {Headers}",
-                        context.Request.Method,
-                        context.Request.Path,
-                        headers
-                    );
-                }
-
-                await next();
-            }
-        );
+        // Health endpoint – outside MCP pipeline and auth
+        app.MapGet("/health", () => Results.Ok("ok"));
 
         // MCP Streamable HTTP returns text/event-stream responses. Some clients send
         // Accept: application/json which triggers 406. Normalize it to avoid the issue.
-        app.Use(
-            async (context, next) =>
-            {
-                if (HttpMethods.IsPost(context.Request.Method) && context.Request.Path == "/")
-                {
-                    var accept = context.Request.Headers.Accept.ToString();
-                    if (!accept.Contains("text/event-stream", StringComparison.OrdinalIgnoreCase)
-                        && !accept.Contains("*/*", StringComparison.OrdinalIgnoreCase))
-                    {
-                        context.Request.Headers.Accept = "text/event-stream, */*";
-                    }
-                }
+        // this was required for Avanade AI
 
-                await next();
+        static string ExtractAuthorizationToken(string authHeader)
+        {
+            if (string.IsNullOrWhiteSpace(authHeader))
+            {
+                return string.Empty;
             }
-        );
 
-        // Auth Middleware (optional): ApiKey can be supplied via x-api-key or Authorization (Bearer or raw)
-        app.Use(
-            async (context, next) =>
+            const string bearerPrefix = "Bearer ";
+            return authHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase)
+                ? authHeader[bearerPrefix.Length..].Trim()
+                : authHeader.Trim();
+        }
+
+        static bool TokenMatchesApiKey(string token, string configuredApiKey)
+        {
+            if (Guid.TryParse(configuredApiKey, out var expectedGuid))
             {
-                var apiKey = app.Configuration["ApiKey"];
-                if (string.IsNullOrWhiteSpace(apiKey))
-                {
-                    await next();
-                    return;
-                }
+                return Guid.TryParse(token, out var providedGuid) && providedGuid == expectedGuid;
+            }
 
-                static string ExtractAuthorizationToken(string authHeader)
-                {
-                    if (string.IsNullOrWhiteSpace(authHeader))
-                    {
-                        return string.Empty;
-                    }
+            return string.Equals(token, configuredApiKey, StringComparison.Ordinal);
+        }
 
-                    const string bearerPrefix = "Bearer ";
-                    return authHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase)
-                        ? authHeader[bearerPrefix.Length..].Trim()
-                        : authHeader.Trim();
-                }
+        static async Task<bool> TryAuthorizeRequestAsync(HttpContext context, string apiKey)
+        {
+            var tokenFromApiKeyHeader = context.Request.Headers.TryGetValue(
+                "x-api-key",
+                out var extractedApiKey
+            )
+                ? extractedApiKey.ToString().Trim()
+                : string.Empty;
 
-                static bool TokenMatchesApiKey(string token, string configuredApiKey)
-                {
-                    if (Guid.TryParse(configuredApiKey, out var expectedGuid))
-                    {
-                        return Guid.TryParse(token, out var providedGuid) && providedGuid == expectedGuid;
-                    }
+            var tokenFromAuthorizationHeader = ExtractAuthorizationToken(
+                context.Request.Headers.Authorization.ToString()
+            );
 
-                    return string.Equals(token, configuredApiKey, StringComparison.Ordinal);
-                }
+            var authorized =
+                TokenMatchesApiKey(tokenFromApiKeyHeader, apiKey)
+                || TokenMatchesApiKey(tokenFromAuthorizationHeader, apiKey);
 
-                var tokenFromApiKeyHeader = context.Request.Headers.TryGetValue(
-                    "x-api-key",
-                    out var extractedApiKey
+            if (authorized)
+            {
+                return true;
+            }
+
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync("Unauthorized");
+            return false;
+        }
+
+        app.Use(async (context, next) =>
+        {
+            // Let the health endpoint bypass MCP middleware and auth
+            if (context.Request.Path.StartsWithSegments("/health"))
+            {
+                await next();
+                return;
+            }
+
+            if (HttpMethods.IsPost(context.Request.Method) && context.Request.Path == "/")
+            {
+                var accept = context.Request.Headers.Accept.ToString();
+                if (
+                    !accept.Contains("text/event-stream", StringComparison.OrdinalIgnoreCase)
+                    && !accept.Contains("*/*", StringComparison.OrdinalIgnoreCase)
                 )
-                    ? extractedApiKey.ToString().Trim()
-                    : string.Empty;
-
-                var tokenFromAuthorizationHeader = ExtractAuthorizationToken(
-                    context.Request.Headers.Authorization.ToString()
-                );
-
-                var authorized =
-                    TokenMatchesApiKey(tokenFromApiKeyHeader, apiKey)
-                    || TokenMatchesApiKey(tokenFromAuthorizationHeader, apiKey);
-
-                if (!authorized)
                 {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("Unauthorized");
+                    context.Request.Headers.Accept = "text/event-stream, */*";
+                }
+            }
+
+            // Auth (optional): ApiKey can be supplied via x-api-key or Authorization (Bearer or raw)
+            var apiKey = app.Configuration["ApiKey"];
+            if (!string.IsNullOrWhiteSpace(apiKey))
+            {
+                var isAuthorized = await TryAuthorizeRequestAsync(context, apiKey);
+                if (!isAuthorized)
+                {
                     return;
                 }
-
-                await next();
             }
-        );
+
+            await next();
+        });
 
         app.MapMcp();
-        app.MapGet("/health", () => Results.Ok("ok"));
 
         return app;
     }
