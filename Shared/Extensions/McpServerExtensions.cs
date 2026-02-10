@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.Shared.Extensions;
 
@@ -24,7 +25,12 @@ public static class McpServerExtensions
         builder.Services.AddSingleton<AzureDevOpsService>();
 
         // Add MCP Server and register tools
-        builder.Services.AddMcpServer().WithHttpTransport().WithToolsFromAssembly(toolsAssembly);
+        builder.Services
+            .AddMcpServer()
+            .WithHttpTransport()
+            .WithToolsFromAssembly(toolsAssembly)
+            .WithPrompts(Array.Empty<McpServerPrompt>())
+            .WithResources(Array.Empty<McpServerResource>());
 
         builder.Services.AddCors(options =>
         {
@@ -53,7 +59,13 @@ public static class McpServerExtensions
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"{ex.GetType().Name}: {ex.Message}");
+                    logger.LogError(
+                        ex,
+                        "Unhandled exception in {Method} {Path}: {Message}",
+                        context.Request.Method,
+                        context.Request.Path,
+                        ex.Message
+                    );
                     throw;
                 }
             }
