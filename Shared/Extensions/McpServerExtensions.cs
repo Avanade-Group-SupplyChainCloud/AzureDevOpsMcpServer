@@ -2,7 +2,9 @@ using System.Reflection;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace AzureDevOpsMcp.Shared.Extensions;
 
@@ -37,6 +39,10 @@ public static class McpServerExtensions
 
     public static WebApplication UseAzureDevOpsMcp(this WebApplication app)
     {
+        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger(
+            "AzureDevOpsMcp.RequestHeaders"
+        );
+
         // Global exception handler - catches all exceptions in the request pipeline
         app.Use(
             async (context, next) =>
@@ -55,6 +61,47 @@ public static class McpServerExtensions
 
         // app.UseHttpsRedirection();
         app.UseCors();
+
+        // Simple header logging for diagnostics
+        app.Use(
+            async (context, next) =>
+            {
+                if (app.Configuration.GetValue("AppInsights:LogRequestHeaders", false))
+                {
+                    var headers = string.Join(
+                        ";",
+                        context.Request.Headers.Select(h => $"{h.Key}={h.Value}")
+                    );
+                    logger.LogInformation(
+                        "{Method} {Path} Headers: {Headers}",
+                        context.Request.Method,
+                        context.Request.Path,
+                        headers
+                    );
+                }
+
+                await next();
+            }
+        );
+
+        // MCP Streamable HTTP returns text/event-stream responses. Some clients send
+        // Accept: application/json which triggers 406. Normalize it to avoid the issue.
+        app.Use(
+            async (context, next) =>
+            {
+                if (HttpMethods.IsPost(context.Request.Method) && context.Request.Path == "/")
+                {
+                    var accept = context.Request.Headers.Accept.ToString();
+                    if (!accept.Contains("text/event-stream", StringComparison.OrdinalIgnoreCase)
+                        && !accept.Contains("*/*", StringComparison.OrdinalIgnoreCase))
+                    {
+                        context.Request.Headers.Accept = "text/event-stream, */*";
+                    }
+                }
+
+                await next();
+            }
+        );
 
         // Auth Middleware (optional): ApiKey can be supplied via x-api-key or Authorization (Bearer or raw)
         app.Use(
