@@ -9,10 +9,10 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-    <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="20.266.0-preview" />
-    <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="20.266.0-preview" />
-    <PackageReference Include="Microsoft.VisualStudio.Services.InteractiveClient" Version="20.266.0-preview" />
-    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.6.0-preview.1" />
+    <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="20.268.0-preview" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="20.268.0-preview" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.InteractiveClient" Version="20.268.0-preview" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.8.0-preview.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.2" />
   </ItemGroup>
 
