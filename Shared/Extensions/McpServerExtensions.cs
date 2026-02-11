@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
@@ -20,9 +21,21 @@ public static class McpServerExtensions
         builder.Services.AddApplicationInsightsTelemetry();
 
         // Configure Azure DevOps settings
-        builder.Services.Configure<AzureDevOpsSettings>(
-            builder.Configuration.GetSection("AzureDevOps")
-        );
+        builder
+            .Services.AddOptions<AzureDevOpsSettings>()
+            .Bind(builder.Configuration.GetSection("AzureDevOps"))
+            .Validate(s => !string.IsNullOrWhiteSpace(s.OrgUrl), "AzureDevOps:OrgUrl is required.")
+            .Validate(
+                s =>
+                    !string.IsNullOrWhiteSpace(s.PersonalAccessToken)
+                    || (
+                        !string.IsNullOrWhiteSpace(s.TenantId)
+                        && !string.IsNullOrWhiteSpace(s.ClientId)
+                        && !string.IsNullOrWhiteSpace(s.ClientSecret)
+                    ),
+                "Azure DevOps auth is required. Provide AzureDevOps:PersonalAccessToken, or AzureDevOps:TenantId+ClientId+ClientSecret."
+            )
+            .ValidateOnStart();
         builder.Services.AddSingleton<AzureDevOpsService>();
 
         // Add MCP Server and register tools
