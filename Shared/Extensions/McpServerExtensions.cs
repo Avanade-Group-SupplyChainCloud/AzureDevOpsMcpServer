@@ -25,15 +25,9 @@ public static class McpServerExtensions
             .Services.AddOptions<AzureDevOpsSettings>()
             .Bind(builder.Configuration.GetSection("AzureDevOps"))
             .Validate(s => !string.IsNullOrWhiteSpace(s.OrgUrl), "AzureDevOps:OrgUrl is required.")
-            .Validate(
-                s =>
-                    !string.IsNullOrWhiteSpace(s.PersonalAccessToken)
-                    || (
-                        !string.IsNullOrWhiteSpace(s.TenantId)
-                        && !string.IsNullOrWhiteSpace(s.ClientId)
-                        && !string.IsNullOrWhiteSpace(s.ClientSecret)
-                    ),
-                "Azure DevOps auth is required. Provide AzureDevOps:PersonalAccessToken, or AzureDevOps:TenantId+ClientId+ClientSecret."
+            .Validate(s => !string.IsNullOrWhiteSpace(s.TenantId), "AzureDevOps:TenantId is required.")
+            .Validate(s => !string.IsNullOrWhiteSpace(s.ClientId), "AzureDevOps:ClientId is required.")
+            .Validate(s => !string.IsNullOrWhiteSpace(s.ClientSecret), "AzureDevOps:ClientSecret is required."
             )
             .ValidateOnStart();
         builder.Services.AddSingleton<AzureDevOpsService>();

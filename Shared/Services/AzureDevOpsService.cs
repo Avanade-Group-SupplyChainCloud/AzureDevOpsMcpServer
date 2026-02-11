@@ -1,5 +1,4 @@
 using System.Net.Http.Headers;
-using System.Text;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Options;
@@ -11,7 +10,6 @@ using Microsoft.TeamFoundation.Wiki.WebApi;
 using Microsoft.TeamFoundation.Work.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Client;
-using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 
 namespace AzureDevOpsMcp.Shared.Services;
@@ -21,9 +19,6 @@ public class AzureDevOpsSettings
     public string OrgUrl { get; set; }
     public string DefaultProject { get; set; }
 
-    // PAT auth
-    public string PersonalAccessToken { get; set; }
-
     // Entra ID app registration (client credentials) auth
     public string TenantId { get; set; }
     public string ClientId { get; set; }
@@ -32,16 +27,12 @@ public class AzureDevOpsSettings
 
 public class AzureDevOpsService(IOptions<AzureDevOpsSettings> settings)
 {
-    private readonly AzureDevOpsSettings _settings = settings.Value;
-
     private readonly VssConnection _connection = CreateConnection(settings.Value);
 
     private readonly string _defaultProject = settings.Value.DefaultProject;
 
-    // Kept for Entra token acquisition on HttpClient calls
-    private readonly ClientSecretCredential _entraCredential = IsEntraConfigured(settings.Value)
-        ? new ClientSecretCredential(settings.Value.TenantId, settings.Value.ClientId, settings.Value.ClientSecret)
-        : null;
+    private readonly ClientSecretCredential _entraCredential =
+        new(settings.Value.TenantId, settings.Value.ClientId, settings.Value.ClientSecret);
 
     public VssConnection Connection => _connection;
     public string DefaultProject => _defaultProject;
@@ -59,21 +50,12 @@ public class AzureDevOpsService(IOptions<AzureDevOpsSettings> settings)
     {
         var httpClient = new HttpClient();
 
-        if (_entraCredential != null)
-        {
-            var token = _entraCredential.GetToken(
-                new TokenRequestContext(["499b84ac-1321-427f-aa17-267ca6975798/.default"]),
-                default);
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token.Token);
-        }
-        else
-        {
-            var authValue = Convert.ToBase64String(
-                Encoding.ASCII.GetBytes($":{_settings.PersonalAccessToken}"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Basic", authValue);
-        }
+        // 499b84ac-1321-427f-aa17-267ca6975798 is the well-known Azure DevOps resource App ID
+        var token = _entraCredential.GetToken(
+            new TokenRequestContext(["499b84ac-1321-427f-aa17-267ca6975798/.default"]),
+            default);
+        httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token.Token);
 
         httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json")
@@ -83,22 +65,9 @@ public class AzureDevOpsService(IOptions<AzureDevOpsSettings> settings)
 
     private static VssConnection CreateConnection(AzureDevOpsSettings s)
     {
-        var orgUri = new Uri(s.OrgUrl);
-
-        if (IsEntraConfigured(s))
-        {
-            var credential = new ClientSecretCredential(s.TenantId, s.ClientId, s.ClientSecret);
-            return new VssConnection(orgUri, new VssAzureIdentityCredential(credential));
-        }
-
-        return new VssConnection(orgUri,
-            new VssBasicCredential(string.Empty, s.PersonalAccessToken));
+        var credential = new ClientSecretCredential(s.TenantId, s.ClientId, s.ClientSecret);
+        return new VssConnection(new Uri(s.OrgUrl), new VssAzureIdentityCredential(credential));
     }
-
-    private static bool IsEntraConfigured(AzureDevOpsSettings s) =>
-        !string.IsNullOrWhiteSpace(s.TenantId)
-        && !string.IsNullOrWhiteSpace(s.ClientId)
-        && !string.IsNullOrWhiteSpace(s.ClientSecret);
 
     public async Task<ProjectHttpClient> GetCoreApiAsync() =>
         await _connection.GetClientAsync<ProjectHttpClient>();

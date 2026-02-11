@@ -155,7 +155,7 @@ This repo contains three MCP server “agents”, each exposing its own set of t
 
 - .NET 10 SDK
 - An Azure DevOps organization and project.
-- A Personal Access Token (PAT) with appropriate permissions (Code, Work Items, Build, etc.).
+- An Entra ID app registration (tenant ID, client ID, client secret) with appropriate Azure DevOps permissions.
 
 ## Configuration
 
@@ -165,18 +165,29 @@ Each agent has its own `appsettings.json`.
   - `ManagerAgent/appsettings.json`
   - `InfraAgent/appsettings.json`
   - `QAAgent/appsettings.json`
-2.  Update the `AzureDevOps` section with your organization URL and PAT:
+2.  Update the `AzureDevOps` section with your organization URL and auth settings.
 
 ```json
 "AzureDevOps": {
   "OrgUrl": "https://dev.azure.com/your-organization",
-  "Pat": "your-personal-access-token"
+  "TenantId": "<tenant-guid>",
+  "ClientId": "<app-client-id-guid>",
+  "ClientSecret": "<app-secret>",
+  "DefaultProject": "Your Project"
 }
 ```
 
+The server authenticates using Entra ID client credentials (service principal). The app registration must be added to your Azure DevOps organization with appropriate permissions.
+
 ### API key (optional but recommended)
 
-If you set `ApiKey` in an agent's `appsettings.json`, the server requires an `x-api-key` header on all requests.
+If you set `ApiKey` in an agent's `appsettings.json`, the server requires auth on all requests.
+
+Supported ways to send it:
+
+- `x-api-key: <ApiKey>`
+- `Authorization: Bearer <ApiKey>`
+- `Authorization: <ApiKey>` (raw token)
 
 ## Running the Server
 
