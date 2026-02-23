@@ -251,41 +251,12 @@ public class WorkItemDeepDiveTools(AzureDevOpsService adoService)
 
     private static bool IsNoisePrComment(Microsoft.TeamFoundation.SourceControl.WebApi.Comment c)
     {
-        if (c == null)
+        if (c == null || string.IsNullOrWhiteSpace(c.Content))
             return true;
 
-        var author = c.Author?.DisplayName ?? string.Empty;
-        var content = c.Content ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(content))
-            return true;
-
-        // Drop common system/bot identities.
-        if (author.Contains("Microsoft.VisualStudio.Services", StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        // Drop common non-conversational automation updates.
-        // (Keep it simple: match well-known phrases we see in ADO PR threads.)
-        var lowered = content.Trim().ToLowerInvariant();
-
-        if (lowered == "policy status has been updated")
-            return true;
-
-        if (Regex.IsMatch(lowered, @"\b(voted|vote of)\b"))
-            return true;
-
-        if (lowered.Contains("joined as a reviewer"))
-            return true;
-        if (lowered.Contains("published the pull request"))
-            return true;
-        if (lowered.Contains("set auto-complete") || lowered.Contains("set autocomplete"))
-            return true;
-        if (lowered.Contains("updated the pull request status"))
-            return true;
-        if (lowered.StartsWith("the reference refs/heads/") && lowered.Contains(" was updated"))
-            return true;
-
-        return false;
+        // System-generated comments (votes, status updates, reviewer joins, etc.) are CommentType.System.
+        // Only keep user-authored text comments.
+        return c.CommentType != CommentType.Text;
     }
 
     private async Task<string> ResolveRepositoryIdForPullRequestAsync(string project, int pullRequestId)
