@@ -85,21 +85,7 @@ public class WorkItemDeepDiveTools(AzureDevOpsService adoService)
                 var pr = await gitClient.GetPullRequestAsync(project, repoId, prRef.PrId);
                 var threads = await gitClient.GetThreadsAsync(project, repoId, prRef.PrId);
 
-                var threadData = (threads ?? [])
-                    .Where(t => t.Comments != null && t.Comments.Any())
-                    .Select(t => new
-                    {
-                        ThreadId = t.Id,
-                        Status = t.Status.ToString(),
-                        FilePath = t.ThreadContext?.FilePath,
-                        Comments = t.Comments.Select(tc => new
-                        {
-                            Author = tc.Author?.DisplayName,
-                            tc.Content,
-                            Date = tc.PublishedDate == default ? null : tc.PublishedDate.ToString("o"),
-                        }),
-                    })
-                    .ToList();
+                var threadData = BuildConversationalThreadData(threads);
 
                 pullRequests.Add(new
                 {
@@ -112,18 +98,6 @@ public class WorkItemDeepDiveTools(AzureDevOpsService adoService)
                     SourceBranch = pr.SourceRefName,
                     TargetBranch = pr.TargetRefName,
                     Repository = pr.Repository?.Name,
-                    Reviewers = pr.Reviewers?.Select(r => new
-                    {
-                        r.DisplayName,
-                        Vote = r.Vote switch
-                        {
-                            10 => "Approved",
-                            5 => "Approved with suggestions",
-                            -5 => "Waiting for author",
-                            -10 => "Rejected",
-                            _ => "No vote",
-                        },
-                    }),
                     CommentThreads = threadData,
                 });
             }
@@ -226,6 +200,92 @@ public class WorkItemDeepDiveTools(AzureDevOpsService adoService)
         var existing = list[existingIndex];
         if (string.IsNullOrWhiteSpace(existing.RepoId) && !string.IsNullOrWhiteSpace(pr.RepoId))
             list[existingIndex] = pr;
+    }
+
+    private static List<object> BuildConversationalThreadData(IEnumerable<GitPullRequestCommentThread> threads)
+    {
+        if (threads == null)
+            return [];
+
+        var result = new List<object>();
+
+        foreach (var t in threads)
+        {
+            if (t?.Comments == null || t.Comments.Count == 0)
+                continue;
+
+            // Filter out system/bot noise and keep only meaningful discussion.
+            var filtered = t.Comments
+                .Where(c => !IsNoisePrComment(c))
+                .Select(c => new
+                {
+                    Author = c.Author?.DisplayName,
+                    Content = c.Content,
+                    Date = c.PublishedDate == default ? null : c.PublishedDate.ToString("o"),
+                })
+                .ToList();
+
+            if (filtered.Count < 2)
+                continue;
+
+            var distinctAuthors = filtered
+                .Select(c => c.Author)
+                .Where(a => !string.IsNullOrWhiteSpace(a))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Count();
+
+            // Only include true back-and-forth (at least two distinct human authors).
+            if (distinctAuthors < 2)
+                continue;
+
+            result.Add(new
+            {
+                ThreadId = t.Id,
+                FilePath = t.ThreadContext?.FilePath,
+                Comments = filtered,
+            });
+        }
+
+        return result;
+    }
+
+    private static bool IsNoisePrComment(Microsoft.TeamFoundation.SourceControl.WebApi.Comment c)
+    {
+        if (c == null)
+            return true;
+
+        var author = c.Author?.DisplayName ?? string.Empty;
+        var content = c.Content ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(content))
+            return true;
+
+        // Drop common system/bot identities.
+        if (author.Contains("Microsoft.VisualStudio.Services", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // Drop common non-conversational automation updates.
+        // (Keep it simple: match well-known phrases we see in ADO PR threads.)
+        var lowered = content.Trim().ToLowerInvariant();
+
+        if (lowered == "policy status has been updated")
+            return true;
+
+        if (Regex.IsMatch(lowered, @"\b(voted|vote of)\b"))
+            return true;
+
+        if (lowered.Contains("joined as a reviewer"))
+            return true;
+        if (lowered.Contains("published the pull request"))
+            return true;
+        if (lowered.Contains("set auto-complete") || lowered.Contains("set autocomplete"))
+            return true;
+        if (lowered.Contains("updated the pull request status"))
+            return true;
+        if (lowered.StartsWith("the reference refs/heads/") && lowered.Contains(" was updated"))
+            return true;
+
+        return false;
     }
 
     private async Task<string> ResolveRepositoryIdForPullRequestAsync(string project, int pullRequestId)
