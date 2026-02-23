@@ -126,9 +126,14 @@ public static class McpServerExtensions
                 context.Request.Headers.Authorization.ToString()
             );
 
+            var tokenFromQueryString = context.Request.Query.TryGetValue("apiKey", out var q)
+                ? q.ToString().Trim()
+                : string.Empty;
+
             var authorized =
                 TokenMatchesApiKey(tokenFromApiKeyHeader, apiKey)
-                || TokenMatchesApiKey(tokenFromAuthorizationHeader, apiKey);
+                || TokenMatchesApiKey(tokenFromAuthorizationHeader, apiKey)
+                || TokenMatchesApiKey(tokenFromQueryString, apiKey);
 
             if (authorized)
             {
@@ -155,7 +160,7 @@ public static class McpServerExtensions
                     }
                 }
 
-                // Auth (optional): ApiKey can be supplied via x-api-key or Authorization (Bearer or raw)
+                // Auth (optional): ApiKey can be supplied via x-api-key header, Authorization (Bearer), or ?apiKey= query string.
                 var apiKey = app.Configuration["ApiKey"];
                 if (!string.IsNullOrWhiteSpace(apiKey))
                 {
