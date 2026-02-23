@@ -126,17 +126,9 @@ public static class McpServerExtensions
                 context.Request.Headers.Authorization.ToString()
             );
 
-            var tokenFromQueryString = context.Request.Query.TryGetValue(
-                "apiKey",
-                out var queryApiKey
-            )
-                ? queryApiKey.ToString().Trim()
-                : string.Empty;
-
             var authorized =
                 TokenMatchesApiKey(tokenFromApiKeyHeader, apiKey)
-                || TokenMatchesApiKey(tokenFromAuthorizationHeader, apiKey)
-                || TokenMatchesApiKey(tokenFromQueryString, apiKey);
+                || TokenMatchesApiKey(tokenFromAuthorizationHeader, apiKey);
 
             if (authorized)
             {
