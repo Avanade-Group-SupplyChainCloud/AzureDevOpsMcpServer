@@ -38,45 +38,26 @@ public class PipelineTools(AzureDevOpsService adoService)
 
     [McpServerTool(Name = "get_run")]
     [Description("Get details of a specific pipeline run.")]
-    public async Task<string> GetRun(
+    public async Task<Build> GetRun(
         [Description("The ID of the pipeline.")] int pipelineId,
         [Description("The ID of the run.")] int runId
     )
     {
-        var connection = _adoService.Connection;
+        var client = await _adoService.GetBuildApiAsync();
         var project = _adoService.DefaultProject;
-        var baseUrl = connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/pipelines/{pipelineId}/runs/{runId}?api-version=7.1";
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error getting pipeline run: {response.StatusCode} - {content}";
-
-        return content;
+        return await client.GetBuildAsync(project, runId);
     }
 
     [McpServerTool(Name = "list_runs")]
     [Description("List runs for a specific pipeline.")]
-    public async Task<string> ListRuns(
+    public async Task<IEnumerable<Build>> ListRuns(
         [Description("The ID of the pipeline.")] int pipelineId
     )
     {
-        var connection = _adoService.Connection;
+        var client = await _adoService.GetBuildApiAsync();
         var project = _adoService.DefaultProject;
-        var baseUrl = connection.Uri.ToString().TrimEnd('/');
-        var url = $"{baseUrl}/{project}/_apis/pipelines/{pipelineId}/runs?api-version=7.1";
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error listing pipeline runs: {response.StatusCode} - {content}";
-
-        return content;
+        var builds = await client.GetBuildsAsync(project, definitions: new[] { pipelineId });
+        return builds ?? Enumerable.Empty<Build>();
     }
 
     [McpServerTool(Name = "run_pipeline")]

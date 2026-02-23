@@ -18,16 +18,33 @@ public static class McpServerExtensions
         Assembly toolsAssembly
     )
     {
-        builder.Services.AddApplicationInsightsTelemetry();
+        var appInsightsConnStr =
+            builder.Configuration["ApplicationInsights:ConnectionString"]
+            ?? builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+        if (!string.IsNullOrWhiteSpace(appInsightsConnStr))
+        {
+            builder.Services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = appInsightsConnStr;
+            });
+        }
 
         // Configure Azure DevOps settings
         builder
             .Services.AddOptions<AzureDevOpsSettings>()
             .Bind(builder.Configuration.GetSection("AzureDevOps"))
             .Validate(s => !string.IsNullOrWhiteSpace(s.OrgUrl), "AzureDevOps:OrgUrl is required.")
-            .Validate(s => !string.IsNullOrWhiteSpace(s.TenantId), "AzureDevOps:TenantId is required.")
-            .Validate(s => !string.IsNullOrWhiteSpace(s.ClientId), "AzureDevOps:ClientId is required.")
-            .Validate(s => !string.IsNullOrWhiteSpace(s.ClientSecret), "AzureDevOps:ClientSecret is required."
+            .Validate(
+                s => !string.IsNullOrWhiteSpace(s.TenantId),
+                "AzureDevOps:TenantId is required."
+            )
+            .Validate(
+                s => !string.IsNullOrWhiteSpace(s.ClientId),
+                "AzureDevOps:ClientId is required."
+            )
+            .Validate(
+                s => !string.IsNullOrWhiteSpace(s.ClientSecret),
+                "AzureDevOps:ClientSecret is required."
             )
             .ValidateOnStart();
         builder.Services.AddSingleton<AzureDevOpsService>();
@@ -57,14 +74,17 @@ public static class McpServerExtensions
         app.UseCors();
 
         // Health endpoint – outside MCP pipeline and auth
-        app.Map("/health", healthApp =>
-        {
-            healthApp.Run(context =>
+        app.Map(
+            "/health",
+            healthApp =>
             {
-                context.Response.StatusCode = StatusCodes.Status200OK;
-                return Task.CompletedTask;
-            });
-        });
+                healthApp.Run(context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status200OK;
+                    return Task.CompletedTask;
+                });
+            }
+        );
 
         // MCP Streamable HTTP returns text/event-stream responses. Some clients send
         // Accept: application/json which triggers 406. Normalize it to avoid the issue.
@@ -120,33 +140,35 @@ public static class McpServerExtensions
             return false;
         }
 
-        app.Use(async (context, next) =>
-        {
-            if (HttpMethods.IsPost(context.Request.Method) && context.Request.Path == "/")
+        app.Use(
+            async (context, next) =>
             {
-                var accept = context.Request.Headers.Accept.ToString();
-                if (
-                    !accept.Contains("text/event-stream", StringComparison.OrdinalIgnoreCase)
-                    && !accept.Contains("*/*", StringComparison.OrdinalIgnoreCase)
-                )
+                if (HttpMethods.IsPost(context.Request.Method) && context.Request.Path == "/")
                 {
-                    context.Request.Headers.Accept = "text/event-stream, */*";
+                    var accept = context.Request.Headers.Accept.ToString();
+                    if (
+                        !accept.Contains("text/event-stream", StringComparison.OrdinalIgnoreCase)
+                        && !accept.Contains("*/*", StringComparison.OrdinalIgnoreCase)
+                    )
+                    {
+                        context.Request.Headers.Accept = "text/event-stream, */*";
+                    }
                 }
-            }
 
-            // Auth (optional): ApiKey can be supplied via x-api-key or Authorization (Bearer or raw)
-            var apiKey = app.Configuration["ApiKey"];
-            if (!string.IsNullOrWhiteSpace(apiKey))
-            {
-                var isAuthorized = await TryAuthorizeRequestAsync(context, apiKey);
-                if (!isAuthorized)
+                // Auth (optional): ApiKey can be supplied via x-api-key or Authorization (Bearer or raw)
+                var apiKey = app.Configuration["ApiKey"];
+                if (!string.IsNullOrWhiteSpace(apiKey))
                 {
-                    return;
+                    var isAuthorized = await TryAuthorizeRequestAsync(context, apiKey);
+                    if (!isAuthorized)
+                    {
+                        return;
+                    }
                 }
-            }
 
-            await next();
-        });
+                await next();
+            }
+        );
 
         app.MapMcp();
 

@@ -52,24 +52,17 @@ public class GitTools(AzureDevOpsService adoService)
         [Description("Maximum number of branches to return.")] int top = 100
     )
     {
-        var connection = _adoService.Connection;
+        var client = await _adoService.GetGitApiAsync();
         var project = _adoService.DefaultProject;
-        var baseUrl = connection.Uri.ToString().TrimEnd('/');
-        var url =
-            $"{baseUrl}/{project}/_apis/git/repositories/{repositoryId}/refs?filter=heads&peelTags=true&api-version=7.1-preview.1";
-
-        if (!string.IsNullOrEmpty(filterContains))
-            url += $"&filterContains={Uri.EscapeDataString(filterContains)}";
-
-        using var httpClient = _adoService.CreateHttpClient();
-
-        var response = await httpClient.GetAsync(url);
-        var content = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error listing branches: {response.StatusCode} - {content}";
-
-        return content;
+        var refs = await client.GetRefsAsync(
+            repositoryId,
+            project,
+            filter: "heads",
+            filterContains: filterContains,
+            peelTags: true,
+            top: top
+        );
+        return JsonSerializer.Serialize(refs, new JsonSerializerOptions { WriteIndented = true });
     }
 
     [McpServerTool(Name = "get_branch")]

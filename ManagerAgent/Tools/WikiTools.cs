@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Text.Json;
 using AzureDevOpsMcp.Shared.Services;
 using Microsoft.TeamFoundation.Wiki.WebApi;
+using Microsoft.TeamFoundation.Wiki.WebApi.Contracts;
 using ModelContextProtocol.Server;
 
 namespace AzureDevOpsMcp.Manager.Tools;
@@ -40,28 +41,15 @@ public class WikiTools(AzureDevOpsService adoService)
         [Description("Number of days to include page views for.")] int? pageViewsForDays = null
     )
     {
-        // Using REST API since WikiPagesBatchRequest type is not available in all SDK versions
-        var connection = _adoService.Connection;
-        var baseUrl = connection.Uri.ToString().TrimEnd('/');
+        var client = await _adoService.GetWikiApiAsync();
         var project = _adoService.DefaultProject;
-        var url =
-            $"{baseUrl}/{project}/_apis/wiki/wikis/{Uri.EscapeDataString(wikiIdentifier)}/pagesbatch?api-version=7.1";
-
-        var body = new { top, pageViewsForDays };
-
-        using var httpClient = _adoService.CreateHttpClient();
-        var content = new StringContent(
-            JsonSerializer.Serialize(body),
-            System.Text.Encoding.UTF8,
-            "application/json"
-        );
-        var response = await httpClient.PostAsync(url, content);
-        var responseContent = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-            return $"Error listing wiki pages: {response.StatusCode} - {responseContent}";
-
-        return responseContent;
+        var request = new WikiPagesBatchRequest
+        {
+            Top = top,
+            PageViewsForDays = pageViewsForDays
+        };
+        var pages = await client.GetPagesBatchAsync(request, project, wikiIdentifier);
+        return JsonSerializer.Serialize(pages, new JsonSerializerOptions { WriteIndented = true });
     }
 
     [McpServerTool(Name = "get_wiki_page")]

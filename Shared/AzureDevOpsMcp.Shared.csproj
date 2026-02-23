@@ -8,12 +8,12 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-    <PackageReference Include="Azure.Identity" Version="1.14.2" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.0.0" />
+    <PackageReference Include="Azure.Identity" Version="1.18.0-beta.3" />
     <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="20.268.0-preview" />
     <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="20.268.0-preview" />
     <PackageReference Include="Microsoft.VisualStudio.Services.InteractiveClient" Version="20.268.0-preview" />
-    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.8.0-preview.1" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.9.0-preview.2" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.2" />
   </ItemGroup>
 
