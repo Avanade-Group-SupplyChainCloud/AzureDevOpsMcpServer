@@ -99,6 +99,7 @@ This repo contains three MCP server “agents”, each exposing its own set of t
 - `list_pull_requests`: List pull requests in a repository with filtering options.
 - `get_pull_request_commits`: Get the commits associated with a pull request.
 - `get_pull_request_reviewers`: Get the reviewers of a pull request.
+- `get_pr_area_snapshot`: Snapshot open PRs under an Area Path, including a real Azure AI summary per PR.
 - `update_pull_request`: Update a pull request (title, description, status, etc.).
 - `update_pull_request_reviewers`: Add or remove reviewers from a pull request.
 - `add_pull_request_reviewer`: Add a reviewer to a pull request.
@@ -179,6 +180,24 @@ Each agent has its own `appsettings.json`.
 
 The server authenticates using Entra ID client credentials (service principal). The app registration must be added to your Azure DevOps organization with appropriate permissions.
 
+### Azure AI (Foundry / Azure OpenAI) for real PR summaries (optional)
+
+`get_pr_area_snapshot` can generate a real AI summary per PR by calling Azure AI Foundry / Azure OpenAI.
+
+Add an `AzureAI` section to the agent you run (typically `InfraAgent/appsettings.json`):
+
+```json
+"AzureAI": {
+  "Url": "https://<your-resource-name>.openai.azure.com/",
+  "ApiKey": "<your-azure-openai-api-key>",
+  "Model": "gpt-5.2"
+}
+```
+
+Notes:
+- Azure uses *deployment names* for requests; `Model` is your deployment name (often the same as the model name in the portal).
+- `AzureAI` settings are validated at startup; the server will fail to start if required values are missing.
+
 ### API key (optional but recommended)
 
 If you set `ApiKey` in an agent's `appsettings.json`, the server requires auth on all requests.
@@ -236,6 +255,20 @@ Each agent listens on the port configured in its `Properties/launchSettings.json
       "args": {
         "id": 12345,
         "updatesJson": "[{\"field\":\"System.Title\",\"value\":\"Update API contract\"},{\"field\":\"Microsoft.VSTS.Scheduling.OriginalEstimate\",\"value\":8}]"
+      }
+    }
+    ```
+
+- get_pr_area_snapshot
+  - Purpose: Snapshot all open PRs in the default project (optionally echoing an Area Path label for caller context).
+  - Signature: `get_pr_area_snapshot(areaPath)`
+  - Example:
+
+    ```json
+    {
+      "tool": "get_pr_area_snapshot",
+      "args": {
+        "areaPath": "MyProject\\MyTeam"
       }
     }
     ```
