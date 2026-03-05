@@ -54,7 +54,7 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                 JsonOptions
             );
 
-        var snapshotEntries = new List<object>();
+        var snapshotItems = new List<(int readinessScore, object entry)>();
 
         foreach (var pr in allPrs)
         {
@@ -142,11 +142,11 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                 workItemHierarchy = hierarchy,
             };
 
-            var aiSummary = await _aiSummaryService.SummarizePrSnapshotAsync(
+            var analysis = await _aiSummaryService.AnalyzePrAsync(
                 JsonSerializer.Serialize(aiSummaryInput, JsonOptions)
             );
 
-            snapshotEntries.Add(new
+            snapshotItems.Add((analysis.ReadinessScore, new
             {
                 prId = pr.PullRequestId,
                 title = pr.Title,
@@ -161,16 +161,22 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                 linkedWorkItem = linkedWiSnapshot,
                 linkedWorkItemAreaPaths = linkedAreaPaths,
                 workItemHierarchy = hierarchy,
-                aiSummary,
-            });
+                aiSummary = analysis.Summary,
+                readinessScore = analysis.ReadinessScore,
+            }));
         }
+
+        var pullRequests = snapshotItems
+            .OrderByDescending(x => x.readinessScore)
+            .Select(x => x.entry)
+            .ToList();
 
         var snapshot = new
         {
             area = areaPath,
             snapshotDate = DateTime.UtcNow.ToString("o"),
-            totalOpenPrs = snapshotEntries.Count,
-            pullRequests = snapshotEntries,
+            totalOpenPrs = pullRequests.Count,
+            pullRequests,
         };
 
         return JsonSerializer.Serialize(snapshot, JsonOptions);

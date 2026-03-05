@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PR Snapshot</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <style>
+    th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+    th.sortable:hover { background-color: rgba(255,255,255,0.07); }
+    th.sortable .sort-icon { opacity: 0.35; font-size: 0.75em; margin-left: 4px; }
+    th.sortable.sort-asc .sort-icon::after  { content: '▲'; opacity: 1; }
+    th.sortable.sort-desc .sort-icon::after { content: '▼'; opacity: 1; }
+    th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: '⇅'; }
+    .badge-readiness { font-size: 0.8em; min-width: 3.2em; display: inline-block; text-align: center; }
+    #areaFilterPanel .area-list { max-height: 240px; overflow-y: auto; }
+  </style>
 </head>
 <body>
   <div class="container-fluid py-3">
@@ -14,15 +24,32 @@
         <div class="text-secondary small" id="meta">Loading…</div>
       </div>
 
+      <div class="btn-group" role="group" aria-label="Filter controls">
+        <button class="btn btn-outline-warning" type="button" data-bs-toggle="collapse" data-bs-target="#areaFilterPanel" aria-expanded="false" aria-controls="areaFilterPanel">Area Filter</button>
+        <button class="btn btn-outline-warning btn-sm" type="button" id="areaSelectAllBtn">All</button>
+        <button class="btn btn-outline-warning btn-sm" type="button" id="areaSelectNoneBtn">None</button>
+      </div>
+
       <div class="btn-group" role="group" aria-label="Column controls">
         <button class="btn btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#columnsPanel" aria-expanded="false" aria-controls="columnsPanel">Columns</button>
-        <button class="btn btn-outline-light" type="button" id="checkAllBtn">Check all</button>
-        <button class="btn btn-outline-light" type="button" id="uncheckAllBtn">Uncheck all</button>
+        <button class="btn btn-outline-light btn-sm" type="button" id="checkAllBtn">All</button>
+        <button class="btn btn-outline-light btn-sm" type="button" id="uncheckAllBtn">None</button>
       </div>
 
       <button class="btn btn-outline-info" type="button" id="reloadBtn">Reload JSON</button>
     </div>
 
+    <!-- Area path filter panel -->
+    <div class="collapse" id="areaFilterPanel">
+      <div class="card mb-3 border-warning">
+        <div class="card-header text-warning-emphasis bg-transparent border-warning py-2 small fw-semibold">Filter by Area Path</div>
+        <div class="card-body py-2">
+          <div class="area-list row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1" id="areaCheckboxes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column chooser panel -->
     <div class="collapse" id="columnsPanel">
       <div class="card mb-3">
         <div class="card-body">
@@ -48,15 +75,18 @@
   <script>
     const SNAPSHOT_URL = './pr-area-snapshot.latest.json';
 
-    const metaEl = document.getElementById('meta');
-    const statusEl = document.getElementById('status');
-    const columnsEl = document.getElementById('columns');
-    const theadEl = document.getElementById('thead');
-    const tbodyEl = document.getElementById('tbody');
+    const metaEl         = document.getElementById('meta');
+    const statusEl       = document.getElementById('status');
+    const columnsEl      = document.getElementById('columns');
+    const theadEl        = document.getElementById('thead');
+    const tbodyEl        = document.getElementById('tbody');
+    const areaCheckboxEl = document.getElementById('areaCheckboxes');
 
-    const reloadBtn = document.getElementById('reloadBtn');
-    const checkAllBtn = document.getElementById('checkAllBtn');
-    const uncheckAllBtn = document.getElementById('uncheckAllBtn');
+    const reloadBtn        = document.getElementById('reloadBtn');
+    const checkAllBtn      = document.getElementById('checkAllBtn');
+    const uncheckAllBtn    = document.getElementById('uncheckAllBtn');
+    const areaSelectAllBtn  = document.getElementById('areaSelectAllBtn');
+    const areaSelectNoneBtn = document.getElementById('areaSelectNoneBtn');
 
     const escapeHtml = (value) => {
       const str = value == null ? '' : String(value);
@@ -70,50 +100,119 @@
 
     const toBool = (v) => v === true;
 
+    // Returns a Bootstrap badge for readiness score
+    function readinessBadge(score) {
+      const n = Number(score) || 0;
+      const cls = n >= 75 ? 'bg-success' : n >= 45 ? 'bg-warning text-dark' : 'bg-danger';
+      return `<span class="badge badge-readiness ${cls}">${n}%</span>`;
+    }
+
     const columns = [
-      { key: 'prId', label: 'PR', value: (pr) => pr.prId, thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-      { key: 'title', label: 'Title', value: (pr) => pr.title ?? '' },
-      { key: 'repository', label: 'Repo', value: (pr) => pr.repository ?? '', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-      { key: 'createdBy', label: 'Author', value: (pr) => pr.createdBy ?? '', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-      { key: 'ageDays', label: 'Age (days)', value: (pr) => pr.ageDays, thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
-      { key: 'isDraft', label: 'Draft', value: (pr) => toBool(pr.isDraft) ? 'Yes' : 'No', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-
-      { key: 'reviewersSummary', label: 'Reviewers', value: (pr) => pr.reviewers?.summary ?? '', thClass: 'text-nowrap' },
-      { key: 'threadsActive', label: 'Threads (active)', value: (pr) => pr.threadCounts?.active ?? 0, thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
-      { key: 'threadsTotal', label: 'Threads (total)', value: (pr) => pr.threadCounts?.total ?? 0, thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
-
-      { key: 'linkedWorkItemId', label: 'WI', value: (pr) => pr.linkedWorkItem?.id ?? '', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-      { key: 'linkedWorkItemType', label: 'WI Type', value: (pr) => pr.linkedWorkItem?.type ?? '', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-      { key: 'linkedWorkItemState', label: 'WI State', value: (pr) => pr.linkedWorkItem?.state ?? '', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-      { key: 'linkedWorkItemAreaPaths', label: 'WI Area Path(s)', value: (pr) => pr.linkedWorkItemAreaPaths ?? '' },
-
-      { key: 'aiSummary', label: 'AI Summary', value: (pr) => pr.aiSummary ?? '' },
-
-      { key: 'url', label: 'PR Link', value: (pr) => pr.url ?? '', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'prId',                   label: 'PR',               value: (pr) => pr.prId,                          thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'title',                  label: 'Title',            value: (pr) => pr.title ?? '' },
+      { key: 'repository',             label: 'Repo',             value: (pr) => pr.repository ?? '',              thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'createdBy',              label: 'Author',           value: (pr) => pr.createdBy ?? '',               thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'ageDays',                label: 'Age (days)',       value: (pr) => pr.ageDays,                       thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
+      { key: 'isDraft',                label: 'Draft',            value: (pr) => toBool(pr.isDraft) ? 'Yes' : 'No', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'reviewersSummary',       label: 'Reviewers',        value: (pr) => pr.reviewers?.summary ?? '',      thClass: 'text-nowrap' },
+      { key: 'threadsActive',          label: 'Threads (active)', value: (pr) => pr.threadCounts?.active ?? 0,     thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
+      { key: 'threadsTotal',           label: 'Threads (total)',  value: (pr) => pr.threadCounts?.total ?? 0,      thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
+      { key: 'linkedWorkItemId',       label: 'WI',               value: (pr) => pr.linkedWorkItem?.id ?? '',      thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'linkedWorkItemType',     label: 'WI Type',          value: (pr) => pr.linkedWorkItem?.type ?? '',    thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'linkedWorkItemState',    label: 'WI State',         value: (pr) => pr.linkedWorkItem?.state ?? '',   thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'linkedWorkItemAreaPaths',label: 'WI Area Path(s)',  value: (pr) => pr.linkedWorkItemAreaPaths ?? '' },
+      { key: 'readinessScore',         label: 'Readiness',        value: (pr) => pr.readinessScore ?? 0,           thClass: 'text-nowrap', tdClass: 'text-nowrap text-end', html: (pr) => readinessBadge(pr.readinessScore ?? 0) },
+      { key: 'aiSummary',              label: 'AI Summary',       value: (pr) => pr.aiSummary ?? '' },
+      { key: 'url',                    label: 'PR Link',          value: (pr) => pr.url ?? '',                     thClass: 'text-nowrap', tdClass: 'text-nowrap' },
     ];
 
     const defaultVisible = new Set([
-      'prId',
-      'title',
-      'repository',
-      'ageDays',
-      'reviewersSummary',
-      'threadsActive',
-      'threadsTotal',
-      'linkedWorkItemId',
-      'linkedWorkItemAreaPaths',
-      'aiSummary',
-      'url',
+      'prId', 'title', 'repository', 'ageDays',
+      'reviewersSummary', 'threadsActive', 'threadsTotal',
+      'linkedWorkItemId', 'linkedWorkItemAreaPaths',
+      'readinessScore', 'aiSummary', 'url',
     ]);
 
-    let snapshot = null;
-    let visible = new Set(defaultVisible);
+    let snapshot        = null;
+    let visible         = new Set(defaultVisible);
+    let selectedAreas   = new Set();   // empty = show all
+    let sortKey         = null;
+    let sortDir         = 'asc';       // 'asc' | 'desc'
 
+    // -------------------------------------------------------------------------
+    // Status
+    // -------------------------------------------------------------------------
     function setStatus(kind, text) {
       statusEl.className = `alert alert-${kind} py-2`;
       statusEl.textContent = text;
     }
 
+    // -------------------------------------------------------------------------
+    // Area filter
+    // -------------------------------------------------------------------------
+    function allAreaPaths() {
+      if (!snapshot) return [];
+      const paths = new Set();
+      for (const pr of snapshot.pullRequests ?? []) {
+        const raw = pr.linkedWorkItemAreaPaths ?? '';
+        for (const p of raw.split(',').map(s => s.trim()).filter(Boolean)) paths.add(p);
+      }
+      return [...paths].sort();
+    }
+
+    function renderAreaFilter() {
+      const areas = allAreaPaths();
+      areaCheckboxEl.innerHTML = '';
+
+      for (const area of areas) {
+        const id = `area_${CSS.escape(area)}`;
+        const checked = selectedAreas.size === 0 || selectedAreas.has(area);
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'col';
+        wrapper.innerHTML = `
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="${escapeHtml(id)}" ${checked ? 'checked' : ''} data-area="${escapeHtml(area)}">
+            <label class="form-check-label small" for="${escapeHtml(id)}">${escapeHtml(area)}</label>
+          </div>`;
+
+        wrapper.querySelector('input').addEventListener('change', () => {
+          rebuildSelectedAreas();
+          renderTable();
+        });
+
+        areaCheckboxEl.appendChild(wrapper);
+      }
+    }
+
+    function rebuildSelectedAreas() {
+      const checked = [...areaCheckboxEl.querySelectorAll('input[type=checkbox]:checked')].map(el => el.dataset.area);
+      const all = allAreaPaths();
+      // If everything is checked, treat as "no filter" for cleanliness
+      selectedAreas = checked.length === all.length ? new Set() : new Set(checked);
+    }
+
+    function setAllAreas(state) {
+      areaCheckboxEl.querySelectorAll('input[type=checkbox]').forEach(el => { el.checked = state; });
+      selectedAreas = state ? new Set() : new Set(['__none__']); // __none__ = show nothing
+      renderTable();
+    }
+
+    areaSelectAllBtn.addEventListener('click',  () => setAllAreas(true));
+    areaSelectNoneBtn.addEventListener('click', () => setAllAreas(false));
+
+    function prMatchesAreaFilter(pr) {
+      if (selectedAreas.size === 0) return true;
+      if (selectedAreas.has('__none__')) return false;
+      const raw = pr.linkedWorkItemAreaPaths ?? '';
+      const prAreas = raw.split(',').map(s => s.trim()).filter(Boolean);
+      if (prAreas.length === 0) return selectedAreas.size === 0;
+      return prAreas.some(a => selectedAreas.has(a));
+    }
+
+    // -------------------------------------------------------------------------
+    // Column chooser
+    // -------------------------------------------------------------------------
     function renderColumnChooser() {
       columnsEl.innerHTML = '';
 
@@ -123,13 +222,11 @@
 
         const wrapper = document.createElement('div');
         wrapper.className = 'col';
-
         wrapper.innerHTML = `
           <div class="form-check">
             <input class="form-check-input" type="checkbox" value="" id="${id}" ${checked ? 'checked' : ''}>
             <label class="form-check-label" for="${id}">${escapeHtml(col.label)}</label>
-          </div>
-        `;
+          </div>`;
 
         wrapper.querySelector('input').addEventListener('change', (e) => {
           if (e.target.checked) visible.add(col.key);
@@ -141,10 +238,47 @@
       }
     }
 
+    // -------------------------------------------------------------------------
+    // Sorting
+    // -------------------------------------------------------------------------
+    function sortedPrs(prs) {
+      if (!sortKey) return prs;
+      const col = columns.find(c => c.key === sortKey);
+      if (!col) return prs;
+
+      return [...prs].sort((a, b) => {
+        let av = col.value(a);
+        let bv = col.value(b);
+        // Numeric comparison when both are numbers
+        if (typeof av === 'number' && typeof bv === 'number') {
+          return sortDir === 'asc' ? av - bv : bv - av;
+        }
+        av = String(av ?? '').toLowerCase();
+        bv = String(bv ?? '').toLowerCase();
+        const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+        return sortDir === 'asc' ? cmp : -cmp;
+      });
+    }
+
+    function handleSort(key) {
+      if (sortKey === key) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortKey = key;
+        sortDir = 'asc';
+      }
+      renderTable();
+    }
+
+    // -------------------------------------------------------------------------
+    // Table render
+    // -------------------------------------------------------------------------
     function renderTable() {
       if (!snapshot) return;
 
-      const prs = Array.isArray(snapshot.pullRequests) ? snapshot.pullRequests : [];
+      const allPrs = Array.isArray(snapshot.pullRequests) ? snapshot.pullRequests : [];
+      const filtered = allPrs.filter(prMatchesAreaFilter);
+      const prs = sortedPrs(filtered);
 
       // Header
       theadEl.innerHTML = '';
@@ -152,8 +286,14 @@
         if (!visible.has(col.key)) continue;
         const th = document.createElement('th');
         th.scope = 'col';
-        if (col.thClass) th.className = col.thClass;
-        th.textContent = col.label;
+
+        const baseClass = col.thClass ?? '';
+        const sortClass = sortKey === col.key ? `sort-${sortDir}` : '';
+        th.className = `${baseClass} sortable ${sortClass}`.trim();
+
+        th.innerHTML = `${escapeHtml(col.label)}<span class="sort-icon"></span>`;
+        th.dataset.key = col.key;
+        th.addEventListener('click', () => handleSort(col.key));
         theadEl.appendChild(th);
       }
 
@@ -171,7 +311,8 @@
           if (col.key === 'url') {
             const url = col.value(pr);
             if (url) td.innerHTML = `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">Open</a>`;
-            else td.textContent = '';
+          } else if (col.html) {
+            td.innerHTML = col.html(pr);
           } else {
             const v = col.value(pr);
             td.textContent = v == null ? '' : String(v);
@@ -185,14 +326,19 @@
 
       const areaLabel = snapshot.area ?? '';
       const date = snapshot.snapshotDate ?? '';
-      metaEl.textContent = `${prs.length} open PR(s) • snapshotDate: ${date}${areaLabel ? ` • area label: ${areaLabel}` : ''}`;
-      setStatus('secondary', `Rendered ${prs.length} PR(s) from ${SNAPSHOT_URL}`);
+      metaEl.textContent = `${prs.length} / ${allPrs.length} PR(s) • snapshotDate: ${date}${areaLabel ? ` • area: ${areaLabel}` : ''}`;
+      setStatus('secondary', `Showing ${prs.length} of ${allPrs.length} PR(s) from ${SNAPSHOT_URL}`);
     }
 
+    // -------------------------------------------------------------------------
+    // Load
+    // -------------------------------------------------------------------------
     async function loadSnapshot() {
       setStatus('secondary', `Loading ${SNAPSHOT_URL}…`);
       metaEl.textContent = 'Loading…';
       snapshot = null;
+      selectedAreas = new Set();
+      sortKey = null;
 
       const res = await fetch(SNAPSHOT_URL, { cache: 'no-store' });
       if (!res.ok) {
@@ -202,6 +348,7 @@
 
       snapshot = await res.json();
       renderColumnChooser();
+      renderAreaFilter();
       renderTable();
     }
 
