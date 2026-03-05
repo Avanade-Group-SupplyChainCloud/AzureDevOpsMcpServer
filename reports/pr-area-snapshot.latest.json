@@ -1,65 +1,55 @@
 {
   "area": "",
-  "snapshotDate": "2026-03-05T15:58:46.5265471Z",
-  "totalOpenPrs": 52,
+  "snapshotDate": "2026-03-05T17:46:49.6105569Z",
+  "totalOpenPrs": 50,
   "pullRequests": [
     {
-      "prId": 14221,
-      "title": "Update resharper submodule",
-      "repository": "SupplyChainCloud.Integrations.Parcel",
-      "createdBy": "Jack Hawkins",
-      "creationDate": "2026-03-05T15:48:08.2263218Z",
+      "prId": 14235,
+      "title": "Fix decimal issue for Freight class",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Lucy Browning",
+      "creationDate": "2026-03-05T17:13:04.6266481Z",
       "ageDays": 0,
       "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14221",
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/14235",
       "reviewers": {
-        "total": 2,
-        "approved": 2,
+        "total": 1,
+        "approved": 1,
         "approvedWithSuggestions": 0,
         "waitingForAuthor": 0,
         "noResponse": 0,
         "rejected": 0,
-        "approverCount": 2,
-        "summary": "2 approved"
+        "approverCount": 1,
+        "summary": "1 approved"
       },
-      "targetRefName": "refs/heads/feature/MyDhlTemplate",
+      "targetRefName": "refs/heads/qa",
       "minApproverCount": 2,
       "threadCounts": {
         "active": 0,
-        "resolved": 1,
+        "resolved": 0,
         "closed": 0,
-        "total": 1
+        "total": 0
       },
       "linkedWorkItem": {
-        "id": 45287,
-        "title": "(Hours)  Ship Engine Conversion",
-        "type": "Task",
+        "id": 45944,
+        "title": "LTL - SMC3 Demo is failing to include freightclass or description",
+        "type": "Bug",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45944"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45944",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
-          "id": 45171,
-          "type": "Feature",
-          "title": "MyDhl Template Conversion",
-          "state": "Active"
-        },
-        {
-          "id": 45261,
-          "type": "User Story",
-          "title": "Ship Engine Conversion",
-          "state": "Active"
-        },
-        {
-          "id": 45287,
-          "type": "Task",
-          "title": "(Hours)  Ship Engine Conversion",
+          "id": 45944,
+          "type": "Bug",
+          "title": "LTL - SMC3 Demo is failing to include freightclass or description",
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR is fully approved by the required two reviewers and shows no active discussion threads. There are no policy or review blockers remaining. It appears ready to merge whenever appropriate.",
-      "readinessScore": 100
+      "aiSummary": "The PR is still open because it requires at least 2 approvers, but only 1 approval has been provided so far. There are no active comments or threads, and the PR content itself appears ready. The next step is for an additional qualified reviewer to approve the changes. Once that second approval is obtained, the PR can be merged.",
+      "readinessScore": 85
     },
     {
       "prId": 14200,
@@ -67,7 +57,7 @@
       "repository": "SupplyChainCloud.Integrations.Parcel",
       "createdBy": "Ben Klutzke",
       "creationDate": "2026-03-04T16:52:24.7939632Z",
-      "ageDays": 0,
+      "ageDays": 1,
       "isDraft": false,
       "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14200",
       "reviewers": {
@@ -93,8 +83,10 @@
         "title": "(Hours)  Ship Engine Conversion",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45292"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45292",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -116,7 +108,7 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "This PR remains open because it only has 1 approval while the branch policy requires 2 approvers. There are no active comment threads and the review appears otherwise clean. The next step is to obtain one more required approval to satisfy the policy and allow merging.",
+      "aiSummary": "The PR is still open because it requires two approvers but currently has only one approval. All comment threads are resolved and there are no active discussions blocking progress. The next step is to obtain one additional required reviewer approval to unblock the merge.",
       "readinessScore": 85
     },
     {
@@ -125,7 +117,7 @@
       "repository": "SupplyChainCloud.D365.Order",
       "createdBy": "Chris Vaughn",
       "creationDate": "2026-02-10T16:47:14.3483442Z",
-      "ageDays": 22,
+      "ageDays": 23,
       "isDraft": false,
       "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/7b7e4101-fe78-4abd-9788-9504e7f408f7/pullrequest/13915",
       "reviewers": {
@@ -151,8 +143,10 @@
         "title": "Order AI - Budget Analysis",
         "type": "Task",
         "state": "Active",
-        "areaPath": "Supply Chain Cloud\\D365"
+        "areaPath": "Supply Chain Cloud\\D365",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44519"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44519",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\D365",
       "workItemHierarchy": [
         {
@@ -174,60 +168,68 @@
           "state": "Active"
         }
       ],
-      "aiSummary": "This PR has all required approvals, but it remains open because there is still one active comment thread that needs to be addressed or resolved. Once that discussion is completed, nothing else is blocking the merge. The author should resolve the active thread and proceed with merging.",
-      "readinessScore": 85
+      "aiSummary": "The PR has all required approvals, but it remains open because there is still one active comment thread that has not been resolved. The next step is for the author to address or resolve that remaining thread. Once that is closed out, the PR should be ready to merge.",
+      "readinessScore": 82
     },
     {
-      "prId": 13682,
-      "title": "CanadaPost template, Void",
+      "prId": 14202,
+      "title": "My DHL => Dev",
       "repository": "SupplyChainCloud.Integrations.Parcel",
-      "createdBy": "Dylan Barnett",
-      "creationDate": "2026-01-26T15:56:00.8234804Z",
-      "ageDays": 38,
+      "createdBy": "Jack Hawkins",
+      "creationDate": "2026-03-04T20:57:04.7383485Z",
+      "ageDays": 0,
       "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/13682",
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14202",
       "reviewers": {
-        "total": 1,
+        "total": 2,
         "approved": 1,
-        "approvedWithSuggestions": 0,
+        "approvedWithSuggestions": 1,
         "waitingForAuthor": 0,
         "noResponse": 0,
         "rejected": 0,
-        "approverCount": 1,
-        "summary": "1 approved"
+        "approverCount": 2,
+        "summary": "1 approved, 1 approved with suggestions"
       },
-      "targetRefName": "refs/heads/feature/CanadaPostTemplate",
+      "targetRefName": "refs/heads/dev",
       "minApproverCount": 2,
       "threadCounts": {
-        "active": 0,
-        "resolved": 7,
-        "closed": 1,
-        "total": 8
+        "active": 1,
+        "resolved": 2,
+        "closed": 0,
+        "total": 3
       },
       "linkedWorkItem": {
-        "id": 45181,
-        "title": "Void Endpoint Conversion",
-        "type": "User Story",
-        "state": "Active",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "id": 45285,
+        "title": "(Hours)  Rate Engine Conversion",
+        "type": "Task",
+        "state": "Closed",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45285"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45285",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
-          "id": 45165,
+          "id": 45171,
           "type": "Feature",
-          "title": "Canada Post Template Conversion",
+          "title": "MyDhl Template Conversion",
           "state": "Active"
         },
         {
-          "id": 45181,
+          "id": 45260,
           "type": "User Story",
-          "title": "Void Endpoint Conversion",
+          "title": "Rate Engine Conversion",
           "state": "Active"
+        },
+        {
+          "id": 45285,
+          "type": "Task",
+          "title": "(Hours)  Rate Engine Conversion",
+          "state": "Closed"
         }
       ],
-      "aiSummary": "The PR has no active discussion threads and has one approval, but it is still open because it requires two approvers and currently only one has approved. Nothing else appears to be blocking it. The next step is to obtain one more required approval to satisfy the policy gate and allow merging.",
-      "readinessScore": 55
+      "aiSummary": "This PR has the required two approvals, but it remains open because there is still one active discussion thread that likely needs resolution or acknowledgment. The reviewer who approved with suggestions may also expect a final update from the author. Once the active thread is addressed, the PR should be ready to merge. No policy blockers remain beyond that final cleanup.",
+      "readinessScore": 80
     },
     {
       "prId": 13809,
@@ -261,8 +263,10 @@
         "title": "Investigate effort to replace Moq with NSubstitute.",
         "type": "Task",
         "state": "Closed",
-        "areaPath": "Supply Chain Cloud\\Infrastructure"
+        "areaPath": "Supply Chain Cloud\\Infrastructure",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45496"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45496",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Infrastructure",
       "workItemHierarchy": [
         {
@@ -284,164 +288,8 @@
           "state": "Closed"
         }
       ],
-      "aiSummary": "The PR remains open because it requires two approvers but currently has only one, with the second reviewer still not responding. There are no active discussion threads and the work item is closed, so the only remaining blocker is the missing required approval. The next step is for the outstanding reviewer to complete their review so the PR can meet the approval policy.",
-      "readinessScore": 45
-    },
-    {
-      "prId": 14174,
-      "title": "Main - Merge Net 10 Feature into Dev",
-      "repository": "SupplyChainCloud",
-      "createdBy": "John Rodriguez",
-      "creationDate": "2026-03-03T20:06:37.4150979Z",
-      "ageDays": 1,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/6d89afac-267d-4516-85c3-11ce7e30846c/pullrequest/14174",
-      "reviewers": {
-        "total": 1,
-        "approved": 1,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 0,
-        "rejected": 0,
-        "approverCount": 1,
-        "summary": "1 approved"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 4,
-        "closed": 0,
-        "total": 4
-      },
-      "linkedWorkItem": {
-        "id": 40183,
-        "title": "LTL Discounts UI - Move navigation to carrier",
-        "type": "Task",
-        "state": "Closed",
-        "areaPath": "Supply Chain Cloud"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud, Supply Chain Cloud\\Infrastructure, Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 39425,
-          "type": "User Story",
-          "title": "LTL Enhancements",
-          "state": "Active"
-        },
-        {
-          "id": 40183,
-          "type": "Task",
-          "title": "LTL Discounts UI - Move navigation to carrier",
-          "state": "Closed"
-        }
-      ],
-      "aiSummary": "This pull request remains open because it only has one approval, but two are required per the minimum approver policy. All discussion threads are resolved, so the only remaining blocker is the missing required reviewer. The next step is to obtain at least one more approval from an eligible reviewer so the PR can be merged.",
-      "readinessScore": 40
-    },
-    {
-      "prId": 14126,
-      "title": "Template - Fix Rating logic for Fedex Rest Ship",
-      "repository": "SupplyChainCloud.Integrations.Parcel",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2026-02-27T12:33:57.9392807Z",
-      "ageDays": 6,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14126",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 0,
-        "closed": 0,
-        "total": 0
-      },
-      "linkedWorkItem": {
-        "id": 45938,
-        "title": "Parcel Template - Fix Rating logic for Fedex Rest Ship",
-        "type": "Bug",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 45938,
-          "type": "Bug",
-          "title": "Parcel Template - Fix Rating logic for Fedex Rest Ship",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "This PR is still open because none of the required reviewers have responded, and it currently has zero of the two required approvals. There are no active comment threads or other blockers, so the only remaining action is for the assigned reviewers to complete their reviews. Once at least two approvals are provided, the PR should be ready to merge.",
-      "readinessScore": 40
-    },
-    {
-      "prId": 13816,
-      "title": "Averitt Nullable Error in Response",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2026-02-04T12:43:17.8828920Z",
-      "ageDays": 29,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13816",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/feature/carriers/AverittExpress",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 0,
-        "closed": 0,
-        "total": 0
-      },
-      "linkedWorkItem": {
-        "id": 45740,
-        "title": "Averitt Express Feature Close",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 43620,
-          "type": "Feature",
-          "title": "Averitt Express",
-          "state": "Active"
-        },
-        {
-          "id": 45739,
-          "type": "User Story",
-          "title": "Averitt Express Feature Close",
-          "state": "Active"
-        },
-        {
-          "id": 45740,
-          "type": "Task",
-          "title": "Averitt Express Feature Close",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR is still open because none of the reviewers have responded and it has zero approvals, while the minimum required approver count is two. There are no active discussion threads, so the only blocker is the lack of reviewer action. The next step is for the assigned reviewers to complete their reviews and provide the required approvals. Until then, the PR cannot proceed.",
-      "readinessScore": 35
+      "aiSummary": "The PR is still open because it only has one approval while two are required. There are no active comment threads, so the code review itself appears clean, but it remains blocked until the second reviewer responds. The next step is to prompt the remaining reviewer to complete their review and provide the required approval. Once that happens, the PR should be ready to merge.",
+      "readinessScore": 50
     },
     {
       "prId": 13437,
@@ -475,8 +323,10 @@
         "title": "(Hours) Remove USPS, UPS Ready, and nShift from DB",
         "type": "Task",
         "state": "Active",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/42556"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/42556",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -498,59 +348,67 @@
           "state": "Active"
         }
       ],
-      "aiSummary": "The PR is still open because it only has one approval while two are required, and there is also an active comment thread with one reviewer waiting for the author to respond. It cannot merge until the author addresses the remaining feedback and obtains the second required approval. Next steps are to resolve the active thread and request the outstanding reviewer to complete their review once updates are made.",
-      "readinessScore": 35
+      "aiSummary": "The PR is still open because it has only one approver while the policy requires two, and there is still an active comment thread that needs to be addressed. One reviewer is also marked as waiting for the author, indicating requested changes are pending. The next steps are for the author to resolve the active thread and request a second reviewer approval. Once both items are completed, the PR can proceed toward merging.",
+      "readinessScore": 40
     },
     {
-      "prId": 13185,
-      "title": "Generic Postal Code Enrichment",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-10-27T10:14:54.5865421Z",
-      "ageDays": 129,
+      "prId": 14205,
+      "title": "Australia Post Template Feature => dev",
+      "repository": "SupplyChainCloud.Integrations.Parcel",
+      "createdBy": "Lucy Browning",
+      "creationDate": "2026-03-04T21:19:54.0680202Z",
+      "ageDays": 0,
       "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13185",
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14205",
       "reviewers": {
-        "total": 2,
-        "approved": 0,
+        "total": 1,
+        "approved": 1,
         "approvedWithSuggestions": 0,
         "waitingForAuthor": 0,
-        "noResponse": 2,
+        "noResponse": 0,
         "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
+        "approverCount": 1,
+        "summary": "1 approved"
       },
       "targetRefName": "refs/heads/dev",
       "minApproverCount": 2,
       "threadCounts": {
         "active": 1,
-        "resolved": 7,
+        "resolved": 1,
         "closed": 0,
-        "total": 8
+        "total": 2
       },
       "linkedWorkItem": {
-        "id": 43141,
-        "title": "Add format postal code to general enrichment",
+        "id": 45241,
+        "title": "(Hours)  Feature Branch Close - Australia Post Template Conversion",
         "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "state": "Active",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45241"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45241",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
-          "id": 39042,
-          "type": "User Story",
-          "title": "LTL Clean Up",
+          "id": 45164,
+          "type": "Feature",
+          "title": "Australia Post Template Conversion",
           "state": "Active"
         },
         {
-          "id": 43141,
+          "id": 45222,
+          "type": "User Story",
+          "title": "Feature Branch Close - Australia Post Template Conversion",
+          "state": "New"
+        },
+        {
+          "id": 45241,
           "type": "Task",
-          "title": "Add format postal code to general enrichment",
-          "state": "In Review"
+          "title": "(Hours)  Feature Branch Close - Australia Post Template Conversion",
+          "state": "Active"
         }
       ],
-      "aiSummary": "This PR is still open because neither reviewer has responded and it currently has zero approvals, while the policy requires at least two. There is also one active comment thread that may still require author follow‑up. The next step is for the assigned reviewers to complete their reviews and for the author to resolve the remaining active thread if it contains actionable feedback. Once two approvals are given and the thread is cleared, the PR can move forward.",
+      "aiSummary": "The PR is still open because it only has one approval while the branch policy requires at least two, so it is blocked on an additional reviewer. There is also one active comment thread that may still need resolution. Next steps are to address the active thread and obtain the second required approval.",
       "readinessScore": 35
     },
     {
@@ -575,18 +433,20 @@
       "targetRefName": "refs/heads/feature/OnTracTemplate",
       "minApproverCount": 2,
       "threadCounts": {
-        "active": 0,
+        "active": 1,
         "resolved": 0,
         "closed": 0,
-        "total": 0
+        "total": 1
       },
       "linkedWorkItem": {
         "id": 45288,
         "title": "(Hours)  Rate Engine Conversion",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45288"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45288",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -608,7 +468,7 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR remains open because it has zero approvals while the policy requires at least two approvers. There are no active comment threads and no other blockers, so the only issue is the missing required reviews. Additional reviewers need to evaluate and approve the PR before it can move forward.",
+      "aiSummary": "The PR is still open because no reviewers have responded yet, and it requires at least two approvals but currently has zero. There is also one active comment thread that still needs to be resolved. The next step is for assigned reviewers to begin their review and for the author to address the active thread. Once reviewers engage and provide the required approvals, the PR can move forward.",
       "readinessScore": 30
     },
     {
@@ -643,8 +503,10 @@
         "title": "(Hours)  Manifest Engine Conversion",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45300"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45300",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -666,7 +528,67 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "This PR remains open because no reviewers have responded yet, leaving it with zero required approvals against a minimum of two. There is also one active discussion thread that still needs to be addressed. The next step is for the assigned reviewers to provide feedback and approvals, and for the author to resolve the remaining thread. Once those are completed, the PR can move toward merge readiness.",
+      "aiSummary": "This PR is still open because none of the two required reviewers have responded, and it has zero of the two mandatory approvals. There is also one active comment thread that still needs to be resolved. The next step is for the assigned reviewers to provide feedback and approvals, and for the author to address the active thread once reviewers engage. Until then, the PR cannot proceed toward merge.",
+      "readinessScore": 30
+    },
+    {
+      "prId": 13773,
+      "title": "USPS REST Rate Engine",
+      "repository": "SupplyChainCloud.Integrations.Parcel",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2026-01-29T11:12:16.5690861Z",
+      "ageDays": 35,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/13773",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/feature/UspsRestTemplate",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 7,
+        "closed": 0,
+        "total": 7
+      },
+      "linkedWorkItem": {
+        "id": 45296,
+        "title": "(Hours)  Rate Engine Conversion",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45296"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45296",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 45174,
+          "type": "Feature",
+          "title": "UspsRest Template Conversion",
+          "state": "Active"
+        },
+        {
+          "id": 45271,
+          "type": "User Story",
+          "title": "Rate Engine Conversion",
+          "state": "Active"
+        },
+        {
+          "id": 45296,
+          "type": "Task",
+          "title": "(Hours)  Rate Engine Conversion",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR is still open because none of the assigned reviewers have responded and it currently has zero approvals while requiring two. Although all comment threads are resolved and there are no active discussion blockers, the PR cannot proceed until reviewers complete their evaluations. The next step is for the reviewers to review and provide the required approvals. The author may need to ping reviewers to unblock progress.",
       "readinessScore": 30
     },
     {
@@ -701,8 +623,10 @@
         "title": "(Hours)  Forward Air - UI",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45018"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45018",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -724,18 +648,138 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "This pull request remains open because none of the required reviewers have responded, and it has zero approvals while the policy requires at least two. There are no active discussion threads, so the only blocker is the missing reviewer approvals. The next step is for the assigned reviewers to review and approve the changes. Once two approvals are recorded, the PR can proceed toward merge.",
+      "aiSummary": "The PR is still open because no reviewers have responded and it currently has zero approverCount against a required minimum of two. There are no active discussion threads, so the only blocker is missing mandatory approvals. The next step is for the assigned reviewers to review and formally approve the changes. Once two approvals are given, the PR can move forward toward merging.",
       "readinessScore": 30
     },
     {
-      "prId": 13306,
-      "title": "ADuiePyle Dispatch",
+      "prId": 13328,
+      "title": "Forward Auth Seeding",
+      "repository": "SupplyChainCloud.CarrierAuthentication",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-11-20T11:39:14.0769472Z",
+      "ageDays": 105,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/48328012-6baf-4e25-9fc6-a99b321a3f98/pullrequest/13328",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 1,
+        "noResponse": 1,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "1 waiting for author, 1 no response"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 1,
+        "resolved": 7,
+        "closed": 0,
+        "total": 8
+      },
+      "linkedWorkItem": {
+        "id": 45007,
+        "title": "(Hours)  Forward Air - Carrier Auth Seed",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45007"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45007",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44150,
+          "type": "Feature",
+          "title": "Forward Air",
+          "state": "Active"
+        },
+        {
+          "id": 45006,
+          "type": "User Story",
+          "title": "Forward Air - Carrier Auth Seed",
+          "state": "Active"
+        },
+        {
+          "id": 45007,
+          "type": "Task",
+          "title": "(Hours)  Forward Air - Carrier Auth Seed",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR is still open because it has zero approvals while requiring two, and one reviewer is waiting for the author to address feedback. There is also an active comment thread that must be resolved before reviewers can finalize their review. Additionally, one reviewer has not responded at all. The next step is for the author to resolve the active thread and prompt reviewers to complete their approvals.",
+      "readinessScore": 30
+    },
+    {
+      "prId": 13270,
+      "title": "Forward Carrier Seed",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-11-11T04:27:41.0456379Z",
+      "ageDays": 114,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13270",
+      "reviewers": {
+        "total": 1,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 1,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "1 no response"
+      },
+      "targetRefName": "refs/heads/feature/carriers/Forward",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 2,
+        "closed": 0,
+        "total": 2
+      },
+      "linkedWorkItem": {
+        "id": 45009,
+        "title": "(Hours)  Forward Air - Carrier Seed",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45009"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45009",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44150,
+          "type": "Feature",
+          "title": "Forward Air",
+          "state": "Active"
+        },
+        {
+          "id": 45008,
+          "type": "User Story",
+          "title": "Forward Air - Carrier Seed",
+          "state": "Active"
+        },
+        {
+          "id": 45009,
+          "type": "Task",
+          "title": "(Hours)  Forward Air - Carrier Seed",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "This pull request is still open because it has zero approvals while requiring at least two, and the only assigned reviewer has not responded. There are no active discussion threads, so the main blocker is the lack of required reviewers engaging with the PR. Next step is to add or notify the appropriate approvers so they can complete their reviews.",
+      "readinessScore": 30
+    },
+    {
+      "prId": 13195,
+      "title": "ADuiePyle Rate and TransitTime",
       "repository": "SupplyChainCloud.Integrations.Ltl",
       "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2025-11-17T08:26:31.7850530Z",
-      "ageDays": 108,
+      "creationDate": "2025-10-31T09:49:32.7330266Z",
+      "ageDays": 125,
       "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13306",
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13195",
       "reviewers": {
         "total": 3,
         "approved": 0,
@@ -749,18 +793,20 @@
       "targetRefName": "refs/heads/PT/ADuiePyleLTLSkeleton",
       "minApproverCount": 2,
       "threadCounts": {
-        "active": 0,
-        "resolved": 11,
+        "active": 1,
+        "resolved": 58,
         "closed": 0,
-        "total": 11
+        "total": 59
       },
       "linkedWorkItem": {
-        "id": 44768,
-        "title": "(Hours) ADuiePyle Dispatch ",
+        "id": 44770,
+        "title": "(Hours) ADuiePyle Rate and TransitTime",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44770"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44770",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -770,310 +816,20 @@
           "state": "Active"
         },
         {
-          "id": 44767,
+          "id": 44769,
           "type": "User Story",
-          "title": "ADuiePyle Dispatch",
+          "title": "ADuiePyle Rate and TransitTime",
           "state": "Active"
         },
         {
-          "id": 44768,
+          "id": 44770,
           "type": "Task",
-          "title": "(Hours) ADuiePyle Dispatch ",
+          "title": "(Hours) ADuiePyle Rate and TransitTime",
           "state": "In Review"
         }
       ],
-      "aiSummary": "This PR remains open because none of the three assigned reviewers have responded, and it still has zero approvals despite requiring at least two. Although all comment threads are resolved and no technical blockers remain, the lack of reviewer engagement prevents it from progressing. The next step is for the reviewers to complete their reviews and provide the required approvals.",
+      "aiSummary": "The PR remains open because none of the three assigned reviewers have responded, and it still needs at least two approvals to meet the required approval policy. There is also one active comment thread that may require author or reviewer action. The next step is for reviewers to engage, resolve the remaining thread, and provide the required approvals.",
       "readinessScore": 30
-    },
-    {
-      "prId": 13173,
-      "title": "Central Transport Documents",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-10-23T09:56:47.8191347Z",
-      "ageDays": 133,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13173",
-      "reviewers": {
-        "total": 3,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 3,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "3 no response"
-      },
-      "targetRefName": "refs/heads/HS/CentralTransportSkeleton",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 23,
-        "closed": 0,
-        "total": 24
-      },
-      "linkedWorkItem": {
-        "id": 44645,
-        "title": "(Hours) Central Transport - Documents ",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44147,
-          "type": "Feature",
-          "title": "Central Transport",
-          "state": "Active"
-        },
-        {
-          "id": 44643,
-          "type": "User Story",
-          "title": "Central Transport - Documents",
-          "state": "Active"
-        },
-        {
-          "id": 44645,
-          "type": "Task",
-          "title": "(Hours) Central Transport - Documents ",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR is still open because none of the three reviewers have responded and it has zero approvals, leaving it blocked against the required minimum of two approvers. There is also one active discussion thread that still needs to be resolved. The next step is for reviewers to provide feedback and approvals, and for the author to address the remaining active thread. Once those items are completed, the PR can move toward merge readiness.",
-      "readinessScore": 30
-    },
-    {
-      "prId": 13019,
-      "title": "UI Screen for Averitt Express",
-      "repository": "SupplyChainCloud",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2025-10-03T06:40:56.4159667Z",
-      "ageDays": 153,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/6d89afac-267d-4516-85c3-11ce7e30846c/pullrequest/13019",
-      "reviewers": {
-        "total": 3,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 3,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "3 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 2,
-        "resolved": 1,
-        "closed": 0,
-        "total": 3
-      },
-      "linkedWorkItem": {
-        "id": 44706,
-        "title": "(Hours) Averitt Express - UI ",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 43620,
-          "type": "Feature",
-          "title": "Averitt Express",
-          "state": "Active"
-        },
-        {
-          "id": 44705,
-          "type": "User Story",
-          "title": "Averitt Express - UI",
-          "state": "Active"
-        },
-        {
-          "id": 44706,
-          "type": "Task",
-          "title": "(Hours) Averitt Express - UI ",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR is still open because no reviewers have responded and it has zero approvals, leaving it blocked by the required minimum of two approvers. There are also two active discussion threads that need resolution. Reviewers must provide feedback and at least two approvals are required before this can proceed. The author may need to ping reviewers to re-engage and address open threads.",
-      "readinessScore": 30
-    },
-    {
-      "prId": 12947,
-      "title": "CentralTransportRateAndTransitTime",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-09-19T13:10:40.6227619Z",
-      "ageDays": 167,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/12947",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/feature/carriers/CentralTransport",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 18,
-        "closed": 0,
-        "total": 19
-      },
-      "linkedWorkItem": {
-        "id": 44639,
-        "title": "(Hours) Central Transport - Rate and Transit Time ",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44147,
-          "type": "Feature",
-          "title": "Central Transport",
-          "state": "Active"
-        },
-        {
-          "id": 44637,
-          "type": "User Story",
-          "title": "Central Transport - Rate and Transit Time",
-          "state": "Active"
-        },
-        {
-          "id": 44639,
-          "type": "Task",
-          "title": "(Hours) Central Transport - Rate and Transit Time ",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR remains open because it has zero approvals while requiring two, and both assigned reviewers have not responded. There is also one active comment thread still unresolved. The next step is for the reviewers to engage and provide required approvals, and for the author to address the active thread if it needs action. Until then the PR cannot progress toward merge.",
-      "readinessScore": 30
-    },
-    {
-      "prId": 13788,
-      "title": "Averitt Feature Close (Averitt Feature => Dev)",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2026-01-30T13:04:20.5919714Z",
-      "ageDays": 34,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13788",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 2,
-        "resolved": 0,
-        "closed": 0,
-        "total": 2
-      },
-      "linkedWorkItem": {
-        "id": 44702,
-        "title": "(Hours) Averitt Express - Carrier Seed ",
-        "type": "Task",
-        "state": "Closed",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 43620,
-          "type": "Feature",
-          "title": "Averitt Express",
-          "state": "Active"
-        },
-        {
-          "id": 44701,
-          "type": "User Story",
-          "title": "Averitt Express - Carrier Seed",
-          "state": "Closed"
-        },
-        {
-          "id": 44702,
-          "type": "Task",
-          "title": "(Hours) Averitt Express - Carrier Seed ",
-          "state": "Closed"
-        }
-      ],
-      "aiSummary": "This PR remains open because it has zero approvals and two required reviewers have not responded, leaving it blocked by the minimum approver requirement. Additionally, there are two active comment threads that must be addressed. The next steps are for reviewers to complete their reviews and for the author to resolve the active threads. Only after at least two approvals are received can the PR move forward.",
-      "readinessScore": 25
-    },
-    {
-      "prId": 13575,
-      "title": "Usps Rest Ship Engine",
-      "repository": "SupplyChainCloud.Integrations.Parcel",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2026-01-13T10:06:46.6861316Z",
-      "ageDays": 51,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/13575",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/feature/UspsRestTemplate",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 17,
-        "closed": 0,
-        "total": 18
-      },
-      "linkedWorkItem": {
-        "id": 45297,
-        "title": "(Hours)  Ship Engine Conversion",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 45174,
-          "type": "Feature",
-          "title": "UspsRest Template Conversion",
-          "state": "Active"
-        },
-        {
-          "id": 45272,
-          "type": "User Story",
-          "title": "Ship Engine Conversion",
-          "state": "Active"
-        },
-        {
-          "id": 45297,
-          "type": "Task",
-          "title": "(Hours)  Ship Engine Conversion",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "This PR remains open because it has zero approvals while requiring at least two, and both assigned reviewers have not responded. There is also one active comment thread that still needs to be addressed. The next steps are for reviewers to engage and provide the required approvals, and for the author to resolve the remaining active thread if it is awaiting action. Until then, the PR cannot progress toward merging.",
-      "readinessScore": 25
     },
     {
       "prId": 13121,
@@ -1107,8 +863,10 @@
         "title": "(Hours) ADuiePyle LTL Carrier Seed ",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44758"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44758",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1130,240 +888,8 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR remains open because none of the five assigned reviewers have responded, and it has zero approvals despite requiring at least two. There are no active discussion threads, so the only blocker is the lack of required reviewer engagement. The next step is for reviewers to review and approve the changes, or for the author to prompt them directly. Until at least two approvals are recorded, the PR cannot progress.",
-      "readinessScore": 25
-    },
-    {
-      "prId": 13077,
-      "title": "Central Transport Dispatch",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-10-13T12:24:19.4586398Z",
-      "ageDays": 143,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13077",
-      "reviewers": {
-        "total": 3,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 3,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "3 no response"
-      },
-      "targetRefName": "refs/heads/feature/carriers/CentralTransport",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 2,
-        "resolved": 18,
-        "closed": 0,
-        "total": 20
-      },
-      "linkedWorkItem": {
-        "id": 44648,
-        "title": "(Hours) Central Transport - Dispatch ",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44147,
-          "type": "Feature",
-          "title": "Central Transport",
-          "state": "Active"
-        },
-        {
-          "id": 44647,
-          "type": "User Story",
-          "title": "Central Transport - Dispatch",
-          "state": "Active"
-        },
-        {
-          "id": 44648,
-          "type": "Task",
-          "title": "(Hours) Central Transport - Dispatch ",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR is still open because no reviewers have responded and it has zero required approvals, while the policy requires at least two. There are also two active comment threads that still need to be resolved. Reviewers must engage and provide the required approvals, and the author should address the open threads. Once responses and approvals are completed, the PR can move forward.",
-      "readinessScore": 25
-    },
-    {
-      "prId": 14205,
-      "title": "Australia Post Template Feature => dev",
-      "repository": "SupplyChainCloud.Integrations.Parcel",
-      "createdBy": "Lucy Browning",
-      "creationDate": "2026-03-04T21:19:54.0680202Z",
-      "ageDays": 0,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14205",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 1,
-        "closed": 0,
-        "total": 2
-      },
-      "linkedWorkItem": {
-        "id": 45241,
-        "title": "(Hours)  Feature Branch Close - Australia Post Template Conversion",
-        "type": "Task",
-        "state": "Active",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 45164,
-          "type": "Feature",
-          "title": "Australia Post Template Conversion",
-          "state": "Active"
-        },
-        {
-          "id": 45222,
-          "type": "User Story",
-          "title": "Feature Branch Close - Australia Post Template Conversion",
-          "state": "New"
-        },
-        {
-          "id": 45241,
-          "type": "Task",
-          "title": "(Hours)  Feature Branch Close - Australia Post Template Conversion",
-          "state": "Active"
-        }
-      ],
-      "aiSummary": "The pull request is still open because no reviewers have responded and it has zero approvals while requiring two, leaving it blocked by policy. There is also one active comment thread that still needs to be resolved. The next step is for the assigned reviewers to complete their reviews and for the author to address the open thread. Once reviewers approve and the thread is resolved, the PR can proceed toward merging.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 14202,
-      "title": "My DHL => Dev",
-      "repository": "SupplyChainCloud.Integrations.Parcel",
-      "createdBy": "Jack Hawkins",
-      "creationDate": "2026-03-04T20:57:04.7383485Z",
-      "ageDays": 0,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14202",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 1,
-        "closed": 0,
-        "total": 2
-      },
-      "linkedWorkItem": {
-        "id": 45285,
-        "title": "(Hours)  Rate Engine Conversion",
-        "type": "Task",
-        "state": "Closed",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 45171,
-          "type": "Feature",
-          "title": "MyDhl Template Conversion",
-          "state": "Active"
-        },
-        {
-          "id": 45260,
-          "type": "User Story",
-          "title": "Rate Engine Conversion",
-          "state": "Active"
-        },
-        {
-          "id": 45285,
-          "type": "Task",
-          "title": "(Hours)  Rate Engine Conversion",
-          "state": "Closed"
-        }
-      ],
-      "aiSummary": "The PR is still open because no reviewers have responded yet and zero of the required two approvals have been received. There is also one active discussion thread that still needs to be resolved. Reviewers need to complete their reviews and provide approvals before this can move forward. The author may need to nudge reviewers to get the required responses.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 14129,
-      "title": "Endicia Void Template ",
-      "repository": "SupplyChainCloud.Integrations.Parcel",
-      "createdBy": "Yadav, Praveen",
-      "creationDate": "2026-03-02T11:48:18.6365784Z",
-      "ageDays": 3,
-      "isDraft": true,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14129",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/feature/EndiciaTemplate",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 4,
-        "closed": 0,
-        "total": 5
-      },
-      "linkedWorkItem": {
-        "id": 45221,
-        "title": "(Hours)  Void Engine Conversion",
-        "type": "Task",
-        "state": "Active",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 45168,
-          "type": "Feature",
-          "title": "Endicia Template Conversion",
-          "state": "Active"
-        },
-        {
-          "id": 45189,
-          "type": "User Story",
-          "title": "Void Engine Conversion",
-          "state": "New"
-        },
-        {
-          "id": 45221,
-          "type": "Task",
-          "title": "(Hours)  Void Engine Conversion",
-          "state": "Active"
-        }
-      ],
-      "aiSummary": "The PR is still open because it is marked as a draft, has no reviewer responses, and does not meet the required minimum of two approvals. There is also one active comment thread that likely still needs attention. The author should move the PR out of draft status, resolve the active thread, and request/obtain the required approvals. Only after reviewers engage and approve can it progress toward merging.",
-      "readinessScore": 20
+      "aiSummary": "This PR is still open because none of the five assigned reviewers have responded, and it has zero approvals while requiring at least two. There are no active comment threads blocking progress, so the only remaining issue is the complete lack of reviewer engagement. The next step is for the reviewers to provide their required approvals so the PR can advance.",
+      "readinessScore": 30
     },
     {
       "prId": 14026,
@@ -1397,8 +923,10 @@
         "title": "FedEx API's - Dangerous Goods data not sending",
         "type": "Bug",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45490"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45490",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1408,7 +936,235 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR is still open because one reviewer has rejected it, there are two active discussion threads, and it lacks the required second approval to meet the minimum approver count. The author needs to address the rejection feedback and resolve the active threads, after which reviewers can re-evaluate. Once updates are made, the PR should be resubmitted for the required second approval. Until then, it cannot proceed toward merging.",
+      "aiSummary": "The PR is still open because it has one rejecting reviewer, two active discussion threads, and it does not meet the required minimum of two approvers. It cannot be merged until the rejection is addressed and an additional reviewer approves. The author should resolve the active threads and work with reviewers to update the code or get reconsideration. Once feedback is resolved and at least two approvals are obtained, it can proceed to merge.",
+      "readinessScore": 25
+    },
+    {
+      "prId": 13788,
+      "title": "Averitt Feature Close (Averitt Feature => Dev)",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2026-01-30T13:04:20.5919714Z",
+      "ageDays": 34,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13788",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 2,
+        "resolved": 0,
+        "closed": 0,
+        "total": 2
+      },
+      "linkedWorkItem": {
+        "id": 44702,
+        "title": "(Hours) Averitt Express - Carrier Seed ",
+        "type": "Task",
+        "state": "Closed",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44702"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44702",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 43620,
+          "type": "Feature",
+          "title": "Averitt Express",
+          "state": "Active"
+        },
+        {
+          "id": 44701,
+          "type": "User Story",
+          "title": "Averitt Express - Carrier Seed",
+          "state": "Closed"
+        },
+        {
+          "id": 44702,
+          "type": "Task",
+          "title": "(Hours) Averitt Express - Carrier Seed ",
+          "state": "Closed"
+        }
+      ],
+      "aiSummary": "This pull request is still open because it has zero approvals while requiring two, and both assigned reviewers have not responded. Additionally, there are two active comment threads that indicate unresolved feedback. The reviewers need to engage and provide their required approvals, and the active threads must be addressed. Once feedback is resolved and two approvals are secured, the PR can move forward toward merging.",
+      "readinessScore": 25
+    },
+    {
+      "prId": 13360,
+      "title": "A. Duie Pyle Shipment Status",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2025-12-02T07:39:46.7847202Z",
+      "ageDays": 93,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13360",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/PT/ADuiePyleLTLSkeleton",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 1,
+        "closed": 0,
+        "total": 1
+      },
+      "linkedWorkItem": {
+        "id": 44772,
+        "title": "(Hours) ADuiePyle Shipment Status ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44772"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44772",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44148,
+          "type": "Feature",
+          "title": "A. Duie Pyle",
+          "state": "Active"
+        },
+        {
+          "id": 44771,
+          "type": "User Story",
+          "title": "ADuiePyle Shipment Status",
+          "state": "Active"
+        },
+        {
+          "id": 44772,
+          "type": "Task",
+          "title": "(Hours) ADuiePyle Shipment Status ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR is still open because none of the required reviewers have responded, and it has zero approvals while needing at least two. There are no active discussion threads, so the only blocker is the lack of reviewer engagement. The next step is to re-engage the assigned reviewers or reassign them so the mandatory approvals can be completed.",
+      "readinessScore": 25
+    },
+    {
+      "prId": 14129,
+      "title": "Endicia Void Template ",
+      "repository": "SupplyChainCloud.Integrations.Parcel",
+      "createdBy": "Yadav, Praveen",
+      "creationDate": "2026-03-02T11:48:18.6365784Z",
+      "ageDays": 3,
+      "isDraft": true,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14129",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/feature/EndiciaTemplate",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 1,
+        "resolved": 4,
+        "closed": 0,
+        "total": 5
+      },
+      "linkedWorkItem": {
+        "id": 45221,
+        "title": "(Hours)  Void Engine Conversion",
+        "type": "Task",
+        "state": "Active",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45221"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45221",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 45168,
+          "type": "Feature",
+          "title": "Endicia Template Conversion",
+          "state": "Active"
+        },
+        {
+          "id": 45189,
+          "type": "User Story",
+          "title": "Void Engine Conversion",
+          "state": "New"
+        },
+        {
+          "id": 45221,
+          "type": "Task",
+          "title": "(Hours)  Void Engine Conversion",
+          "state": "Active"
+        }
+      ],
+      "aiSummary": "The PR is still open because it is marked as a draft, has no reviewer responses, and has zero approvals despite requiring two. There is also one active discussion thread that may need resolution. The author should convert it out of draft when ready, address the active thread, and prompt reviewers to complete their reviews so the required approvals can be obtained.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 14126,
+      "title": "Template - Fix Rating logic for Fedex Rest Ship",
+      "repository": "SupplyChainCloud.Integrations.Parcel",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2026-02-27T12:33:57.9392807Z",
+      "ageDays": 6,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/14126",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 0,
+        "closed": 0,
+        "total": 0
+      },
+      "linkedWorkItem": {
+        "id": 45938,
+        "title": "Parcel Template - Fix Rating logic for Fedex Rest Ship",
+        "type": "Bug",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45938"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45938",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 45938,
+          "type": "Bug",
+          "title": "Parcel Template - Fix Rating logic for Fedex Rest Ship",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR is still open because no reviewers have responded and it currently has zero approvals, while two approvals are required. There are no active comment threads and no draft status, so the only blocker is missing reviewer engagement. Next step is to prompt the assigned reviewers to review and provide the required approvals. Until that happens, the PR cannot proceed.",
       "readinessScore": 20
     },
     {
@@ -1443,8 +1199,10 @@
         "title": "(Hours)  Void Engine Conversion",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45298"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45298",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1466,18 +1224,18 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR is still open because it has zero approvals while requiring two, and both assigned reviewers have not responded. Additionally, there are two active comment threads that likely still need resolution. The next step is for reviewers to perform their reviews and for the author to address the active threads. Only after reviewers approve can this move forward toward merging.",
+      "aiSummary": "This PR remains open because no reviewers have responded yet and the required two approvals have not been met. There are also two active comment threads that still need to be addressed. The next step is for the assigned reviewers to complete their reviews and for the author to resolve the remaining threads. Until approvals are received, the PR cannot proceed.",
       "readinessScore": 20
     },
     {
-      "prId": 13773,
-      "title": "USPS REST Rate Engine",
-      "repository": "SupplyChainCloud.Integrations.Parcel",
+      "prId": 13816,
+      "title": "Averitt Nullable Error in Response",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
       "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2026-01-29T11:12:16.5690861Z",
-      "ageDays": 35,
+      "creationDate": "2026-02-04T12:43:17.8828920Z",
+      "ageDays": 29,
       "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/13773",
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13816",
       "reviewers": {
         "total": 2,
         "approved": 0,
@@ -1488,43 +1246,45 @@
         "approverCount": 0,
         "summary": "2 no response"
       },
-      "targetRefName": "refs/heads/feature/UspsRestTemplate",
+      "targetRefName": "refs/heads/feature/carriers/AverittExpress",
       "minApproverCount": 2,
       "threadCounts": {
         "active": 0,
-        "resolved": 7,
+        "resolved": 0,
         "closed": 0,
-        "total": 7
+        "total": 0
       },
       "linkedWorkItem": {
-        "id": 45296,
-        "title": "(Hours)  Rate Engine Conversion",
+        "id": 45740,
+        "title": "Averitt Express Feature Close",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45740"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45740",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
-          "id": 45174,
+          "id": 43620,
           "type": "Feature",
-          "title": "UspsRest Template Conversion",
+          "title": "Averitt Express",
           "state": "Active"
         },
         {
-          "id": 45271,
+          "id": 45739,
           "type": "User Story",
-          "title": "Rate Engine Conversion",
+          "title": "Averitt Express Feature Close",
           "state": "Active"
         },
         {
-          "id": 45296,
+          "id": 45740,
           "type": "Task",
-          "title": "(Hours)  Rate Engine Conversion",
+          "title": "Averitt Express Feature Close",
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR remains open because none of the assigned reviewers have responded, and it still has zero approvals despite requiring at least two. There are no active discussion threads blocking progress, but the lack of reviewer engagement is preventing movement. The next step is for the designated reviewers to perform their reviews and provide the required approvals.",
+      "aiSummary": "The PR is still open because no reviewers have responded and it has zero approvals, while the policy requires at least two approvers. There are no active discussion threads blocking progress, but the lack of required reviews fully prevents merging. Next step is for the assigned reviewers to provide their approvals so the PR can move forward.",
       "readinessScore": 20
     },
     {
@@ -1559,8 +1319,10 @@
         "title": "(Hours) Carrier, Parcel Legacy - AppInsight changes",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45780"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45780",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1576,7 +1338,67 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "This PR remains open because none of the four reviewers have responded, and it still has one active discussion thread requiring attention. It also has zero approvals while two are required, so it cannot progress toward completion. The next step is for reviewers to begin reviewing and resolving the active thread so required approvals can be collected.",
+      "aiSummary": "The PR remains open because none of the four assigned reviewers have responded and it has zero approvals, leaving it blocked against the required minimum of two approvers. There is also one active comment thread still unresolved. Reviewers need to pick up the PR, complete their reviews, and provide the required approvals. Once reviewers respond and the remaining thread is resolved, it can progress toward merge.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13575,
+      "title": "Usps Rest Ship Engine",
+      "repository": "SupplyChainCloud.Integrations.Parcel",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2026-01-13T10:06:46.6861316Z",
+      "ageDays": 51,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3d7e1e4c-ffc5-4913-8ab5-6fa4648f168e/pullrequest/13575",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/feature/UspsRestTemplate",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 1,
+        "resolved": 17,
+        "closed": 0,
+        "total": 18
+      },
+      "linkedWorkItem": {
+        "id": 45297,
+        "title": "(Hours)  Ship Engine Conversion",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45297"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45297",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 45174,
+          "type": "Feature",
+          "title": "UspsRest Template Conversion",
+          "state": "Active"
+        },
+        {
+          "id": 45272,
+          "type": "User Story",
+          "title": "Ship Engine Conversion",
+          "state": "Active"
+        },
+        {
+          "id": 45297,
+          "type": "Task",
+          "title": "(Hours)  Ship Engine Conversion",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR remains open because it has zero approvals while requiring two, and both assigned reviewers have not responded. There is also one active discussion thread still unresolved. Reviewers need to complete their reviews and provide the required approvals, and the active thread should be addressed. Once those blockers are cleared, the PR can proceed toward merge.",
       "readinessScore": 20
     },
     {
@@ -1611,8 +1433,10 @@
         "title": "Saia Shipment Status Error",
         "type": "Bug",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45553"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45553",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1622,7 +1446,7 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "This PR remains open because none of the three assigned reviewers have responded, and it still requires at least two approvals to meet the minimum approver policy. There are no active discussion threads, so the sole blocker is the lack of reviewer engagement. The next step is to ping the reviewers or reassign the review to ensure the required approvals are obtained.",
+      "aiSummary": "The pull request remains open because none of the three reviewers have responded and it has zero approvals, while two approvals are required by policy. There are no active comment threads, so the only blocker is the lack of reviewer engagement. The next step is for reviewers to provide their evaluations so the PR can meet the required approval count. Until then, it cannot proceed toward merge.",
       "readinessScore": 20
     },
     {
@@ -1657,8 +1481,10 @@
         "title": "(Hours) Remove USPS, UPS Ready, and nShift from API",
         "type": "Task",
         "state": "Active",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/42555"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/42555",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1680,7 +1506,7 @@
           "state": "Active"
         }
       ],
-      "aiSummary": "The PR is still open because no reviewers have responded, and it requires two approvals to meet the minimum approver policy. Additionally, there are two active comment threads that have not been resolved. The author should address the active threads and prompt the assigned reviewers to complete their reviews so the required approvals can be collected.",
+      "aiSummary": "This PR remains open because it has zero approvals while requiring two, and both assigned reviewers have not responded. Additionally, there are two active comment threads that have not been resolved. The reviewers need to review and approve the PR, and the author should address the active threads to move it forward.",
       "readinessScore": 20
     },
     {
@@ -1715,8 +1541,10 @@
         "title": "'Nullable object must have a value' error when rating ABF Freight",
         "type": "Bug",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45370"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45370",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1726,7 +1554,7 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR remains open because it requires two approvers, but none of the assigned reviewers have responded and the approver count is still zero. There are no active discussion threads, so the only blocker is the lack of required approvals. The next step is for the reviewers to provide their review so the PR can meet the approval policy.",
+      "aiSummary": "The PR is still open because no reviewers have responded and it has zero approvals, while two approvals are required. There are no active discussion threads, so the only blocker is the lack of reviewer engagement. The next step is for the assigned reviewers to review and approve the changes. The author may need to follow up with reviewers to move it forward.",
       "readinessScore": 20
     },
     {
@@ -1761,8 +1589,10 @@
         "title": "(Hours)  Dayton Freight - Carrier Auth Seed",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45103"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45103",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1784,7 +1614,7 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "This PR remains open because none of the three assigned reviewers have responded, and it has zero approvals against a required minimum of two. There are no active discussion threads blocking progress, so the only barrier is the lack of required reviewer engagement. The next step is for reviewers to be prompted to complete their reviews so approval requirements can be satisfied.",
+      "aiSummary": "The PR remains open because none of the three assigned reviewers have responded, and it has zero approvals despite requiring at least two. There are no active comment threads blocking progress, so the only issue is the complete lack of reviewer engagement. The next step is to re-engage or reassign reviewers to obtain the required approvals. Until then, the PR cannot move forward.",
       "readinessScore": 20
     },
     {
@@ -1819,8 +1649,10 @@
         "title": "(Hours)  Forward Air - Shipment Status",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45017"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45017",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -1842,529 +1674,7 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR is still open because none of the required reviewers have responded, and it has zero approvals while two approvals are required. There are no active comment threads, but the lack of reviewer engagement is fully blocking progress. The next step is for the assigned reviewers to review and provide the required approvals. The author may need to proactively ping reviewers to move it forward.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13360,
-      "title": "A. Duie Pyle Shipment Status",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2025-12-02T07:39:46.7847202Z",
-      "ageDays": 93,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13360",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/PT/ADuiePyleLTLSkeleton",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 1,
-        "closed": 0,
-        "total": 1
-      },
-      "linkedWorkItem": {
-        "id": 44772,
-        "title": "(Hours) ADuiePyle Shipment Status ",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44148,
-          "type": "Feature",
-          "title": "A. Duie Pyle",
-          "state": "Active"
-        },
-        {
-          "id": 44771,
-          "type": "User Story",
-          "title": "ADuiePyle Shipment Status",
-          "state": "Active"
-        },
-        {
-          "id": 44772,
-          "type": "Task",
-          "title": "(Hours) ADuiePyle Shipment Status ",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "This PR is still open because none of the required reviewers have responded, and it has zero approvals against a minimum requirement of two. There are no active comment threads, so the only blocker is lack of reviewer engagement. The next step is for the assigned reviewers to review and approve the changes. Until then, the PR cannot move forward.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13328,
-      "title": "Forward Auth Seeding",
-      "repository": "SupplyChainCloud.CarrierAuthentication",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-11-20T11:39:14.0769472Z",
-      "ageDays": 105,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/48328012-6baf-4e25-9fc6-a99b321a3f98/pullrequest/13328",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 1,
-        "noResponse": 1,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "1 waiting for author, 1 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 7,
-        "closed": 0,
-        "total": 8
-      },
-      "linkedWorkItem": {
-        "id": 45007,
-        "title": "(Hours)  Forward Air - Carrier Auth Seed",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44150,
-          "type": "Feature",
-          "title": "Forward Air",
-          "state": "Active"
-        },
-        {
-          "id": 45006,
-          "type": "User Story",
-          "title": "Forward Air - Carrier Auth Seed",
-          "state": "Active"
-        },
-        {
-          "id": 45007,
-          "type": "Task",
-          "title": "(Hours)  Forward Air - Carrier Auth Seed",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "This PR is still open because it has zero approvals while two are required, and one reviewer is waiting for author updates. There is also an active discussion thread that still needs to be resolved. The author should address the open thread and update the PR so reviewers can complete their reviews. After that, it will still need both required approvals before it can merge.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13320,
-      "title": "Forward Rate",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-11-19T11:24:00.1650154Z",
-      "ageDays": 106,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13320",
-      "reviewers": {
-        "total": 3,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 3,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "3 no response"
-      },
-      "targetRefName": "refs/heads/HS/ForwardLTLSkeleton",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 0,
-        "closed": 0,
-        "total": 0
-      },
-      "linkedWorkItem": {
-        "id": 45076,
-        "title": "Forward Air - Rate",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44150,
-          "type": "Feature",
-          "title": "Forward Air",
-          "state": "Active"
-        },
-        {
-          "id": 45014,
-          "type": "User Story",
-          "title": "Forward Air - Rate",
-          "state": "Active"
-        },
-        {
-          "id": 45076,
-          "type": "Task",
-          "title": "Forward Air - Rate",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR remains open because none of the three assigned reviewers have responded, and it lacks the required two approvals to meet policy. There are no active comment threads, so the only blocker is the absence of reviewer engagement. The next step is for reviewers to review and provide the necessary approvals. Until that happens, the PR cannot be merged.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13271,
-      "title": "Forward Skeleton",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-11-11T06:55:12.2687141Z",
-      "ageDays": 114,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13271",
-      "reviewers": {
-        "total": 1,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 1,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "1 no response"
-      },
-      "targetRefName": "refs/heads/HS/ForwardCarrierSeed",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 2,
-        "resolved": 2,
-        "closed": 0,
-        "total": 4
-      },
-      "linkedWorkItem": {
-        "id": 45011,
-        "title": "(Hours)  Forward Air - LTL Skeleton",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44150,
-          "type": "Feature",
-          "title": "Forward Air",
-          "state": "Active"
-        },
-        {
-          "id": 45010,
-          "type": "User Story",
-          "title": "Forward Air - LTL Skeleton",
-          "state": "Active"
-        },
-        {
-          "id": 45011,
-          "type": "Task",
-          "title": "(Hours)  Forward Air - LTL Skeleton",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR remains open because no reviewers have responded and it does not meet the required minimum of two approvals. Additionally, there are still active comment threads that need to be addressed. The next step is to resolve the open threads and engage the appropriate reviewers to obtain the required approvals. Until then, the PR cannot move forward.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13270,
-      "title": "Forward Carrier Seed",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-11-11T04:27:41.0456379Z",
-      "ageDays": 114,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13270",
-      "reviewers": {
-        "total": 1,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 1,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "1 no response"
-      },
-      "targetRefName": "refs/heads/feature/carriers/Forward",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 2,
-        "closed": 0,
-        "total": 2
-      },
-      "linkedWorkItem": {
-        "id": 45009,
-        "title": "(Hours)  Forward Air - Carrier Seed",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44150,
-          "type": "Feature",
-          "title": "Forward Air",
-          "state": "Active"
-        },
-        {
-          "id": 45008,
-          "type": "User Story",
-          "title": "Forward Air - Carrier Seed",
-          "state": "Active"
-        },
-        {
-          "id": 45009,
-          "type": "Task",
-          "title": "(Hours)  Forward Air - Carrier Seed",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "This PR is still open because it has zero approvals while requiring at least two, and the only assigned reviewer has not responded. There are no active discussion threads, so the sole blocker is the absence of required reviewers. Additional reviewers need to be added or existing reviewers must complete their reviews. Once two approvals are received, the PR can proceed toward merging.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13195,
-      "title": "ADuiePyle Rate and TransitTime",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2025-10-31T09:49:32.7330266Z",
-      "ageDays": 125,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13195",
-      "reviewers": {
-        "total": 3,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 3,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "3 no response"
-      },
-      "targetRefName": "refs/heads/PT/ADuiePyleLTLSkeleton",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 58,
-        "closed": 0,
-        "total": 59
-      },
-      "linkedWorkItem": {
-        "id": 44770,
-        "title": "(Hours) ADuiePyle Rate and TransitTime",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44148,
-          "type": "Feature",
-          "title": "A. Duie Pyle",
-          "state": "Active"
-        },
-        {
-          "id": 44769,
-          "type": "User Story",
-          "title": "ADuiePyle Rate and TransitTime",
-          "state": "Active"
-        },
-        {
-          "id": 44770,
-          "type": "Task",
-          "title": "(Hours) ADuiePyle Rate and TransitTime",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR remains open because none of the three reviewers have responded, and zero required approvals have been provided despite a minimum requirement of two. There is also one active discussion thread still unresolved. The next step is for reviewers to engage and provide feedback or approvals, and for the author to address the active thread if needed.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13188,
-      "title": "UI Screen for A. Duie Pyle",
-      "repository": "SupplyChainCloud",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2025-10-28T11:51:23.1016790Z",
-      "ageDays": 128,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/6d89afac-267d-4516-85c3-11ce7e30846c/pullrequest/13188",
-      "reviewers": {
-        "total": 3,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 3,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "3 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 2,
-        "resolved": 2,
-        "closed": 0,
-        "total": 4
-      },
-      "linkedWorkItem": {
-        "id": 44762,
-        "title": "(Hours) ADuiePyle UI ",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44148,
-          "type": "Feature",
-          "title": "A. Duie Pyle",
-          "state": "Active"
-        },
-        {
-          "id": 44761,
-          "type": "User Story",
-          "title": "ADuiePyle UI",
-          "state": "Active"
-        },
-        {
-          "id": 44762,
-          "type": "Task",
-          "title": "(Hours) ADuiePyle UI ",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "This pull request remains open because none of the three assigned reviewers have responded and zero approvals have been recorded, leaving it blocked by the requirement for at least two approvers. There are also two active comment threads that still require attention. The next step is for reviewers to engage and provide the necessary approvals, and for the author to address the active discussions if needed. Until then, the PR cannot progress toward merging.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13141,
-      "title": "ADuiePyle LTL Skeleton",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Thangavelu, Prabu",
-      "creationDate": "2025-10-21T11:53:48.1274882Z",
-      "ageDays": 135,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13141",
-      "reviewers": {
-        "total": 4,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 4,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "4 no response"
-      },
-      "targetRefName": "refs/heads/feature/carriers/ADuiePyle",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 6,
-        "closed": 0,
-        "total": 6
-      },
-      "linkedWorkItem": {
-        "id": 44760,
-        "title": "(Hours) ADuiePyle LTL Skeleton ",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44148,
-          "type": "Feature",
-          "title": "A. Duie Pyle",
-          "state": "Active"
-        },
-        {
-          "id": 44759,
-          "type": "User Story",
-          "title": "ADuiePyle LTL Skeleton",
-          "state": "Active"
-        },
-        {
-          "id": 44760,
-          "type": "Task",
-          "title": "(Hours) ADuiePyle LTL Skeleton ",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "This PR remains open because no reviewers have responded and it has zero approvals while requiring at least two. There are no active comment threads, so the only blocker is the lack of required reviewer engagement. The next step is for the assigned reviewers to review and approve the initial skeleton so the PR can progress. Until then, it cannot be merged.",
-      "readinessScore": 20
-    },
-    {
-      "prId": 13072,
-      "title": "Central Transport UI",
-      "repository": "SupplyChainCloud",
-      "createdBy": "Subramanian, Hanish",
-      "creationDate": "2025-10-13T04:57:39.4335225Z",
-      "ageDays": 143,
-      "isDraft": false,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/6d89afac-267d-4516-85c3-11ce7e30846c/pullrequest/13072",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 3,
-        "closed": 0,
-        "total": 4
-      },
-      "linkedWorkItem": {
-        "id": 44651,
-        "title": "(Hours) Central Transport - UI ",
-        "type": "Task",
-        "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
-      "workItemHierarchy": [
-        {
-          "id": 44147,
-          "type": "Feature",
-          "title": "Central Transport",
-          "state": "Active"
-        },
-        {
-          "id": 44650,
-          "type": "User Story",
-          "title": "Central Transport - UI",
-          "state": "Active"
-        },
-        {
-          "id": 44651,
-          "type": "Task",
-          "title": "(Hours) Central Transport - UI ",
-          "state": "In Review"
-        }
-      ],
-      "aiSummary": "The PR is still open because it has zero approvals and requires at least two, and both assigned reviewers have not responded. There is also one active comment thread still unresolved. The next step is for the reviewers to engage and provide the required approvals, and for the author to address the remaining thread if needed.",
+      "aiSummary": "The PR is still open because it has zero approvals and both assigned reviewers have not responded, leaving it short of the required minimum of two approvers. There are no active comment threads, so the only blocker is the lack of review activity. The next step is for the reviewers to engage and provide the required approvals. Until that happens, the PR cannot progress toward merging.",
       "readinessScore": 20
     },
     {
@@ -2399,8 +1709,10 @@
         "title": "(Hours)  Forward Air - Dispatch",
         "type": "Task",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45013"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45013",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -2422,8 +1734,422 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "The PR is still open because none of the three assigned reviewers have responded, and it has zero approvals despite requiring at least two. There are no active discussion threads blocking progress, so the sole blocker is the lack of reviewer engagement. The next step is for reviewers to begin their review or for the author to prompt them to respond. Until required approvals are received, the PR cannot move forward.",
-      "readinessScore": 15
+      "aiSummary": "This PR remains open because none of the three assigned reviewers have responded, and it has zero required approvals despite needing at least two. There are no active discussion threads, so the only blocker is the missing reviews. The next step is for reviewers to provide feedback and supply the required approvals. Until that happens, the PR cannot progress.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13320,
+      "title": "Forward Rate",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-11-19T11:24:00.1650154Z",
+      "ageDays": 106,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13320",
+      "reviewers": {
+        "total": 3,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 3,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "3 no response"
+      },
+      "targetRefName": "refs/heads/HS/ForwardLTLSkeleton",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 0,
+        "closed": 0,
+        "total": 0
+      },
+      "linkedWorkItem": {
+        "id": 45076,
+        "title": "Forward Air - Rate",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45076"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45076",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44150,
+          "type": "Feature",
+          "title": "Forward Air",
+          "state": "Active"
+        },
+        {
+          "id": 45014,
+          "type": "User Story",
+          "title": "Forward Air - Rate",
+          "state": "Active"
+        },
+        {
+          "id": 45076,
+          "type": "Task",
+          "title": "Forward Air - Rate",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR is still open because it has zero approvals and all three reviewers have not responded, while the policy requires at least two approvers. There are no active comment threads, so the only blocker is the lack of required review activity. The next step is for reviewers to provide feedback and grant approvals so the PR can progress.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13306,
+      "title": "ADuiePyle Dispatch",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2025-11-17T08:26:31.7850530Z",
+      "ageDays": 108,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13306",
+      "reviewers": {
+        "total": 3,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 3,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "3 no response"
+      },
+      "targetRefName": "refs/heads/PT/ADuiePyleLTLSkeleton",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 11,
+        "closed": 0,
+        "total": 11
+      },
+      "linkedWorkItem": {
+        "id": 44768,
+        "title": "(Hours) ADuiePyle Dispatch ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44768"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44768",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44148,
+          "type": "Feature",
+          "title": "A. Duie Pyle",
+          "state": "Active"
+        },
+        {
+          "id": 44767,
+          "type": "User Story",
+          "title": "ADuiePyle Dispatch",
+          "state": "Active"
+        },
+        {
+          "id": 44768,
+          "type": "Task",
+          "title": "(Hours) ADuiePyle Dispatch ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR remains open because no reviewers have responded and it has zero approvals, while two approvals are required by policy. Although all discussion threads are resolved, the lack of reviewer engagement fully blocks progression. The next step is for the assigned reviewers to review and provide the required approvals. If the reviewer list is outdated, the author should reassign or nudge the appropriate reviewers.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13271,
+      "title": "Forward Skeleton",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-11-11T06:55:12.2687141Z",
+      "ageDays": 114,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13271",
+      "reviewers": {
+        "total": 1,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 1,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "1 no response"
+      },
+      "targetRefName": "refs/heads/HS/ForwardCarrierSeed",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 2,
+        "resolved": 2,
+        "closed": 0,
+        "total": 4
+      },
+      "linkedWorkItem": {
+        "id": 45011,
+        "title": "(Hours)  Forward Air - LTL Skeleton",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45011"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45011",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44150,
+          "type": "Feature",
+          "title": "Forward Air",
+          "state": "Active"
+        },
+        {
+          "id": 45010,
+          "type": "User Story",
+          "title": "Forward Air - LTL Skeleton",
+          "state": "Active"
+        },
+        {
+          "id": 45011,
+          "type": "Task",
+          "title": "(Hours)  Forward Air - LTL Skeleton",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The pull request is still open because it has zero approvals and requires at least two, and the only assigned reviewer has not responded. There are also two active comment threads that still need to be addressed. The next step is to resolve the active discussions and bring in the required reviewers to complete their reviews so the PR can progress. Until then, it remains blocked from merging.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13188,
+      "title": "UI Screen for A. Duie Pyle",
+      "repository": "SupplyChainCloud",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2025-10-28T11:51:23.1016790Z",
+      "ageDays": 128,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/6d89afac-267d-4516-85c3-11ce7e30846c/pullrequest/13188",
+      "reviewers": {
+        "total": 3,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 3,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "3 no response"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 2,
+        "resolved": 2,
+        "closed": 0,
+        "total": 4
+      },
+      "linkedWorkItem": {
+        "id": 44762,
+        "title": "(Hours) ADuiePyle UI ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44762"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44762",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44148,
+          "type": "Feature",
+          "title": "A. Duie Pyle",
+          "state": "Active"
+        },
+        {
+          "id": 44761,
+          "type": "User Story",
+          "title": "ADuiePyle UI",
+          "state": "Active"
+        },
+        {
+          "id": 44762,
+          "type": "Task",
+          "title": "(Hours) ADuiePyle UI ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "This PR remains open because none of the three reviewers have responded and no required approvals have been given, leaving it blocked by the minimum approver requirement of two. In addition, there are still two active comment threads that need to be addressed. The next step is for reviewers to evaluate the changes and provide approvals, and for the author to resolve the active discussions if action is required. Only after those steps can the PR move toward merging.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13185,
+      "title": "Generic Postal Code Enrichment",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-10-27T10:14:54.5865421Z",
+      "ageDays": 129,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13185",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 1,
+        "resolved": 7,
+        "closed": 0,
+        "total": 8
+      },
+      "linkedWorkItem": {
+        "id": 43141,
+        "title": "Add format postal code to general enrichment",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/43141"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/43141",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 39042,
+          "type": "User Story",
+          "title": "LTL Clean Up",
+          "state": "Active"
+        },
+        {
+          "id": 43141,
+          "type": "Task",
+          "title": "Add format postal code to general enrichment",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "This PR remains open because no reviewers have responded and it has zero of the two required approvals. There is also one active comment thread that still needs to be resolved. The next step is for the assigned reviewers to review the changes and provide the required approvals. The author may also need to follow up with reviewers to unblock progress.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13173,
+      "title": "Central Transport Documents",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-10-23T09:56:47.8191347Z",
+      "ageDays": 133,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13173",
+      "reviewers": {
+        "total": 3,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 3,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "3 no response"
+      },
+      "targetRefName": "refs/heads/HS/CentralTransportSkeleton",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 1,
+        "resolved": 23,
+        "closed": 0,
+        "total": 24
+      },
+      "linkedWorkItem": {
+        "id": 44645,
+        "title": "(Hours) Central Transport - Documents ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44645"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44645",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44147,
+          "type": "Feature",
+          "title": "Central Transport",
+          "state": "Active"
+        },
+        {
+          "id": 44643,
+          "type": "User Story",
+          "title": "Central Transport - Documents",
+          "state": "Active"
+        },
+        {
+          "id": 44645,
+          "type": "Task",
+          "title": "(Hours) Central Transport - Documents ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR remains open because none of the three reviewers have responded and no required approvals have been provided, leaving it blocked by the minimum approver requirement. There is also one active discussion thread that still needs to be resolved. The next step is for reviewers to engage and provide the two required approvals, and for the author to address the active thread if action is needed. Until that occurs, the PR cannot progress toward merging.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13141,
+      "title": "ADuiePyle LTL Skeleton",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2025-10-21T11:53:48.1274882Z",
+      "ageDays": 135,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13141",
+      "reviewers": {
+        "total": 4,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 4,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "4 no response"
+      },
+      "targetRefName": "refs/heads/feature/carriers/ADuiePyle",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 6,
+        "closed": 0,
+        "total": 6
+      },
+      "linkedWorkItem": {
+        "id": 44760,
+        "title": "(Hours) ADuiePyle LTL Skeleton ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44760"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44760",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44148,
+          "type": "Feature",
+          "title": "A. Duie Pyle",
+          "state": "Active"
+        },
+        {
+          "id": 44759,
+          "type": "User Story",
+          "title": "ADuiePyle LTL Skeleton",
+          "state": "Active"
+        },
+        {
+          "id": 44760,
+          "type": "Task",
+          "title": "(Hours) ADuiePyle LTL Skeleton ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "This pull request remains open because none of the four assigned reviewers have responded, and it has zero required approvals against a minimum requirement of two. There are no active comment threads, so the only blocker is the lack of reviewer engagement. The next step is for reviewers to provide their feedback and at least two approvals. The author may need to prompt reviewers to ensure the PR gets attention.",
+      "readinessScore": 20
     },
     {
       "prId": 13135,
@@ -2457,8 +2183,10 @@
         "title": "F&O errors when receiving a blank transactionID",
         "type": "Bug",
         "state": "Closed",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44688"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44688",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -2468,8 +2196,8 @@
           "state": "Closed"
         }
       ],
-      "aiSummary": "The PR remains open because no reviewers have responded and it currently has zero approvals, while the policy requires at least two. There are also three active comment threads, indicating unresolved discussions or required changes. Reviewers need to provide feedback and approvals, and the author may need to address the active threads. Once reviewers engage and issues are resolved, the PR can progress toward merging.",
-      "readinessScore": 15
+      "aiSummary": "The pull request remains open because no reviewers have responded and it has zero of the two required approvals. Additionally, there are three active discussion threads that still need to be resolved. The next step is for reviewers to engage and provide approvals, and for the author to address the active threads. Until then, the PR cannot progress toward merging.",
+      "readinessScore": 20
     },
     {
       "prId": 13133,
@@ -2503,8 +2231,10 @@
         "title": "Trim +4 ZIP Codes for R+L Carriers",
         "type": "Bug",
         "state": "In Review",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44948"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44948",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -2514,8 +2244,248 @@
           "state": "In Review"
         }
       ],
-      "aiSummary": "This PR remains open because the sole reviewer has rejected it, one discussion thread is still active, and it has zero approvals despite requiring at least two. It cannot proceed until the author addresses the feedback and new reviewers provide the required approvals. The next step is to resolve the active thread and request fresh reviews. Only after receiving two approvals can it move toward merging.",
-      "readinessScore": 15
+      "aiSummary": "This PR remains open because the sole reviewer has rejected it, there is still an active discussion thread, and it currently has zero approvals despite requiring at least two. The author needs to address the reviewer’s concerns, resolve the active thread, and secure the required approvals. Until those actions occur, the PR cannot proceed toward merging.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13077,
+      "title": "Central Transport Dispatch",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-10-13T12:24:19.4586398Z",
+      "ageDays": 143,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13077",
+      "reviewers": {
+        "total": 3,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 3,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "3 no response"
+      },
+      "targetRefName": "refs/heads/feature/carriers/CentralTransport",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 2,
+        "resolved": 18,
+        "closed": 0,
+        "total": 20
+      },
+      "linkedWorkItem": {
+        "id": 44648,
+        "title": "(Hours) Central Transport - Dispatch ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44648"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44648",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44147,
+          "type": "Feature",
+          "title": "Central Transport",
+          "state": "Active"
+        },
+        {
+          "id": 44647,
+          "type": "User Story",
+          "title": "Central Transport - Dispatch",
+          "state": "Active"
+        },
+        {
+          "id": 44648,
+          "type": "Task",
+          "title": "(Hours) Central Transport - Dispatch ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "This PR is still open because no reviewers have responded and it has zero approvals, while two approvals are required. It also has two active comment threads that likely need resolution. Reviewers need to engage and provide the required approvals, and the author may need to address any active feedback. Once reviewers respond and approve, the PR can move forward.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13072,
+      "title": "Central Transport UI",
+      "repository": "SupplyChainCloud",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-10-13T04:57:39.4335225Z",
+      "ageDays": 143,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/6d89afac-267d-4516-85c3-11ce7e30846c/pullrequest/13072",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 1,
+        "resolved": 3,
+        "closed": 0,
+        "total": 4
+      },
+      "linkedWorkItem": {
+        "id": 44651,
+        "title": "(Hours) Central Transport - UI ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44651"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44651",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44147,
+          "type": "Feature",
+          "title": "Central Transport",
+          "state": "Active"
+        },
+        {
+          "id": 44650,
+          "type": "User Story",
+          "title": "Central Transport - UI",
+          "state": "Active"
+        },
+        {
+          "id": 44651,
+          "type": "Task",
+          "title": "(Hours) Central Transport - UI ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "This PR is still open because none of the required reviewers have responded, and it has zero approvals while two are required. There is also one active comment thread that still needs to be resolved. The next step is for the assigned reviewers to review the changes and provide the necessary approvals, and for the author to address the active thread if action is required. Until then, the PR cannot move forward.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 13019,
+      "title": "UI Screen for Averitt Express",
+      "repository": "SupplyChainCloud",
+      "createdBy": "Thangavelu, Prabu",
+      "creationDate": "2025-10-03T06:40:56.4159667Z",
+      "ageDays": 153,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/6d89afac-267d-4516-85c3-11ce7e30846c/pullrequest/13019",
+      "reviewers": {
+        "total": 3,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 3,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "3 no response"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 2,
+        "resolved": 1,
+        "closed": 0,
+        "total": 3
+      },
+      "linkedWorkItem": {
+        "id": 44706,
+        "title": "(Hours) Averitt Express - UI ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44706"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44706",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 43620,
+          "type": "Feature",
+          "title": "Averitt Express",
+          "state": "Active"
+        },
+        {
+          "id": 44705,
+          "type": "User Story",
+          "title": "Averitt Express - UI",
+          "state": "Active"
+        },
+        {
+          "id": 44706,
+          "type": "Task",
+          "title": "(Hours) Averitt Express - UI ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR is still open because none of the three reviewers have responded and it currently has zero approvals, which is below the required minimum of two approvers. There are also two active discussion threads that remain unresolved. The author needs to prompt reviewers for feedback and address the active threads. Once reviewers engage and required approvals are obtained, the PR can progress toward merge.",
+      "readinessScore": 20
+    },
+    {
+      "prId": 12947,
+      "title": "CentralTransportRateAndTransitTime",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Subramanian, Hanish",
+      "creationDate": "2025-09-19T13:10:40.6227619Z",
+      "ageDays": 167,
+      "isDraft": false,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/12947",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/feature/carriers/CentralTransport",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 1,
+        "resolved": 18,
+        "closed": 0,
+        "total": 19
+      },
+      "linkedWorkItem": {
+        "id": 44639,
+        "title": "(Hours) Central Transport - Rate and Transit Time ",
+        "type": "Task",
+        "state": "In Review",
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44639"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/44639",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
+      "workItemHierarchy": [
+        {
+          "id": 44147,
+          "type": "Feature",
+          "title": "Central Transport",
+          "state": "Active"
+        },
+        {
+          "id": 44637,
+          "type": "User Story",
+          "title": "Central Transport - Rate and Transit Time",
+          "state": "Active"
+        },
+        {
+          "id": 44639,
+          "type": "Task",
+          "title": "(Hours) Central Transport - Rate and Transit Time ",
+          "state": "In Review"
+        }
+      ],
+      "aiSummary": "The PR remains open because no reviewers have responded and it has zero of the two required approvals, leaving it blocked by policy. There is also one active discussion thread that still needs to be resolved. The next step is for the assigned reviewers to begin their review and provide the required approvals, and for the active thread to be addressed. Until then, the PR cannot progress toward merging.",
+      "readinessScore": 20
     },
     {
       "prId": 14055,
@@ -2548,8 +2518,10 @@
         "title": "Package Updates - Telerik/Chrome Driver",
         "type": "Task",
         "state": "Closed",
-        "areaPath": "Supply Chain Cloud"
+        "areaPath": "Supply Chain Cloud",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45820"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45820",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud",
       "workItemHierarchy": [
         {
@@ -2571,7 +2543,7 @@
           "state": "Closed"
         }
       ],
-      "aiSummary": "This PR remains open because it is still marked as a draft, has no reviewers assigned, and has four active comment threads needing resolution. It also requires at least two approvers, but none have been added yet. The next steps are to finish addressing the active threads, move the PR out of draft, and assign the required reviewers so approval can begin.",
+      "aiSummary": "The PR is still open because it is marked as a draft, has no assigned reviewers, and requires at least two approvals. There are also four active comment threads that must be resolved. The next step is to move the PR out of draft, assign the required reviewers, and address the open threads. Only after that can the approval process begin.",
       "readinessScore": 10
     },
     {
@@ -2605,8 +2577,10 @@
         "title": "Package Updates - Telerik/Chrome Driver",
         "type": "Task",
         "state": "Closed",
-        "areaPath": "Supply Chain Cloud"
+        "areaPath": "Supply Chain Cloud",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45820"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45820",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud",
       "workItemHierarchy": [
         {
@@ -2628,7 +2602,7 @@
           "state": "Closed"
         }
       ],
-      "aiSummary": "This pull request is still open because it is marked as a draft, has no assigned reviewers, and has two active comment threads. It also requires at least two approvers but currently has none. The author should move it out of draft status, assign reviewers, and address the active threads. Once reviewers evaluate it, required approvals can be collected to unblock merging.",
+      "aiSummary": "The PR remains open because it is still marked as a draft, has no assigned reviewers, and contains two active comment threads that have not been resolved. It also requires at least two approvers, but none have been added yet. The next step is to move the PR out of draft, assign reviewers, and address the open threads. Only after that can the required approvals be collected.",
       "readinessScore": 10
     },
     {
@@ -2663,8 +2637,10 @@
         "title": "(Hours)  Rate Engine Conversion",
         "type": "Task",
         "state": "Active",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45219"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45219",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -2686,129 +2662,7 @@
           "state": "Active"
         }
       ],
-      "aiSummary": "This PR is still open because it is marked as a draft, has five active comment threads, and currently has zero of the two required approver votes. The only reviewer has not responded yet. The author should resolve the active threads, move the PR out of draft when ready, and request required reviewers to provide approvals. No progress toward merging can occur until these steps are completed.",
-      "readinessScore": 10
-    },
-    {
-      "prId": 13321,
-      "title": "Construct Uri from model",
-      "repository": "SupplyChainCloud.Integrations.Ltl",
-      "createdBy": "Yadav, Praveen",
-      "creationDate": "2025-11-19T12:12:44.7988612Z",
-      "ageDays": 106,
-      "isDraft": true,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13321",
-      "reviewers": {
-        "total": 2,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 2,
-        "rejected": 0,
-        "approverCount": 0,
-        "summary": "2 no response"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 1,
-        "resolved": 1,
-        "closed": 0,
-        "total": 2
-      },
-      "linkedWorkItem": null,
-      "linkedWorkItemAreaPaths": "",
-      "workItemHierarchy": [],
-      "aiSummary": "This pull request is still open because it is marked as a draft, has an active discussion thread, and has not received any of the two required approvals. Both reviewers have not responded yet, so it has not progressed toward completion. The author should finalize the draft, resolve the active thread, and request responses from the required approvers. Only after reviewers submit approvals can this PR move forward.",
-      "readinessScore": 10
-    },
-    {
-      "prId": 12349,
-      "title": "Orchestrate new auth strategy for internal calls.",
-      "repository": "SupplyChainCloud.Orchestrate",
-      "createdBy": "Philip Winstead",
-      "creationDate": "2025-06-19T14:54:18.4802401Z",
-      "ageDays": 259,
-      "isDraft": true,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/a1c26d2e-f5ea-469a-844d-ef4b656b6d89/pullrequest/12349",
-      "reviewers": {
-        "total": 0,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 0,
-        "rejected": 0,
-        "summary": "No reviewers assigned"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 0,
-        "closed": 0,
-        "total": 0
-      },
-      "linkedWorkItem": null,
-      "linkedWorkItemAreaPaths": "",
-      "workItemHierarchy": [],
-      "aiSummary": "This pull request is still open because it is marked as a draft and has no reviewers assigned, while requiring at least two approvals. No review can begin until it is taken out of draft and reviewers are added. The next step is for the author to finalize the PR and request the necessary reviewers so approval can proceed.",
-      "readinessScore": 10
-    },
-    {
-      "prId": 12301,
-      "title": "New endpoint for internal token that includes additional claims.",
-      "repository": "SupplyChainCloud.Security",
-      "createdBy": "Philip Winstead",
-      "creationDate": "2025-06-10T20:01:52.2142795Z",
-      "ageDays": 267,
-      "isDraft": true,
-      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3deccd6b-fb82-4cb8-bd7e-8f7aa7b3fa21/pullrequest/12301",
-      "reviewers": {
-        "total": 0,
-        "approved": 0,
-        "approvedWithSuggestions": 0,
-        "waitingForAuthor": 0,
-        "noResponse": 0,
-        "rejected": 0,
-        "summary": "No reviewers assigned"
-      },
-      "targetRefName": "refs/heads/dev",
-      "minApproverCount": 2,
-      "threadCounts": {
-        "active": 0,
-        "resolved": 0,
-        "closed": 0,
-        "total": 0
-      },
-      "linkedWorkItem": {
-        "id": 41910,
-        "title": "[Hours] Provide ability to make internal calls with User and/or Tenant claims context.",
-        "type": "Task",
-        "state": "On Hold",
-        "areaPath": "Supply Chain Cloud\\Infrastructure"
-      },
-      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Infrastructure",
-      "workItemHierarchy": [
-        {
-          "id": 41558,
-          "type": "Feature",
-          "title": "Improve handling of security tokens and context for internal SCC calls.",
-          "state": "Active"
-        },
-        {
-          "id": 41909,
-          "type": "User Story",
-          "title": "Provide ability to make internal calls with User and/or Tenant claims context.",
-          "state": "Active"
-        },
-        {
-          "id": 41910,
-          "type": "Task",
-          "title": "[Hours] Provide ability to make internal calls with User and/or Tenant claims context.",
-          "state": "On Hold"
-        }
-      ],
-      "aiSummary": "The PR remains open because it is still marked as a draft and has no reviewers assigned, while policy requires at least two approvals. There are no active discussion threads, but no review process has started. The linked work item is also on hold, which may indicate the feature is not currently being progressed. Next steps are to move the PR out of draft and assign reviewers once the work item is resumed.",
+      "aiSummary": "This PR is still open because it is marked as a draft, has five active comment threads, and has not received any approvals. It is also blocked by policy since it requires two approvers but currently has zero. The author should resolve the active threads, move the PR out of draft, and request the required reviewers to complete their reviews. Only after that can it progress toward merging.",
       "readinessScore": 10
     },
     {
@@ -2843,8 +2697,10 @@
         "title": "(Hours)  Ship Engine Conversion",
         "type": "Task",
         "state": "Active",
-        "areaPath": "Supply Chain Cloud\\Carriers"
+        "areaPath": "Supply Chain Cloud\\Carriers",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45220"
       },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/45220",
       "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Carriers",
       "workItemHierarchy": [
         {
@@ -2866,8 +2722,134 @@
           "state": "Active"
         }
       ],
-      "aiSummary": "This PR remains open because it is still marked as a draft, has no reviewers responding, and requires two approvals but currently has zero. Additionally, there are multiple active comment threads that need to be resolved. The author should move the PR out of draft status, address the active threads, and obtain the required approvals. Until then, it cannot proceed toward merging.",
-      "readinessScore": 5
+      "aiSummary": "This PR remains open because it is still in draft status, has eight active discussion threads, and has not received any reviewer approvals. It also requires two approvers but currently has none, with the only reviewer having not responded. The author should address the active threads, publish the PR out of draft, and request the required reviewers to complete their reviews.",
+      "readinessScore": 10
+    },
+    {
+      "prId": 13321,
+      "title": "Construct Uri from model",
+      "repository": "SupplyChainCloud.Integrations.Ltl",
+      "createdBy": "Yadav, Praveen",
+      "creationDate": "2025-11-19T12:12:44.7988612Z",
+      "ageDays": 106,
+      "isDraft": true,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/8b1c480c-1a65-4f19-a3d3-7a7d92bef981/pullrequest/13321",
+      "reviewers": {
+        "total": 2,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 2,
+        "rejected": 0,
+        "approverCount": 0,
+        "summary": "2 no response"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 1,
+        "resolved": 1,
+        "closed": 0,
+        "total": 2
+      },
+      "linkedWorkItem": null,
+      "linkedWorkItemUrl": null,
+      "linkedWorkItemAreaPaths": "",
+      "workItemHierarchy": [],
+      "aiSummary": "This pull request is still open because it is marked as a draft, has an active discussion thread, and has not received any of the two required approvals. Both reviewers have not responded, so no review progress has been made. The author should finalize the PR by taking it out of draft, address the active thread, and request the required reviewers to complete their reviews. Only after receiving at least two approvals can it proceed toward merging.",
+      "readinessScore": 10
+    },
+    {
+      "prId": 12349,
+      "title": "Orchestrate new auth strategy for internal calls.",
+      "repository": "SupplyChainCloud.Orchestrate",
+      "createdBy": "Philip Winstead",
+      "creationDate": "2025-06-19T14:54:18.4802401Z",
+      "ageDays": 259,
+      "isDraft": true,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/a1c26d2e-f5ea-469a-844d-ef4b656b6d89/pullrequest/12349",
+      "reviewers": {
+        "total": 0,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 0,
+        "rejected": 0,
+        "summary": "No reviewers assigned"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 0,
+        "closed": 0,
+        "total": 0
+      },
+      "linkedWorkItem": null,
+      "linkedWorkItemUrl": null,
+      "linkedWorkItemAreaPaths": "",
+      "workItemHierarchy": [],
+      "aiSummary": "This pull request is still open because it is marked as a draft and has no reviewers assigned, leaving it far from meeting the required two approvals. There are no active discussion threads, but progress cannot begin until the author publishes the PR and assigns reviewers. The next step is to move it out of draft status and request the necessary reviewers. Only then can the approval process begin.",
+      "readinessScore": 10
+    },
+    {
+      "prId": 12301,
+      "title": "New endpoint for internal token that includes additional claims.",
+      "repository": "SupplyChainCloud.Security",
+      "createdBy": "Philip Winstead",
+      "creationDate": "2025-06-10T20:01:52.2142795Z",
+      "ageDays": 267,
+      "isDraft": true,
+      "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_git/3deccd6b-fb82-4cb8-bd7e-8f7aa7b3fa21/pullrequest/12301",
+      "reviewers": {
+        "total": 0,
+        "approved": 0,
+        "approvedWithSuggestions": 0,
+        "waitingForAuthor": 0,
+        "noResponse": 0,
+        "rejected": 0,
+        "summary": "No reviewers assigned"
+      },
+      "targetRefName": "refs/heads/dev",
+      "minApproverCount": 2,
+      "threadCounts": {
+        "active": 0,
+        "resolved": 0,
+        "closed": 0,
+        "total": 0
+      },
+      "linkedWorkItem": {
+        "id": 41910,
+        "title": "[Hours] Provide ability to make internal calls with User and/or Tenant claims context.",
+        "type": "Task",
+        "state": "On Hold",
+        "areaPath": "Supply Chain Cloud\\Infrastructure",
+        "url": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/41910"
+      },
+      "linkedWorkItemUrl": "https://dev.azure.com/bhsolutions/Supply%20Chain%20Cloud/_workitems/edit/41910",
+      "linkedWorkItemAreaPaths": "Supply Chain Cloud\\Infrastructure",
+      "workItemHierarchy": [
+        {
+          "id": 41558,
+          "type": "Feature",
+          "title": "Improve handling of security tokens and context for internal SCC calls.",
+          "state": "Active"
+        },
+        {
+          "id": 41909,
+          "type": "User Story",
+          "title": "Provide ability to make internal calls with User and/or Tenant claims context.",
+          "state": "Active"
+        },
+        {
+          "id": 41910,
+          "type": "Task",
+          "title": "[Hours] Provide ability to make internal calls with User and/or Tenant claims context.",
+          "state": "On Hold"
+        }
+      ],
+      "aiSummary": "The PR is still open because it is marked as a draft and has no reviewers assigned, leaving it far from meeting the required minimum of two approvals. Additionally, the linked work item is in an On Hold state, suggesting the work may not currently be moving forward. The next step is to confirm whether the task should proceed; if so, the PR should be moved out of draft and reviewers assigned. If the work remains on hold, the PR may need to be closed or paused explicitly.",
+      "readinessScore": 10
     }
   ]
 }

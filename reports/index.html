@@ -24,6 +24,8 @@
         <div class="text-secondary small" id="meta">Loading…</div>
       </div>
 
+      <input class="form-control form-control-sm" style="max-width: 360px" type="search" id="quickFilter" placeholder="Filter title / repo / author" aria-label="Quick filter" />
+
       <div class="btn-group" role="group" aria-label="Filter controls">
         <button class="btn btn-outline-warning" type="button" data-bs-toggle="collapse" data-bs-target="#areaFilterPanel" aria-expanded="false" aria-controls="areaFilterPanel">Area Filter</button>
         <button class="btn btn-outline-warning btn-sm" type="button" id="areaSelectAllBtn">All</button>
@@ -79,6 +81,7 @@
     const theadEl        = document.getElementById('thead');
     const tbodyEl        = document.getElementById('tbody');
     const areaCheckboxEl = document.getElementById('areaCheckboxes');
+    const quickFilterEl  = document.getElementById('quickFilter');
 
     const resetBtn         = document.getElementById('resetBtn');
     const checkAllBtn      = document.getElementById('checkAllBtn');
@@ -96,6 +99,8 @@
 
     const toBool = (v) => v === true;
 
+    const STORAGE_KEY = 'prSnapshotViewState.v1';
+
     // Returns a Bootstrap badge for readiness score
     function readinessBadge(score) {
       const n = Number(score) || 0;
@@ -104,35 +109,73 @@
     }
 
     const columns = [
-      { key: 'prId',                   label: 'PR',               value: (pr) => pr.prId,                          thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      {
+        key: 'prId',
+        label: 'PR',
+        value: (pr) => pr.prId,
+        sortValue: (pr) => Number(pr.prId) || 0,
+        html: (pr) => {
+          const id = pr.prId;
+          const url = pr.url ?? '';
+          return url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(id)}</a>` : escapeHtml(id);
+        },
+        thClass: 'text-nowrap',
+        tdClass: 'text-nowrap'
+      },
+      {
+        key: 'linkedWorkItemId',
+        label: 'WI',
+        value: (pr) => pr.linkedWorkItem?.id ?? '',
+        sortValue: (pr) => Number(pr.linkedWorkItem?.id) || 0,
+        html: (pr) => {
+          const id = pr.linkedWorkItem?.id ?? '';
+          if (!id) return '';
+          const url = pr.linkedWorkItemUrl ?? pr.linkedWorkItem?.url ?? '';
+          return url
+            ? `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(id)}</a>`
+            : escapeHtml(id);
+        },
+        thClass: 'text-nowrap',
+        tdClass: 'text-nowrap'
+      },
       { key: 'title',                  label: 'Title',            value: (pr) => pr.title ?? '' },
-      { key: 'repository',             label: 'Repo',             value: (pr) => pr.repository ?? '',              thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      { key: 'repository',             label: 'Repo',             value: (pr) => pr.repository ?? '',              thClass: 'text-nowrap', tdClass: 'text-break' },
       { key: 'createdBy',              label: 'Author',           value: (pr) => pr.createdBy ?? '',               thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'ageDays',                label: 'Age (days)',       value: (pr) => pr.ageDays,                       thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
       { key: 'isDraft',                label: 'Draft',            value: (pr) => toBool(pr.isDraft) ? 'Yes' : 'No', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'reviewersSummary',       label: 'Reviewers',        value: (pr) => pr.reviewers?.summary ?? '',      thClass: 'text-nowrap' },
       {
-        key: 'threads',
-        label: 'Threads',
-        value: (pr) => `${pr.threadCounts?.active ?? 0}/${pr.threadCounts?.total ?? 0}`,
-        sortValue: (pr) => ((pr.threadCounts?.active ?? 0) * 100000) + (pr.threadCounts?.total ?? 0),
+        key: 'approvals',
+        label: 'Approvals',
+        value: (pr) => `${pr.reviewers?.approverCount ?? 0}/${pr.minApproverCount ?? 2}`,
+        sortValue: (pr) => {
+          const a = pr.reviewers?.approverCount ?? 0;
+          const m = pr.minApproverCount ?? 2;
+          return m > 0 ? (a / m) : a;
+        },
         thClass: 'text-nowrap',
         tdClass: 'text-nowrap text-end'
       },
-      { key: 'linkedWorkItemId',       label: 'WI',               value: (pr) => pr.linkedWorkItem?.id ?? '',      thClass: 'text-nowrap', tdClass: 'text-nowrap' },
+      {
+        key: 'threads',
+        label: 'Unresolved comments',
+        value: (pr) => (pr.threadCounts?.active ?? 0),
+        sortValue: (pr) => (pr.threadCounts?.active ?? 0),
+        thClass: 'text-nowrap text-center',
+        tdClass: 'text-nowrap text-center'
+      },
       { key: 'linkedWorkItemType',     label: 'WI Type',          value: (pr) => pr.linkedWorkItem?.type ?? '',    thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'linkedWorkItemState',    label: 'WI State',         value: (pr) => pr.linkedWorkItem?.state ?? '',   thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'linkedWorkItemAreaPaths',label: 'WI Area Path(s)',  value: (pr) => pr.linkedWorkItemAreaPaths ?? '' },
       { key: 'readinessScore',         label: 'Readiness',        value: (pr) => pr.readinessScore ?? 0,           thClass: 'text-nowrap', tdClass: 'text-nowrap text-end', html: (pr) => readinessBadge(pr.readinessScore ?? 0) },
       { key: 'aiSummary',              label: 'AI Summary',       value: (pr) => pr.aiSummary ?? '' },
-      { key: 'url',                    label: 'PR Link',          value: (pr) => pr.url ?? '',                     thClass: 'text-nowrap', tdClass: 'text-nowrap' },
     ];
 
     const defaultVisible = new Set([
-      'prId', 'title', 'repository', 'createdBy', 'ageDays',
-      'reviewersSummary', 'threads',
-      'linkedWorkItemId', 'linkedWorkItemAreaPaths',
-      'readinessScore', 'aiSummary', 'url',
+      'prId', 'linkedWorkItemId', 'title', 'repository', 'createdBy', 'ageDays',
+      'reviewersSummary', 'approvals', 'threads',
+      'linkedWorkItemAreaPaths',
+      'readinessScore', 'aiSummary',
     ]);
 
     let snapshot        = null;
@@ -140,6 +183,42 @@
     let selectedAreas   = new Set();   // empty = show all
     let sortKey         = null;
     let sortDir         = 'asc';       // 'asc' | 'desc'
+    let quickFilter     = '';
+
+    function saveViewState() {
+      const state = {
+        visibleKeys: [...visible],
+        selectedAreas: selectedAreas.size === 0 ? null : [...selectedAreas],
+        sortKey,
+        sortDir,
+        quickFilter,
+      };
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { }
+    }
+
+    function clearViewState() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch { }
+    }
+
+    function loadViewState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const state = JSON.parse(raw);
+        if (Array.isArray(state.visibleKeys) && state.visibleKeys.length > 0)
+          visible = new Set(state.visibleKeys);
+        if (Array.isArray(state.selectedAreas))
+          selectedAreas = new Set(state.selectedAreas);
+        else
+          selectedAreas = new Set();
+        sortKey = typeof state.sortKey === 'string' ? state.sortKey : null;
+        sortDir = state.sortDir === 'desc' ? 'desc' : 'asc';
+        quickFilter = typeof state.quickFilter === 'string' ? state.quickFilter : '';
+        return true;
+      } catch {
+        return false;
+      }
+    }
 
     // -------------------------------------------------------------------------
     // Status
@@ -180,6 +259,7 @@
 
         wrapper.querySelector('input').addEventListener('change', () => {
           rebuildSelectedAreas();
+          saveViewState();
           renderTable();
         });
 
@@ -197,6 +277,7 @@
     function selectAllAreas() {
       areaCheckboxEl.querySelectorAll('input[type=checkbox]').forEach(el => { el.checked = true; });
       selectedAreas = new Set();
+      saveViewState();
       renderTable();
     }
 
@@ -231,6 +312,7 @@
         wrapper.querySelector('input').addEventListener('change', (e) => {
           if (e.target.checked) visible.add(col.key);
           else visible.delete(col.key);
+          saveViewState();
           renderTable();
         });
 
@@ -267,17 +349,27 @@
         sortKey = key;
         sortDir = 'asc';
       }
+      saveViewState();
       renderTable();
     }
 
     // -------------------------------------------------------------------------
     // Table render
     // -------------------------------------------------------------------------
+    function prMatchesQuickFilter(pr) {
+      const q = (quickFilter ?? '').trim().toLowerCase();
+      if (!q) return true;
+      const title = String(pr.title ?? '').toLowerCase();
+      const repo = String(pr.repository ?? '').toLowerCase();
+      const author = String(pr.createdBy ?? '').toLowerCase();
+      return title.includes(q) || repo.includes(q) || author.includes(q);
+    }
+
     function renderTable() {
       if (!snapshot) return;
 
       const allPrs = Array.isArray(snapshot.pullRequests) ? snapshot.pullRequests : [];
-      const filtered = allPrs.filter(prMatchesAreaFilter);
+      const filtered = allPrs.filter(prMatchesAreaFilter).filter(prMatchesQuickFilter);
       const prs = sortedPrs(filtered);
 
       // Header
@@ -308,10 +400,7 @@
           const td = document.createElement('td');
           if (col.tdClass) td.className = col.tdClass;
 
-          if (col.key === 'url') {
-            const url = col.value(pr);
-            if (url) td.innerHTML = `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">Open</a>`;
-          } else if (col.html) {
+          if (col.html) {
             td.innerHTML = col.html(pr);
           } else {
             const v = col.value(pr);
@@ -333,15 +422,28 @@
     // -------------------------------------------------------------------------
     // Load
     // -------------------------------------------------------------------------
-    async function loadSnapshot() {
+    async function loadSnapshot({ reset = false } = {}) {
       setStatus('secondary', `Loading ${SNAPSHOT_URL}…`);
       metaEl.textContent = 'Loading…';
       snapshot = null;
-      // Reset view state on load
-      visible = new Set(defaultVisible);
-      selectedAreas = new Set();
-      sortKey = null;
-      sortDir = 'asc';
+
+      if (reset) {
+        visible = new Set(defaultVisible);
+        selectedAreas = new Set();
+        sortKey = 'readinessScore';
+        sortDir = 'desc';
+        quickFilter = '';
+        if (quickFilterEl) quickFilterEl.value = '';
+        clearViewState();
+      } else {
+        // Restore persisted state (if any). Otherwise default to sorting by readiness desc.
+        loadViewState();
+        if (!sortKey || !columns.some(c => c.key === sortKey)) {
+          sortKey = 'readinessScore';
+          sortDir = 'desc';
+        }
+        if (quickFilterEl) quickFilterEl.value = quickFilter;
+      }
 
       const res = await fetch(SNAPSHOT_URL, { cache: 'no-store' });
       if (!res.ok) {
@@ -352,16 +454,28 @@
       snapshot = await res.json();
       renderColumnChooser();
       renderAreaFilter();
+      // Normalize selectedAreas based on rendered checkboxes and persist once.
+      rebuildSelectedAreas();
+      saveViewState();
       renderTable();
     }
 
-    resetBtn.addEventListener('click', () => loadSnapshot());
+    resetBtn.addEventListener('click', () => loadSnapshot({ reset: true }));
 
     checkAllBtn.addEventListener('click', () => {
       visible = new Set(columns.map(c => c.key));
+      saveViewState();
       renderColumnChooser();
       renderTable();
     });
+
+    if (quickFilterEl) {
+      quickFilterEl.addEventListener('input', () => {
+        quickFilter = quickFilterEl.value ?? '';
+        saveViewState();
+        renderTable();
+      });
+    }
 
     loadSnapshot().catch(err => {
       console.error(err);

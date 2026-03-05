@@ -115,8 +115,13 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                 : string.Join(", ", workItems.Select(w => GetField(w, "System.AreaPath")).Where(a => !string.IsNullOrWhiteSpace(a)).Distinct());
 
             object linkedWiSnapshot = null;
+            string linkedWorkItemUrl = null;
             if (primaryWi != null)
             {
+                linkedWorkItemUrl = primaryWi.Id != null
+                    ? BuildWorkItemUrl(project, primaryWi.Id.Value)
+                    : null;
+
                 linkedWiSnapshot = new
                 {
                     id = primaryWi.Id,
@@ -124,6 +129,7 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                     type = GetField(primaryWi, "System.WorkItemType"),
                     state = GetField(primaryWi, "System.State"),
                     areaPath = GetField(primaryWi, "System.AreaPath"),
+                    url = linkedWorkItemUrl,
                 };
             }
 
@@ -146,6 +152,7 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                 minApproverCount,
                 threadCounts,
                 linkedWorkItem = linkedWiSnapshot,
+                linkedWorkItemUrl,
                 linkedWorkItemAreaPaths = linkedAreaPaths,
                 workItemHierarchy = hierarchy,
             };
@@ -169,6 +176,7 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                 minApproverCount,
                 threadCounts,
                 linkedWorkItem = linkedWiSnapshot,
+                linkedWorkItemUrl,
                 linkedWorkItemAreaPaths = linkedAreaPaths,
                 workItemHierarchy = hierarchy,
                 aiSummary = analysis.Summary,
@@ -356,6 +364,12 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
     {
         var orgUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
         return $"{orgUrl}/{Uri.EscapeDataString(project)}/_git/{repoId}/pullrequest/{prId}";
+    }
+
+    private string BuildWorkItemUrl(string project, int workItemId)
+    {
+        var orgUrl = _adoService.Connection.Uri.ToString().TrimEnd('/');
+        return $"{orgUrl}/{Uri.EscapeDataString(project)}/_workitems/edit/{workItemId}";
     }
 
 }
