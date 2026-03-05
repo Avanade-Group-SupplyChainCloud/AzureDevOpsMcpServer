@@ -49,6 +49,16 @@ public static class McpServerExtensions
             .ValidateOnStart();
         builder.Services.AddSingleton<AzureDevOpsService>();
 
+        // Azure AI (Foundry / Azure OpenAI) config for real AI summaries.
+        builder
+            .Services.AddOptions<AzureAiSettings>()
+            .Bind(builder.Configuration.GetSection("AzureAI"))
+            .Validate(s => !string.IsNullOrWhiteSpace(s.Url), "AzureAI:Url is required.")
+            .Validate(s => !string.IsNullOrWhiteSpace(s.ApiKey), "AzureAI:ApiKey is required.")
+            .Validate(s => !string.IsNullOrWhiteSpace(s.Model), "AzureAI:Model is required.")
+            .ValidateOnStart();
+        builder.Services.AddSingleton<AiSummaryService>();
+
         // Add MCP Server and register tools
         builder
             .Services.AddMcpServer()
