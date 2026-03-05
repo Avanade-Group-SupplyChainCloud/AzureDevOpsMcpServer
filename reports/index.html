@@ -141,9 +141,40 @@
       { key: 'title',                  label: 'Title',            value: (pr) => pr.title ?? '' },
       { key: 'repository',             label: 'Repo',             value: (pr) => pr.repository ?? '',              thClass: 'text-nowrap', tdClass: 'text-break' },
       { key: 'createdBy',              label: 'Author',           value: (pr) => pr.createdBy ?? '',               thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-      { key: 'ageDays',                label: 'Age (days)',       value: (pr) => pr.ageDays,                       thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
+      { key: 'ageDays',                label: 'Age (days)',       value: (pr) => pr.ageDays,                       thClass: 'text-nowrap text-center', tdClass: 'text-nowrap text-center' },
       { key: 'isDraft',                label: 'Draft',            value: (pr) => toBool(pr.isDraft) ? 'Yes' : 'No', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
-      { key: 'reviewersSummary',       label: 'Reviewers',        value: (pr) => pr.reviewers?.summary ?? '',      thClass: 'text-nowrap' },
+      {
+        key: 'reviewersSummary',
+        label: 'Reviewers',
+        value: (pr) => pr.reviewers?.summary ?? '',
+        html: (pr) => {
+          const summary = String(pr.reviewers?.summary ?? '');
+          if (!summary) return '';
+
+          const mapLabel = (label) => {
+            const l = String(label ?? '').trim().toLowerCase();
+            if (l === 'approved') return 'a';
+            if (l === 'approved with suggestions') return 'a(s)';
+            if (l === 'waiting for author') return 'wa';
+            if (l === 'no response') return 'nr';
+            if (l === 'rejected') return 'rej';
+            return label;
+          };
+
+          // Display one item per line for readability (and shorten common labels).
+          const parts = summary.split(',').map(s => s.trim()).filter(Boolean);
+          const shortParts = parts.map(p => {
+            const m = /^([0-9]+)\s+(.+)$/.exec(p);
+            if (!m) return escapeHtml(p);
+            const count = m[1];
+            const label = mapLabel(m[2]);
+            return `${escapeHtml(count)} ${escapeHtml(label)}`;
+          });
+          return shortParts.join('<br>');
+        },
+        thClass: 'text-nowrap text-center',
+        tdClass: 'text-nowrap text-center'
+      },
       {
         key: 'approvals',
         label: 'Approvals',
@@ -153,8 +184,8 @@
           const m = pr.minApproverCount ?? 2;
           return m > 0 ? (a / m) : a;
         },
-        thClass: 'text-nowrap',
-        tdClass: 'text-nowrap text-end'
+        thClass: 'text-nowrap text-center',
+        tdClass: 'text-nowrap text-center'
       },
       {
         key: 'threads',
@@ -173,7 +204,7 @@
 
     const defaultVisible = new Set([
       'prId', 'linkedWorkItemId', 'title', 'repository', 'createdBy', 'ageDays',
-      'reviewersSummary', 'approvals', 'threads',
+      'approvals', 'threads',
       'linkedWorkItemAreaPaths',
       'readinessScore', 'aiSummary',
     ]);
