@@ -27,16 +27,14 @@
       <div class="btn-group" role="group" aria-label="Filter controls">
         <button class="btn btn-outline-warning" type="button" data-bs-toggle="collapse" data-bs-target="#areaFilterPanel" aria-expanded="false" aria-controls="areaFilterPanel">Area Filter</button>
         <button class="btn btn-outline-warning btn-sm" type="button" id="areaSelectAllBtn">All</button>
-        <button class="btn btn-outline-warning btn-sm" type="button" id="areaSelectNoneBtn">None</button>
       </div>
 
       <div class="btn-group" role="group" aria-label="Column controls">
         <button class="btn btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#columnsPanel" aria-expanded="false" aria-controls="columnsPanel">Columns</button>
         <button class="btn btn-outline-light btn-sm" type="button" id="checkAllBtn">All</button>
-        <button class="btn btn-outline-light btn-sm" type="button" id="uncheckAllBtn">None</button>
       </div>
 
-      <button class="btn btn-outline-info" type="button" id="reloadBtn">Reload JSON</button>
+      <button class="btn btn-outline-info" type="button" id="resetBtn">Reset</button>
     </div>
 
     <!-- Area path filter panel -->
@@ -82,11 +80,9 @@
     const tbodyEl        = document.getElementById('tbody');
     const areaCheckboxEl = document.getElementById('areaCheckboxes');
 
-    const reloadBtn        = document.getElementById('reloadBtn');
+    const resetBtn         = document.getElementById('resetBtn');
     const checkAllBtn      = document.getElementById('checkAllBtn');
-    const uncheckAllBtn    = document.getElementById('uncheckAllBtn');
     const areaSelectAllBtn  = document.getElementById('areaSelectAllBtn');
-    const areaSelectNoneBtn = document.getElementById('areaSelectNoneBtn');
 
     const escapeHtml = (value) => {
       const str = value == null ? '' : String(value);
@@ -133,7 +129,7 @@
     ];
 
     const defaultVisible = new Set([
-      'prId', 'title', 'repository', 'ageDays',
+      'prId', 'title', 'repository', 'createdBy', 'ageDays',
       'reviewersSummary', 'threads',
       'linkedWorkItemId', 'linkedWorkItemAreaPaths',
       'readinessScore', 'aiSummary', 'url',
@@ -198,18 +194,16 @@
       selectedAreas = checked.length === all.length ? new Set() : new Set(checked);
     }
 
-    function setAllAreas(state) {
-      areaCheckboxEl.querySelectorAll('input[type=checkbox]').forEach(el => { el.checked = state; });
-      selectedAreas = state ? new Set() : new Set(['__none__']); // __none__ = show nothing
+    function selectAllAreas() {
+      areaCheckboxEl.querySelectorAll('input[type=checkbox]').forEach(el => { el.checked = true; });
+      selectedAreas = new Set();
       renderTable();
     }
 
-    areaSelectAllBtn.addEventListener('click',  () => setAllAreas(true));
-    areaSelectNoneBtn.addEventListener('click', () => setAllAreas(false));
+    areaSelectAllBtn.addEventListener('click',  () => selectAllAreas());
 
     function prMatchesAreaFilter(pr) {
       if (selectedAreas.size === 0) return true;
-      if (selectedAreas.has('__none__')) return false;
       const raw = pr.linkedWorkItemAreaPaths ?? '';
       const prAreas = raw.split(',').map(s => s.trim()).filter(Boolean);
       if (prAreas.length === 0) return selectedAreas.size === 0;
@@ -343,8 +337,11 @@
       setStatus('secondary', `Loading ${SNAPSHOT_URL}…`);
       metaEl.textContent = 'Loading…';
       snapshot = null;
+      // Reset view state on load
+      visible = new Set(defaultVisible);
       selectedAreas = new Set();
       sortKey = null;
+      sortDir = 'asc';
 
       const res = await fetch(SNAPSHOT_URL, { cache: 'no-store' });
       if (!res.ok) {
@@ -358,16 +355,10 @@
       renderTable();
     }
 
-    reloadBtn.addEventListener('click', () => loadSnapshot());
+    resetBtn.addEventListener('click', () => loadSnapshot());
 
     checkAllBtn.addEventListener('click', () => {
       visible = new Set(columns.map(c => c.key));
-      renderColumnChooser();
-      renderTable();
-    });
-
-    uncheckAllBtn.addEventListener('click', () => {
-      visible = new Set();
       renderColumnChooser();
       renderTable();
     });
