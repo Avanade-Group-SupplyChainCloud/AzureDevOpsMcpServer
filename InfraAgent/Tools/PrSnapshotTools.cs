@@ -36,6 +36,10 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
         var witClient = await _adoService.GetWorkItemTrackingApiAsync();
         var project = _adoService.DefaultProject;
 
+        // TODO: Pull required-approver count dynamically from branch policies.
+        // For now, keep it simple and assume 2 approvals are required.
+        const int minApproverCount = 2;
+
         // Pull all active PRs across the project (over-fetch to allow filtering by area)
         var searchCriteria = new GitPullRequestSearchCriteria
         {
@@ -61,6 +65,8 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
             var repoId = pr.Repository?.Id.ToString();
             if (string.IsNullOrWhiteSpace(repoId))
                 continue;
+
+            var targetRefName = pr.TargetRefName ?? "";
 
             // Get work items linked to the PR (optional)
             IEnumerable<ResourceRef> wiRefs = null;
@@ -135,7 +141,9 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                 creationDate = pr.CreationDate.ToString("o"),
                 ageDays,
                 isDraft = pr.IsDraft == true,
+                targetRefName,
                 reviewers = reviewerInfo,
+                minApproverCount,
                 threadCounts,
                 linkedWorkItem = linkedWiSnapshot,
                 linkedWorkItemAreaPaths = linkedAreaPaths,
@@ -157,6 +165,8 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
                 isDraft = pr.IsDraft == true,
                 url = BuildPrUrl(project, repoId, pr.PullRequestId),
                 reviewers = reviewerInfo,
+                targetRefName,
+                minApproverCount,
                 threadCounts,
                 linkedWorkItem = linkedWiSnapshot,
                 linkedWorkItemAreaPaths = linkedAreaPaths,
@@ -240,12 +250,26 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
         if (reviewers == null || reviewers.Count == 0)
             return new { total = 0, approved = 0, approvedWithSuggestions = 0, waitingForAuthor = 0, noResponse = 0, rejected = 0, summary = "No reviewers assigned" };
 
+        // Azure DevOps often returns both "container" reviewers (e.g. groups/teams) and individual users.
+        // To match what humans expect, count unique non-container reviewers when present.
+        var effectiveReviewers = reviewers
+            .Where(r => r != null)
+            .Where(r => r.IsContainer != true)
+            .GroupBy(r => r.Id ?? r.UniqueName ?? r.DisplayName ?? string.Empty)
+            .Select(g => g.OrderByDescending(r => r.Vote).First())
+            .ToList();
+
+        // Fallback: if we only have container reviewers (no humans yet), count them instead.
+        if (effectiveReviewers.Count == 0)
+            effectiveReviewers = reviewers.Where(r => r != null).ToList();
+
         // ADO vote values: 10 = approved, 5 = approved with suggestions, -5 = waiting for author, 0 = no vote, -10 = rejected
-        var approved = reviewers.Count(r => r.Vote == 10);
-        var approvedWithSuggestions = reviewers.Count(r => r.Vote == 5);
-        var waitingForAuthor = reviewers.Count(r => r.Vote == -5);
-        var noResponse = reviewers.Count(r => r.Vote == 0);
-        var rejected = reviewers.Count(r => r.Vote == -10);
+        var approved = effectiveReviewers.Count(r => r.Vote == 10);
+        var approvedWithSuggestions = effectiveReviewers.Count(r => r.Vote == 5);
+        var waitingForAuthor = effectiveReviewers.Count(r => r.Vote == -5);
+        var noResponse = effectiveReviewers.Count(r => r.Vote == 0);
+        var rejected = effectiveReviewers.Count(r => r.Vote == -10);
+        var approverCount = approved + approvedWithSuggestions;
 
         var parts = new List<string>();
         if (approved > 0) parts.Add($"{approved} approved");
@@ -256,12 +280,13 @@ public class PrSnapshotTools(AzureDevOpsService adoService, AiSummaryService aiS
 
         return new
         {
-            total = reviewers.Count,
+            total = effectiveReviewers.Count,
             approved,
             approvedWithSuggestions,
             waitingForAuthor,
             noResponse,
             rejected,
+            approverCount,
             summary = parts.Count > 0 ? string.Join(", ", parts) : "No votes yet",
         };
     }

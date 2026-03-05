@@ -83,6 +83,10 @@ public sealed class AiSummaryService
           76-99 = nearly ready (approved or approved with suggestions, no active threads)
           100   = fully approved with no blockers, ready to merge
 
+                Policy rule:
+                - If minApproverCount is provided and reviewers.approverCount < minApproverCount, then the PR is still blocked on required approvals.
+                    In that case, readinessScore MUST be < 100 and the summary MUST say it needs more approvals.
+
         Constraints:
         - Use ONLY the provided JSON data.
         - If a reason cannot be determined, say so in summary and set readinessScore to 0.

@@ -115,8 +115,14 @@
       { key: 'ageDays',                label: 'Age (days)',       value: (pr) => pr.ageDays,                       thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
       { key: 'isDraft',                label: 'Draft',            value: (pr) => toBool(pr.isDraft) ? 'Yes' : 'No', thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'reviewersSummary',       label: 'Reviewers',        value: (pr) => pr.reviewers?.summary ?? '',      thClass: 'text-nowrap' },
-      { key: 'threadsActive',          label: 'Threads (active)', value: (pr) => pr.threadCounts?.active ?? 0,     thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
-      { key: 'threadsTotal',           label: 'Threads (total)',  value: (pr) => pr.threadCounts?.total ?? 0,      thClass: 'text-nowrap', tdClass: 'text-nowrap text-end' },
+      {
+        key: 'threads',
+        label: 'Threads',
+        value: (pr) => `${pr.threadCounts?.active ?? 0}/${pr.threadCounts?.total ?? 0}`,
+        sortValue: (pr) => ((pr.threadCounts?.active ?? 0) * 100000) + (pr.threadCounts?.total ?? 0),
+        thClass: 'text-nowrap',
+        tdClass: 'text-nowrap text-end'
+      },
       { key: 'linkedWorkItemId',       label: 'WI',               value: (pr) => pr.linkedWorkItem?.id ?? '',      thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'linkedWorkItemType',     label: 'WI Type',          value: (pr) => pr.linkedWorkItem?.type ?? '',    thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'linkedWorkItemState',    label: 'WI State',         value: (pr) => pr.linkedWorkItem?.state ?? '',   thClass: 'text-nowrap', tdClass: 'text-nowrap' },
@@ -128,7 +134,7 @@
 
     const defaultVisible = new Set([
       'prId', 'title', 'repository', 'ageDays',
-      'reviewersSummary', 'threadsActive', 'threadsTotal',
+      'reviewersSummary', 'threads',
       'linkedWorkItemId', 'linkedWorkItemAreaPaths',
       'readinessScore', 'aiSummary', 'url',
     ]);
@@ -247,8 +253,8 @@
       if (!col) return prs;
 
       return [...prs].sort((a, b) => {
-        let av = col.value(a);
-        let bv = col.value(b);
+        let av = col.sortValue ? col.sortValue(a) : col.value(a);
+        let bv = col.sortValue ? col.sortValue(b) : col.value(b);
         // Numeric comparison when both are numbers
         if (typeof av === 'number' && typeof bv === 'number') {
           return sortDir === 'asc' ? av - bv : bv - av;
