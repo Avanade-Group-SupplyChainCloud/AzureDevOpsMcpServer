@@ -14,6 +14,7 @@
     th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: '⇅'; }
     .badge-readiness { font-size: 0.8em; min-width: 3.2em; display: inline-block; text-align: center; }
     #areaFilterPanel .area-list { max-height: 240px; overflow-y: auto; }
+    .reviewer-abbrev { text-decoration: underline dotted; text-underline-offset: 2px; }
   </style>
 </head>
 <body>
@@ -34,6 +35,12 @@
       <div class="btn-group" role="group" aria-label="Column controls">
         <button class="btn btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#columnsPanel" aria-expanded="false" aria-controls="columnsPanel">Columns</button>
         <button class="btn btn-outline-light btn-sm" type="button" id="checkAllBtn">All</button>
+      </div>
+
+      <div class="btn-group" role="group" aria-label="Preset filters">
+        <button class="btn btn-outline-secondary active" type="button" data-preset="all">All</button>
+        <button class="btn btn-outline-secondary" type="button" data-preset="blocked">Blocked</button>
+        <button class="btn btn-outline-secondary" type="button" data-preset="ready">Merge-ready</button>
       </div>
 
       <button class="btn btn-outline-info" type="button" id="resetBtn">Reset</button>
@@ -90,6 +97,7 @@
     const quickFilterEl  = document.getElementById('quickFilter');
     const errorToastEl   = document.getElementById('errorToast');
     const errorToastBodyEl = document.getElementById('errorToastBody');
+    const presetButtons  = [...document.querySelectorAll('[data-preset]')];
 
     const resetBtn         = document.getElementById('resetBtn');
     const checkAllBtn      = document.getElementById('checkAllBtn');
@@ -108,6 +116,16 @@
     const toBool = (v) => v === true;
 
     const STORAGE_KEY = 'prSnapshotViewState.v1';
+
+    const PRESET_ALL = 'all';
+    const PRESET_BLOCKED = 'blocked';
+    const PRESET_READY = 'ready';
+
+    const PRESET_LABELS = {
+      [PRESET_ALL]: 'All',
+      [PRESET_BLOCKED]: 'Blocked',
+      [PRESET_READY]: 'Merge-ready',
+    };
 
     // Returns a Bootstrap badge for readiness score
     function readinessBadge(score) {
@@ -161,12 +179,12 @@
 
           const mapLabel = (label) => {
             const l = String(label ?? '').trim().toLowerCase();
-            if (l === 'approved') return 'a';
-            if (l === 'approved with suggestions') return 'a(s)';
-            if (l === 'waiting for author') return 'wa';
-            if (l === 'no response') return 'nr';
-            if (l === 'rejected') return 'rej';
-            return label;
+            if (l === 'approved') return { short: 'a', full: 'approved' };
+            if (l === 'approved with suggestions') return { short: 'a(s)', full: 'approved with suggestions' };
+            if (l === 'waiting for author') return { short: 'wa', full: 'waiting for author' };
+            if (l === 'no response') return { short: 'nr', full: 'no response' };
+            if (l === 'rejected') return { short: 'rej', full: 'rejected' };
+            return { short: label, full: label };
           };
 
           // Display one item per line for readability (and shorten common labels).
@@ -176,7 +194,7 @@
             if (!m) return escapeHtml(p);
             const count = m[1];
             const label = mapLabel(m[2]);
-            return `${escapeHtml(count)} ${escapeHtml(label)}`;
+            return `${escapeHtml(count)} <span class="reviewer-abbrev" title="${escapeHtml(label.full)}">${escapeHtml(label.short)}</span>`;
           });
           return shortParts.join('<br>');
         },
@@ -223,6 +241,7 @@
     let sortKey         = null;
     let sortDir         = 'asc';       // 'asc' | 'desc'
     let quickFilter     = '';
+    let quickPreset     = PRESET_ALL;
 
     function saveViewState() {
       const state = {
@@ -231,6 +250,7 @@
         sortKey,
         sortDir,
         quickFilter,
+        quickPreset,
       };
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { }
     }
@@ -253,9 +273,18 @@
         sortKey = typeof state.sortKey === 'string' ? state.sortKey : null;
         sortDir = state.sortDir === 'desc' ? 'desc' : 'asc';
         quickFilter = typeof state.quickFilter === 'string' ? state.quickFilter : '';
+        quickPreset = [PRESET_ALL, PRESET_BLOCKED, PRESET_READY].includes(state.quickPreset) ? state.quickPreset : PRESET_ALL;
         return true;
       } catch {
         return false;
+      }
+    }
+
+    function updatePresetButtons() {
+      for (const btn of presetButtons) {
+        const isActive = btn.dataset.preset === quickPreset;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       }
     }
 
@@ -402,11 +431,29 @@
       return title.includes(q) || repo.includes(q) || author.includes(q);
     }
 
+    function isMergeReady(pr) {
+      const approverCount = pr.reviewers?.approverCount ?? 0;
+      const minApproverCount = pr.minApproverCount ?? 2;
+      const activeThreads = pr.threadCounts?.active ?? 0;
+      const rejected = pr.reviewers?.rejected ?? 0;
+      return !toBool(pr.isDraft) && approverCount >= minApproverCount && activeThreads === 0 && rejected === 0;
+    }
+
+    function isBlocked(pr) {
+      return !isMergeReady(pr);
+    }
+
+    function prMatchesQuickPreset(pr) {
+      if (quickPreset === PRESET_BLOCKED) return isBlocked(pr);
+      if (quickPreset === PRESET_READY) return isMergeReady(pr);
+      return true;
+    }
+
     function renderTable() {
       if (!snapshot) return;
 
       const allPrs = Array.isArray(snapshot.pullRequests) ? snapshot.pullRequests : [];
-      const filtered = allPrs.filter(prMatchesAreaFilter).filter(prMatchesQuickFilter);
+      const filtered = allPrs.filter(prMatchesAreaFilter).filter(prMatchesQuickPreset).filter(prMatchesQuickFilter);
       const prs = sortedPrs(filtered);
 
       // Header
@@ -452,7 +499,8 @@
 
       const areaLabel = snapshot.area ?? '';
       const date = snapshot.snapshotDate ?? '';
-      metaEl.textContent = `${prs.length} / ${allPrs.length} PR(s) • snapshotDate: ${date}${areaLabel ? ` • area: ${areaLabel}` : ''}`;
+      const presetLabel = PRESET_LABELS[quickPreset] ?? PRESET_LABELS[PRESET_ALL];
+      metaEl.textContent = `${prs.length} / ${allPrs.length} PR(s) • preset: ${presetLabel} • snapshotDate: ${date}${areaLabel ? ` • area: ${areaLabel}` : ''}`;
     }
 
     // -------------------------------------------------------------------------
@@ -468,6 +516,7 @@
         sortKey = 'readinessScore';
         sortDir = 'desc';
         quickFilter = '';
+        quickPreset = PRESET_ALL;
         if (quickFilterEl) quickFilterEl.value = '';
         clearViewState();
       } else {
@@ -479,6 +528,8 @@
         }
         if (quickFilterEl) quickFilterEl.value = quickFilter;
       }
+
+      updatePresetButtons();
 
       const res = await fetch(SNAPSHOT_URL, { cache: 'no-store' });
       if (!res.ok) {
@@ -504,6 +555,15 @@
       renderColumnChooser();
       renderTable();
     });
+
+    for (const btn of presetButtons) {
+      btn.addEventListener('click', () => {
+        quickPreset = btn.dataset.preset ?? PRESET_ALL;
+        updatePresetButtons();
+        saveViewState();
+        renderTable();
+      });
+    }
 
     if (quickFilterEl) {
       quickFilterEl.addEventListener('input', () => {
