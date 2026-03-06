@@ -198,12 +198,12 @@
       { key: 'linkedWorkItemType',     label: 'WI Type',          value: (pr) => pr.linkedWorkItem?.type ?? '',    thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'linkedWorkItemState',    label: 'WI State',         value: (pr) => pr.linkedWorkItem?.state ?? '',   thClass: 'text-nowrap', tdClass: 'text-nowrap' },
       { key: 'linkedWorkItemAreaPaths',label: 'WI Area Path(s)',  value: (pr) => pr.linkedWorkItemAreaPaths ?? '' },
-      { key: 'readinessScore',         label: 'Readiness',        value: (pr) => pr.readinessScore ?? 0,           thClass: 'text-nowrap', tdClass: 'text-nowrap text-end', html: (pr) => readinessBadge(pr.readinessScore ?? 0) },
+      { key: 'readinessScore',         label: 'Readiness',        value: (pr) => pr.readinessScore ?? 0,           thClass: 'text-nowrap text-center', tdClass: 'text-nowrap text-center', html: (pr) => readinessBadge(pr.readinessScore ?? 0) },
       { key: 'aiSummary',              label: 'AI Summary',       value: (pr) => pr.aiSummary ?? '' },
     ];
 
     const defaultVisible = new Set([
-      'prId', 'linkedWorkItemId', 'title', 'repository', 'createdBy', 'ageDays',
+      'prId', 'linkedWorkItemId', 'title', 'createdBy', 'ageDays',
       'approvals', 'threads',
       'linkedWorkItemAreaPaths',
       'readinessScore', 'aiSummary',
